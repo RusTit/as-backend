@@ -1,25 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionsCreatedController } from './transactions-created.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { TransactionsCreatedService } from './transactions-created.service';
-import { ConfigModule } from '@nestjs/config';
+
+const mockRepository = {
+  async save(): Promise<void> {
+    return Promise.resolve();
+  },
+
+  async find(): Promise<TransactionCreatedEntity[]> {
+    return [];
+  },
+};
 
 describe('TransactionsCreated Controller', () => {
   let controller: TransactionsCreatedController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot({
-          isGlobal: true,
-        }),
-        TypeOrmModule.forRoot(),
-
-        TypeOrmModule.forFeature([TransactionCreatedEntity]),
-      ],
       controllers: [TransactionsCreatedController],
-      providers: [TransactionsCreatedService],
+      providers: [
+        TransactionsCreatedService,
+        {
+          provide: getRepositoryToken(TransactionCreatedEntity),
+          useValue: mockRepository,
+        },
+      ],
     }).compile();
 
     controller = module.get<TransactionsCreatedController>(

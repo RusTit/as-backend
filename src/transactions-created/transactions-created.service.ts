@@ -12,7 +12,7 @@ export class TransactionsCreatedService {
     >,
   ) {}
 
-  async createNew(id: string) {
+  async createNew(id: string): Promise<void> {
     const newDbRow = new TransactionCreatedEntity();
     newDbRow.transactionId = id;
     await this.transactionCreatedEntityRepository.save(newDbRow);
