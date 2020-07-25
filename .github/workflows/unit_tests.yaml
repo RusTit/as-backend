@@ -17,6 +17,26 @@ jobs:
       matrix:
         node-version: [14.x]
 
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres
+        # Provide the password for postgres
+        env:
+          POSTGRES_USER: as-backend-user
+          POSTGRES_PASSWORD: as-backend-password
+          POSTGRES_DB: as-backend
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL=postgres://as-backend-user:as-backend-password@localhost:6633/as-backend
+
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -33,6 +53,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
       - run: npm install
       - run: npm run build --if-present
+      - run: ts-node ./node_modules/typeorm/cli.js migration:run
       - run: npm test
       - run: npm run test:e2e
         env:
