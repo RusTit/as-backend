@@ -80,7 +80,7 @@ export class WebhookDto {
   payload: TransactionPayloadDto;
 }
 
-export class WebhookResultResponse {
+export class WebhookResultDto {
   @ApiProperty()
   status: string;
   @ApiProperty()
