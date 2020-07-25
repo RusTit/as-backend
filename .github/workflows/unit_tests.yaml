@@ -51,7 +51,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
       - run: npm install
       - run: npm run build --if-present
-      - run: typeorm migration:run
+      - run: npm run typeorm:migrate:run
       - run: npm test
       - run: npm run test:e2e
         env:
