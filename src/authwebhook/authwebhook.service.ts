@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { WebhookDto } from './dtos';
 
 @Injectable()
-export class AuthwebhookService {}
+export class AuthwebhookService {
+  async processWebhookPayload(payload: WebhookDto): Promise<void> {
+    Logger.debug(payload);
+  }
+}
