@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { TransactionsCreatedService } from './transactions-created.service';
-import { TransactionCreatedResultDto } from './dtos';
+import { TransactionCreatedResultDto, ListTransactionsQuery } from './dtos';
 
 @Controller('transactions-created')
 export class TransactionsCreatedController {
@@ -8,9 +8,8 @@ export class TransactionsCreatedController {
 
   @Get()
   async findAll(
-    @Query() skip?: number,
-    @Query() take?: number,
+    @Query() options?: ListTransactionsQuery,
   ): Promise<Array<TransactionCreatedResultDto>> {
-    return this.transactionsCreatedService.findAll();
+    return this.transactionsCreatedService.findAll(options.skip, options.take);
   }
 }
