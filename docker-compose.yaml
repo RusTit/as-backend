@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - '6633:5432'
+    environment:
+      POSTGRES_USER: as-backend-user
+      POSTGRES_PASSWORD: as-backend-password
+      POSTGRES_DB: as-backend
+    # Using a volume will allow for persistent local storage
+    # volumes:
+      # - ./postgres-volume:/var/lib/postgresql/data
