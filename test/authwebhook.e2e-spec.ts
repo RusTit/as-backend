@@ -18,13 +18,19 @@ describe('Authwebhook (e2e)', () => {
 
   it('/authwebhook (POST)', () => {
     const payload: WebhookDto = {
-      eventDate: new Date().toJSON(),
+      notificationId: 'd0e8e7fe-c3e7-4add-a480-27bc5ce28a18',
       eventType: 'net.authorize.payment.authcapture.created',
-      notificationId: 'sdf',
+      eventDate: '2017-03-29T20:48:02.0080095Z',
+      webhookId: '63d6fea2-aa13-4b1d-a204-f5fbc15942b7',
       payload: {
-        entityName: 'transaction'
+        responseCode: 1,
+        merchantReferenceId: '19102146534003137356',
+        authCode: 'LZ6I19',
+        avsResponse: 'Y',
+        authAmount: 45.0,
+        entityName: 'transaction',
+        id: '60020981676',
       },
-      webhookId: 'sdf',
     };
     return request(app.getHttpServer())
       .post('/authwebhook')
