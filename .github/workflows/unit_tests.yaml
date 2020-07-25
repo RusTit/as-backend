@@ -5,6 +5,9 @@ on:
     branches-ignore:
       - master
 
+env:
+  NODE_ENV: development
+
 jobs:
   build:
 
