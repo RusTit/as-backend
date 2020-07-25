@@ -20,33 +20,64 @@ export class PayloadDto {
 }
 
 export class TransactionPayloadDto extends PayloadDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: 1,
+  })
   responseCode: number;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: '19102146534003137356',
+  })
   merchantReferenceId: string;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: 'LZ6I19',
+  })
   authCode: string;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: 'Y',
+  })
   avsResponse: string;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: 45.0,
+  })
   authAmount: number;
-  @ApiProperty()
+
+  @ApiProperty({
+    default: 'transaction',
+  })
   entityName: 'transaction';
-  @ApiProperty()
+
+  @ApiProperty({
+    example: '60020981676',
+  })
   id: string;
 }
 
 export class WebhookDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: 'd0e8e7fe-c3e7-4add-a480-27bc5ce28a18',
+  })
   notificationId: string;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: 'net.authorize.payment.authcapture.created',
+  })
   eventType: WebHookEventType;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: '2017-03-29T20:48:02.0080095Z',
+  })
   eventDate: string;
-  @ApiProperty()
+
+  @ApiProperty({
+    example: '63d6fea2-aa13-4b1d-a204-f5fbc15942b7',
+  })
   webhookId: string;
   @ApiProperty()
-  payload: PayloadDto;
+  payload: TransactionPayloadDto;
 }
 
 export class WebhookResultResponse {
