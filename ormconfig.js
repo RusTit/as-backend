@@ -7,6 +7,6 @@ module.exports = {
     migrationsDir: 'src/migration',
   },
   ssl: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 };
