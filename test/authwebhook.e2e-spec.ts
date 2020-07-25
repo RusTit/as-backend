@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { random } from 'faker';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
 import { WebhookDto } from '../src/authwebhook/dtos';
@@ -20,8 +21,8 @@ describe('Authwebhook (e2e)', () => {
     const payload: WebhookDto = {
       notificationId: 'd0e8e7fe-c3e7-4add-a480-27bc5ce28a18',
       eventType: 'net.authorize.payment.authcapture.created',
-      eventDate: '2017-03-29T20:48:02.0080095Z',
-      webhookId: '63d6fea2-aa13-4b1d-a204-f5fbc15942b7',
+      eventDate: new Date().toJSON(),
+      webhookId: random.uuid(),
       payload: {
         responseCode: 1,
         merchantReferenceId: '19102146534003137356',
@@ -29,7 +30,7 @@ describe('Authwebhook (e2e)', () => {
         avsResponse: 'Y',
         authAmount: 45.0,
         entityName: 'transaction',
-        id: '60020981676',
+        id: random.number({ min: 1000000, max: 9999999 }).toString(),
       },
     };
     return request(app.getHttpServer())
