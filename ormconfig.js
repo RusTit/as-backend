@@ -6,4 +6,5 @@ module.exports = {
   cli: {
     migrationsDir: 'src/migration',
   },
+  ssl: !!process.env.DATABASE_ENABLE_SSL,
 };
