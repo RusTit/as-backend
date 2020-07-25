@@ -2,8 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
+import { WebhookDto } from '../src/authwebhook/dtos';
 
-describe('AppController (e2e)', () => {
+describe('Authwebhook (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -15,10 +16,20 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  it('/authwebhook (POST)', () => {
+    const payload: WebhookDto = {
+      eventDate: new Date().toJSON(),
+      eventType: 'net.authorize.payment.authcapture.created',
+      notificationId: 'sdf',
+      payload: {
+        entityName: 'transaction'
+      },
+      webhookId: 'sdf',
+    };
     return request(app.getHttpServer())
-      .get('/')
+      .post('/authwebhook')
+      .send(payload)
       .expect(200)
-      .expect('Hello World!');
+      .expect({ status: 'WebHook was successfully processed' });
   });
 });

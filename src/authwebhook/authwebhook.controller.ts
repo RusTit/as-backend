@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode } from '@nestjs/common';
 import { WebhookDto, WebhookResultResponse } from './dtos';
 import { AuthwebhookService } from './authwebhook.service';
 
@@ -7,6 +7,7 @@ export class AuthwebhookController {
   constructor(private authwebhookService: AuthwebhookService) {}
 
   @Post()
+  @HttpCode(200)
   async handleWebHookRequest(
     @Body() webhookData: WebhookDto,
   ): Promise<WebhookResultResponse> {
