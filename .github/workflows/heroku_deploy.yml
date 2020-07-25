@@ -49,6 +49,7 @@ jobs:
       run: |
         npm install
         npm run build --if-present
+        echo $NODE_ENV
         typeorm migration:run
         npm test
         npm run test:e2e

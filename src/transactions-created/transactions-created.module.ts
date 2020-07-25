@@ -8,5 +8,6 @@ import { TransactionCreatedEntity } from './TransactionCreated.entity';
   imports: [TypeOrmModule.forFeature([TransactionCreatedEntity])],
   controllers: [TransactionsCreatedController],
   providers: [TransactionsCreatedService],
+  exports: [TransactionsCreatedService],
 })
 export class TransactionsCreatedModule {}

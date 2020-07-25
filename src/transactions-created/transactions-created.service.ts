@@ -12,6 +12,12 @@ export class TransactionsCreatedService {
     >,
   ) {}
 
+  async createNew(id: string) {
+    const newDbRow = new TransactionCreatedEntity();
+    newDbRow.transactionId = id;
+    await this.transactionCreatedEntityRepository.save(newDbRow);
+  }
+
   async findAll(skip = 0, take = 100): Promise<TransactionCreatedEntity[]> {
     return this.transactionCreatedEntityRepository.find({
       skip,
