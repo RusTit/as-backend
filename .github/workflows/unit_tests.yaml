@@ -7,7 +7,7 @@ on:
 
 env:
   NODE_ENV: development
-  DATABASE_URL: postgres://as-backend-user:as-backend-password@localhost/as-backend
+  DATABASE_URL: postgres://as-backend-user:as-backend-password@postgres/as-backend
 
 jobs:
   build:
