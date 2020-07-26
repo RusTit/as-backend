@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -8,6 +9,8 @@ import { TransactionsCreatedModule } from './transactions-created/transactions-c
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AuthnetModule } from './authnet/authnet.module';
+import { ErrorsModule } from './errors/errors.module';
+import { AllExceptionsFilter } from './AllExceptionsFilter';
 
 @Module({
   imports: [
@@ -20,8 +23,15 @@ import { AuthnetModule } from './authnet/authnet.module';
     AuthModule,
     UsersModule,
     AuthnetModule,
+    ErrorsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
 export class AppModule {}
