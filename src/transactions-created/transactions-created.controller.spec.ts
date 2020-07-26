@@ -3,6 +3,7 @@ import { TransactionsCreatedController } from './transactions-created.controller
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { TransactionsCreatedService } from './transactions-created.service';
+import { AuthnetModule } from '../authnet/authnet.module';
 
 const mockRepository = {
   async save(): Promise<void> {
@@ -19,6 +20,7 @@ describe('TransactionsCreated Controller', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
+      imports: [AuthnetModule],
       controllers: [TransactionsCreatedController],
       providers: [
         TransactionsCreatedService,
