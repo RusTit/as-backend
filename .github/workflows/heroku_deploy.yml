@@ -8,6 +8,9 @@ on:
 env:
   NODE_ENV: development
   DATABASE_URL: postgres://as-backend-user:as-backend-password@localhost/as-backend
+  AUTHNET_API_LOGIN_ID: ${{secrets.AUTHNET_API_LOGIN_ID}}
+  AUTHNET_TRANSACTION_KEY: ${{secrets.AUTHNET_TRANSACTION_KEY}}
+  AUTHNET_ENVIRONMENT: prod
 
 jobs:
   build:

@@ -7,6 +7,7 @@ import { AuthwebhookModule } from './authwebhook/authwebhook.module';
 import { TransactionsCreatedModule } from './transactions-created/transactions-created.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AuthnetModule } from './authnet/authnet.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UsersModule } from './users/users.module';
     TransactionsCreatedModule,
     AuthModule,
     UsersModule,
+    AuthnetModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,7 +6,7 @@
 [travis-url]: https://travis-ci.org/nestjs/nest
 [linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
 [linux-url]: https://travis-ci.org/nestjs/nest
-  
+
   <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
     <p align="center">
 <a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
@@ -58,6 +58,15 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## Environment variables
+
+```dotenv
+DATABASE_URL=postgres://as-backend-user:as-backend-password@localhost:6633/as-backend
+AUTHNET_API_LOGIN_ID=111111111111
+AUTHNET_TRANSACTION_KEY=2222222222222222
+AUTHNET_ENVIRONMENT=prod
 ```
 
 ## Support
