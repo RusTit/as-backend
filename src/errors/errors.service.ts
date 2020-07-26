@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Error } from './Error.entity';
 import { Repository } from 'typeorm';
@@ -18,14 +18,9 @@ export class ErrorsService {
     });
   }
 
-  async saveError(exception: unknown): Promise<void> {
+  async saveError(exception: any): Promise<void> {
     try {
-      let message = 'Unknown';
-      if (exception instanceof HttpException) {
-        message = exception.message;
-      } else if (exception instanceof Error) {
-        message = exception.message;
-      }
+      const message = exception.message ? exception.message : 'Unknown';
       const dbError = new Error();
       dbError.message = message;
       await this.errorRepository.save(dbError);
