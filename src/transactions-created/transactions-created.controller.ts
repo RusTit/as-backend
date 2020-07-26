@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { TransactionsCreatedService } from './transactions-created.service';
 import { TransactionCreatedResultDto, ListTransactionsQuery } from './dtos';
 
@@ -11,5 +11,10 @@ export class TransactionsCreatedController {
     @Query() options?: ListTransactionsQuery,
   ): Promise<Array<TransactionCreatedResultDto>> {
     return this.transactionsCreatedService.findAll(options.skip, options.take);
+  }
+
+  @Get(':id')
+  async getDetailsByDbId(@Param('id') id: number): Promise<any> {
+    return this.transactionsCreatedService.getDetailsByDbId(id);
   }
 }

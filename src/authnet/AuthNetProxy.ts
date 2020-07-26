@@ -20,6 +20,12 @@ const runCtrl = async (ctrl: TODO_ANY) => {
   });
 };
 
+export class AuthNetError extends Error {
+  constructor(message?: string) {
+    super(message);
+  }
+}
+
 const createError = (response: TODO_ANY): Error => {
   let errorMessage =
     'Result Code: ' + response.getMessages().getResultCode() + '\n';
@@ -27,7 +33,7 @@ const createError = (response: TODO_ANY): Error => {
     'Error Code: ' + response.getMessages().getMessage()[0].getCode() + '\n';
   errorMessage +=
     'Error message: ' + response.getMessages().getMessage()[0].getText() + '\n';
-  return new Error(errorMessage);
+  return new AuthNetError(errorMessage);
 };
 
 const TRANSACTIONS_LIMIT_COUNT = 1000;
