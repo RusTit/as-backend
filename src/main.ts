@@ -9,6 +9,10 @@ async function bootstrap() {
     .setDescription('The webhook trap and backend for authnet transactions')
     .setVersion('1.0')
     .addTag('authnet')
+    .addBearerAuth({
+      bearerFormat: 'jwt',
+      type: 'http',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);

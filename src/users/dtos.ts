@@ -13,3 +13,11 @@ export class UserCredentialsDto {
   })
   password!: string;
 }
+
+export class OperationResultDto {
+  @ApiProperty()
+  success!: boolean;
+
+  @ApiProperty()
+  message?: string;
+}
