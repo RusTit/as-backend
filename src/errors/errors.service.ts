@@ -11,6 +11,13 @@ export class ErrorsService {
     private errorRepository: Repository<Error>,
   ) {}
 
+  async findAll(skip = 0, take = 100): Promise<Error[]> {
+    return this.errorRepository.find({
+      skip,
+      take,
+    });
+  }
+
   async saveError(exception: unknown): Promise<void> {
     try {
       let message = 'Unknown';
