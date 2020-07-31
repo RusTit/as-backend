@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { AuthnetModule } from './authnet/authnet.module';
 import { ErrorsModule } from './errors/errors.module';
 import { AllExceptionsFilter } from './AllExceptionsFilter';
+import { TransactionsProcessedModule } from './transactions-processed/transactions-processed.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AllExceptionsFilter } from './AllExceptionsFilter';
     UsersModule,
     AuthnetModule,
     ErrorsModule,
+    TransactionsProcessedModule,
   ],
   controllers: [AppController],
   providers: [
