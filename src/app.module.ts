@@ -12,6 +12,7 @@ import { AuthnetModule } from './authnet/authnet.module';
 import { ErrorsModule } from './errors/errors.module';
 import { AllExceptionsFilter } from './AllExceptionsFilter';
 import { TransactionsProcessedModule } from './transactions-processed/transactions-processed.module';
+import { TransactionsIssuesModule } from './transactions-issues/transactions-issues.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TransactionsProcessedModule } from './transactions-processed/transactio
     AuthnetModule,
     ErrorsModule,
     TransactionsProcessedModule,
+    TransactionsIssuesModule,
   ],
   controllers: [AppController],
   providers: [
