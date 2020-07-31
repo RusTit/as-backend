@@ -4,7 +4,9 @@ import { TransactionCreatedResultDto, ListTransactionsQuery } from './dtos';
 
 @Controller('transactions-created')
 export class TransactionsCreatedController {
-  constructor(private transactionsCreatedService: TransactionsCreatedService) {}
+  constructor(
+    private readonly transactionsCreatedService: TransactionsCreatedService,
+  ) {}
 
   @Get()
   async findAll(
