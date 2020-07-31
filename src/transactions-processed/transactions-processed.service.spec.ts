@@ -1,12 +1,32 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TransactionsProcessedService } from './transactions-processed.service';
+import { TransactionProcessedEntity } from './TransactionProcessed.entity';
+import { AuthnetModule } from '../authnet/authnet.module';
+import { getRepositoryToken } from '@nestjs/typeorm';
+
+const mockRepository = {
+  async save(): Promise<void> {
+    return Promise.resolve();
+  },
+
+  async find(): Promise<TransactionProcessedEntity[]> {
+    return [];
+  },
+};
 
 describe('TransactionsProcessedService', () => {
   let service: TransactionsProcessedService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [TransactionsProcessedService],
+      imports: [AuthnetModule],
+      providers: [
+        TransactionsProcessedService,
+        {
+          provide: getRepositoryToken(TransactionProcessedEntity),
+          useValue: mockRepository,
+        },
+      ],
     }).compile();
 
     service = module.get<TransactionsProcessedService>(
@@ -16,5 +36,9 @@ describe('TransactionsProcessedService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  it('should return empty array', async () => {
+    expect((await service.findAll()).length).toBe(0);
   });
 });
