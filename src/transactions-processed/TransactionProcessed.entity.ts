@@ -9,7 +9,7 @@ import {
 
 @Entity()
 @Unique(['transactionId'])
-export class TransactionCreatedEntity {
+export class TransactionProcessedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
