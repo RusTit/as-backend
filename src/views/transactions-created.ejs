@@ -1,10 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Transactions Created</title>
+    <%- include("header") %>
+    <title>Transactions Created</title>
 </head>
 <body>
-
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">transactionId</th>
+        <th scope="col">price</th>
+        <th scope="col">customerName</th>
+        <th scope="col">customerEmail</th>
+        <th scope="col">createdAt</th>
+        <th scope="col">updatedAt</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% transactionList.forEach(function(transactionCreatedEntitiy){ %>
+        <tr>
+            <th scope="row">
+            </th>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>
 </body>
 </html>

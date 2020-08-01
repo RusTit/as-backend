@@ -30,6 +30,7 @@ export class UiController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('/transactions-created')
+  @Render('transactions-created')
   async transactionsCreatedList() {
     const transactionList = await this.uiService.getArrayOfTransactionsCreated();
     return { transactionList };
