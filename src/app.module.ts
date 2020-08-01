@@ -13,6 +13,7 @@ import { ErrorsModule } from './errors/errors.module';
 import { AllExceptionsFilter } from './AllExceptionsFilter';
 import { TransactionsProcessedModule } from './transactions-processed/transactions-processed.module';
 import { TransactionsIssuesModule } from './transactions-issues/transactions-issues.module';
+import { UiModule } from './ui/ui.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { TransactionsIssuesModule } from './transactions-issues/transactions-iss
     ErrorsModule,
     TransactionsProcessedModule,
     TransactionsIssuesModule,
+    UiModule,
   ],
   controllers: [AppController],
   providers: [
