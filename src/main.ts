@@ -30,6 +30,9 @@ async function bootstrap() {
     port: process.env.REDIS_PORT,
     password: process.env.REDIS_PASSWORD,
   });
+  redisClient.on('connect', () => console.log('Redis connected'));
+  redisClient.on('error', (e) => console.error(e));
+  redisClient.on('end', () => console.log('Redis end'));
   app.use(
     session({
       secret: 'nest cats',
