@@ -1,4 +1,4 @@
-import { Body, Controller, Post, HttpCode } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, Logger } from '@nestjs/common';
 import { WebhookDto, WebhookResultDto } from './dtos';
 import { AuthwebhookService } from './authwebhook.service';
 
@@ -11,6 +11,9 @@ export class AuthwebhookController {
   async handleWebHookRequest(
     @Body() webhookData: WebhookDto,
   ): Promise<WebhookResultDto> {
+    Logger.debug(
+      `Webhook type: ${webhookData.eventType} for id: ${webhookData.payload.id}`,
+    );
     await this.authwebhookService.processWebhookPayload(webhookData);
     return { status: 'WebHook was successfully processed' };
   }
