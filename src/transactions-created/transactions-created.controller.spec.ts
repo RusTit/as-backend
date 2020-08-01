@@ -4,16 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { TransactionsCreatedService } from './transactions-created.service';
 import { AuthnetModule } from '../authnet/authnet.module';
-
-const mockRepository = {
-  async save(): Promise<void> {
-    return Promise.resolve();
-  },
-
-  async find(): Promise<TransactionCreatedEntity[]> {
-    return [];
-  },
-};
+import { mockRepository } from './TransactionCreated.mock';
 
 describe('TransactionsCreated Controller', () => {
   let controller: TransactionsCreatedController;

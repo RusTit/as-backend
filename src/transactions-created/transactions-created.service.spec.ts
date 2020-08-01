@@ -3,16 +3,7 @@ import { TransactionsCreatedService } from './transactions-created.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { AuthnetModule } from '../authnet/authnet.module';
-
-const mockRepository = {
-  async save(): Promise<void> {
-    return Promise.resolve();
-  },
-
-  async find(): Promise<TransactionCreatedEntity[]> {
-    return [];
-  },
-};
+import { mockRepository } from './TransactionCreated.mock';
 
 describe('TransactionsCreatedService', () => {
   let service: TransactionsCreatedService;
@@ -36,10 +27,6 @@ describe('TransactionsCreatedService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
-  });
-
-  it('should executed without errors', async () => {
-    expect(await service.createNew('sdf')).toBeUndefined();
   });
 
   it('should return empty array', async () => {
