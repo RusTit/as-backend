@@ -1,11 +1,6 @@
-import {
-  Controller,
-  Get,
-  UseGuards,
-  Post,
-  Request,
-  Body,
-} from '@nestjs/common';
+import { Controller, Get, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
+import { UseGuards, Request, Body } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { LocalAuthGuard } from './auth/local-auth.guard';
@@ -21,9 +16,9 @@ export class AppController {
     private readonly authService: AuthService,
   ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('/')
+  redirectToUi(@Res() res: Response): void {
+    res.redirect('/ui');
   }
 
   @UseGuards(LocalAuthGuard)
