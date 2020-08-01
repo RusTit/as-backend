@@ -7,6 +7,21 @@ export class TransactionCreatedResultDto {
   @ApiProperty()
   transactionId: string;
 
+  @ApiProperty({
+    required: false,
+  })
+  price: number | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  customerName: string | null;
+
+  @ApiProperty({
+    required: false,
+  })
+  customerEmail: string | null;
+
   @ApiProperty()
   createdAt: Date;
 
