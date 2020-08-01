@@ -21,7 +21,14 @@
     <% transactionList.forEach(function(transactionCreatedEntitiy){ %>
         <tr>
             <th scope="row">
+                <%= transactionCreatedEntitiy.id %>
             </th>
+            <th><%= transactionCreatedEntitiy.transactionId %></th>
+            <th><%= transactionCreatedEntitiy.price %></th>
+            <th><%= transactionCreatedEntitiy.customerName %></th>
+            <th><%= transactionCreatedEntitiy.customerEmail %></th>
+            <th><%= transactionCreatedEntitiy.createdAt %></th>
+            <th><%= transactionCreatedEntitiy.updatedAt %></th>
         </tr>
     <% }); %>
     </tbody>
