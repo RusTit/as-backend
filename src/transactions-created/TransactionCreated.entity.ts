@@ -18,6 +18,24 @@ export class TransactionCreatedEntity {
   })
   transactionId: string;
 
+  @Column({
+    type: 'float',
+    nullable: true,
+  })
+  price: number;
+
+  @Column({
+    nullable: true,
+    name: 'customer_name',
+  })
+  customerName: string;
+
+  @Column({
+    nullable: true,
+    name: 'customer_email',
+  })
+  customerEmail: string;
+
   @CreateDateColumn({
     type: 'timestamp with time zone',
     name: 'created_at',
