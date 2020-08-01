@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
@@ -15,9 +15,24 @@ export class TransactionsCreatedService {
   ) {}
 
   async createNew(id: string): Promise<void> {
-    const newDbRow = new TransactionCreatedEntity();
-    newDbRow.transactionId = id;
-    await this.transactionCreatedEntityRepository.save(newDbRow);
+    const existing = await this.transactionCreatedEntityRepository.findOne({
+      where: {
+        transactionId: id,
+      },
+    });
+    if (existing) {
+      Logger.warn(`Transactions with id: ${id} already exist`);
+    } else {
+      const transactionDetails = await this.authnetService.getTransactionsDetails(
+        id,
+      );
+      const newDbRow = new TransactionCreatedEntity();
+      newDbRow.transactionId = id;
+      newDbRow.price = transactionDetails.settleAmount;
+      newDbRow.customerName = transactionDetails.customer?.email || null;
+      newDbRow.customerEmail = `${transactionDetails.billTo.firstName} ${transactionDetails.billTo.lastName}`;
+      await this.transactionCreatedEntityRepository.save(newDbRow);
+    }
   }
 
   async findAll(skip = 0, take = 100): Promise<TransactionCreatedEntity[]> {
