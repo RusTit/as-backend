@@ -15,6 +15,10 @@ export class TransactionsCreatedService {
   ) {}
 
   async createNew(id: string): Promise<void> {
+    const { NODE_ENV } = process.env;
+    if (NODE_ENV === 'test') {
+      return;
+    }
     const existing = await this.transactionCreatedEntityRepository.findOne({
       where: {
         transactionId: id,
