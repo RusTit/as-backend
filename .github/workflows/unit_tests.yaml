@@ -12,6 +12,8 @@ env:
   AUTHNET_API_LOGIN_ID: ${{secrets.AUTHNET_API_LOGIN_ID}}
   AUTHNET_TRANSACTION_KEY: ${{secrets.AUTHNET_TRANSACTION_KEY}}
   AUTHNET_ENVIRONMENT: prod
+  REDIS_HOST: localhost
+  REDIS_PORT: 6379
 
 jobs:
   build:
@@ -41,6 +43,19 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 5432:5432
+      # Label used to access the service container
+      redis:
+        # Docker Hub image
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v2
@@ -63,5 +78,7 @@ jobs:
           npm run typeorm:migrate:run
           run: npm test
       - name: Run e2e tests
+        env:
+          NODE_ENV: test
         run: |
           npm run test:e2e
