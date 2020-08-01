@@ -24,22 +24,22 @@ async function bootstrap() {
   app.set('views', viewsPath);
   app.set('view engine', 'ejs');
 
-  // const RedisStore = connectRedis(session);
-  // const redisClient = redis.createClient({
-  //   host: process.env.REDIS_HOST,
-  //   port: process.env.REDIS_PORT,
-  //   password: process.env.REDIS_PASSWORD,
-  // });
-  // redisClient.on('connect', () => console.log('Redis connected'));
-  // redisClient.on('error', (e) => console.error(e));
-  // redisClient.on('end', () => console.log('Redis end'));
-  // redisClient.on('ready', () => console.log('Redis is ready'));
+  const RedisStore = connectRedis(session);
+  const redisClient = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+    password: process.env.REDIS_PASSWORD,
+  });
+  redisClient.on('connect', () => console.log('Redis connected'));
+  redisClient.on('error', (e) => console.error(e));
+  redisClient.on('end', () => console.log('Redis end'));
+  redisClient.on('ready', () => console.log('Redis is ready'));
   app.use(
     session({
       secret: 'nest cats',
       resave: false,
       saveUninitialized: false,
-      // store: new RedisStore({ client: redisClient }),
+      store: new RedisStore({ client: redisClient }),
     }),
   );
 
