@@ -5,6 +5,7 @@ import { TransactionsIssuesService } from '../transactions-issues/transactions-i
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionsProcessedService } from '../transactions-processed/transactions-processed.service';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
+import { ListTransactionsQuery } from './dtos';
 
 @Injectable()
 export class UiService {
@@ -14,17 +15,24 @@ export class UiService {
     private readonly transactionsProcessedService: TransactionsProcessedService,
   ) {}
 
-  async getArrayOfTransactionsCreated(): Promise<TransactionCreatedEntity[]> {
-    return this.transactionsCreatedService.findAll();
+  async getArrayOfTransactionsCreated(
+    options?: ListTransactionsQuery,
+  ): Promise<TransactionCreatedEntity[]> {
+    return this.transactionsCreatedService.findAll(options.skip, options.take);
   }
 
-  async getArrayOfTransactionsProcessed(): Promise<
-    TransactionProcessedEntity[]
-  > {
-    return this.transactionsProcessedService.findAll();
+  async getArrayOfTransactionsProcessed(
+    options?: ListTransactionsQuery,
+  ): Promise<TransactionProcessedEntity[]> {
+    return this.transactionsProcessedService.findAll(
+      options.skip,
+      options.take,
+    );
   }
 
-  async getArrayOfTransactionsIssues(): Promise<TransactionIssuesEntity[]> {
-    return this.transactionsIssuesService.findAll();
+  async getArrayOfTransactionsIssues(
+    options?: ListTransactionsQuery,
+  ): Promise<TransactionIssuesEntity[]> {
+    return this.transactionsIssuesService.findAll(options.skip, options.take);
   }
 }

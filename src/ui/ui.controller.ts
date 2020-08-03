@@ -6,11 +6,13 @@ import {
   Render,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LoginGuard } from '../auth/login.guard';
 import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
+import { ListTransactionsQuery } from './dtos';
 
 @Controller('ui')
 export class UiController {
@@ -31,24 +33,30 @@ export class UiController {
   @UseGuards(AuthenticatedGuard)
   @Get('/transactions-created')
   @Render('transactions-created')
-  async transactionsCreatedList() {
-    const transactionList = await this.uiService.getArrayOfTransactionsCreated();
+  async transactionsCreatedList(@Query() options?: ListTransactionsQuery) {
+    const transactionList = await this.uiService.getArrayOfTransactionsCreated(
+      options,
+    );
     return { transactionList };
   }
 
   @UseGuards(AuthenticatedGuard)
   @Get('/transactions-issues')
   @Render('transactions-issues')
-  async transactionsIssuesList() {
-    const transactionList = await this.uiService.getArrayOfTransactionsIssues();
+  async transactionsIssuesList(@Query() options?: ListTransactionsQuery) {
+    const transactionList = await this.uiService.getArrayOfTransactionsIssues(
+      options,
+    );
     return { transactionList };
   }
 
   @UseGuards(AuthenticatedGuard)
   @Get('/transactions-processed')
   @Render('transactions-processed')
-  async transactionsProcessedList() {
-    const transactionList = await this.uiService.getArrayOfTransactionsProcessed();
+  async transactionsProcessedList(@Query() options?: ListTransactionsQuery) {
+    const transactionList = await this.uiService.getArrayOfTransactionsProcessed(
+      options,
+    );
     return { transactionList };
   }
 
