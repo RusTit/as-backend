@@ -36,6 +36,22 @@ export class UiController {
     return { transactionList };
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('/transactions-issues')
+  @Render('transactions-issues')
+  async transactionsIssuesList() {
+    const transactionList = await this.uiService.getArrayOfTransactionsIssues();
+    return { transactionList };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/transactions-processed')
+  @Render('transactions-processed')
+  async transactionsProcessedList() {
+    const transactionList = await this.uiService.getArrayOfTransactionsProcessed();
+    return { transactionList };
+  }
+
   @Get('/logout')
   logout(@Request() req, @Res() res: Response) {
     req.logout();

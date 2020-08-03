@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("header") %>
+    <title>Transactions Created</title>
+</head>
+<body>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">transactionId</th>
+        <th scope="col">issueObject</th>
+        <th scope="col">createdAt</th>
+        <th scope="col">updatedAt</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% transactionList.forEach(function(transactionCreatedEntitiy){ %>
+        <tr>
+            <th scope="row">
+                <%= transactionCreatedEntitiy.id %>
+            </th>
+            <th><%= transactionCreatedEntitiy.transactionId %></th>
+            <th><%= JSON.stringify(transactionCreatedEntitiy.issueObject) %></th>
+            <th><%= transactionCreatedEntitiy.createdAt %></th>
+            <th><%= transactionCreatedEntitiy.updatedAt %></th>
+        </tr>
+    <% }); %>
+    </tbody>
+</table>
+</body>
+</html>

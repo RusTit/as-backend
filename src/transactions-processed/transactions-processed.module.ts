@@ -12,5 +12,6 @@ import { AuthnetModule } from '../authnet/authnet.module';
   ],
   providers: [TransactionsProcessedService],
   controllers: [TransactionsProcessedController],
+  exports: [TransactionsProcessedService],
 })
 export class TransactionsProcessedModule {}
