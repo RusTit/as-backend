@@ -6,7 +6,7 @@ import Bottleneck from 'bottleneck';
 import Logger from './logger';
 import dotenvProxy from './dotenvProxy';
 import AuthNetProxy from './AuthNetProxy';
-import ShipStationProxy from './ShipStationProxy';
+import ShipStationProxy, { ProductTag } from './ShipStationProxy';
 import * as Helper from './Helper';
 import {
   convertRecordsIntoArrayOfTransactionsIds,
@@ -191,11 +191,14 @@ export async function CreateAndInitCore(): Promise<ServiceCore> {
 //   }
 // };
 
-export function createBigCommerceProcessor(): BigCommerceProcessor {
+export function createBigCommerceProcessor(
+  tagsList: Map<string, ProductTag>
+): BigCommerceProcessor {
   return new BigCommerceProcessor(
     BIGCOMMERCE_STORE_HASH,
     BIGCOMMERCE_CLIENT_ID,
-    BIGCOMMERCE_ACCESS_TOKEN
+    BIGCOMMERCE_ACCESS_TOKEN,
+    tagsList
   );
 }
 
@@ -209,7 +212,7 @@ export async function dbProcessor(): Promise<void> {
   const orderTransTotal: OrderTransactionPair[] = [];
   const processors: Processor[] = [
     new IssuedProcessor(),
-    createBigCommerceProcessor(),
+    createBigCommerceProcessor(shipStationProxy.tagsList),
     new CommonProcessor(shipStationProxy.tagsList),
   ];
   for (const processor of processors) {

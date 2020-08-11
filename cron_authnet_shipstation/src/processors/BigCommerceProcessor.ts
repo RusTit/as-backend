@@ -10,6 +10,7 @@ import {
   OrderItem,
   Weight,
 } from '../ShipStationTypes';
+import { ProductTag } from '../ShipStationProxy';
 
 export function isBigCommerceTransaction(transaction: TODO_ANY): boolean {
   return transaction.solution?.name?.toLowerCase() === 'bigcommerce';
@@ -17,14 +18,21 @@ export function isBigCommerceTransaction(transaction: TODO_ANY): boolean {
 
 export default class BigCommerceProcessor extends Processor {
   private readonly bigCommerceProxy: BigCommerceProxy;
+  private readonly tagsList: Map<string, ProductTag>;
 
-  constructor(store_hash: string, client_id: string, access_token: string) {
+  constructor(
+    store_hash: string,
+    client_id: string,
+    access_token: string,
+    tagsList: Map<string, ProductTag>
+  ) {
     super('BigCommerceProcessor');
     this.bigCommerceProxy = new BigCommerceProxy(
       store_hash,
       client_id,
       access_token
     );
+    this.tagsList = tagsList;
   }
 
   async process(transactionDetails: TODO_ANY[]): Promise<ProcessorResult> {
@@ -152,7 +160,10 @@ export default class BigCommerceProcessor extends Processor {
     const tags: Set<number> = new Set();
     for (const product of productsBigCommerce) {
       product.product_options.forEach((option: TODO_ANY) => {
-        tags.add(option.option_id);
+        const item = this.tagsList.get(option.display_value);
+        if (item) {
+          tags.add(item.tagId);
+        }
       });
     }
     return [...tags.values()];

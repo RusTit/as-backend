@@ -9,6 +9,7 @@ import {
 } from '../src/main';
 import { isApprovedTransaction} from '../src/filters'
 import { TODO_ANY, } from '../src/Helper';
+import ShipStationProxy from "../src/ShipStationProxy";
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', 'output');
 /**
@@ -61,10 +62,12 @@ describe('main tests', () => {
     expect(transactions.length).toBeGreaterThan(0);
   });
   it('test bigcommerce processor', async () => {
-    const ids = ['62466142313'];
+    const ids = ['62498274422'];
     const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
     const transactionsDetails = await Promise.all(ids.map(createFetcherDetails(authNetProxy)));
-    const bigCommerceProcessor = createBigCommerceProcessor();
+    const bigCommerceProcessor = createBigCommerceProcessor(shipStationProxy.tagsList);
     const orders = await bigCommerceProcessor.process(transactionsDetails);
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
