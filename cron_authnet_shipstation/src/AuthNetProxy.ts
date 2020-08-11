@@ -187,6 +187,39 @@ export default class AuthNetProxy {
     return result;
   }
 
+  async getSubscription(subscriptionId: string): Promise<TODO_ANY | null> {
+    const merchantAuthenticationType = this.createMerchantAuthenticationType();
+    const getRequest = new ApiContracts.ARBGetSubscriptionRequest();
+    getRequest.setMerchantAuthentication(merchantAuthenticationType);
+    getRequest.setSubscriptionId(subscriptionId);
+
+    const jsonRequest = getRequest.getJSON();
+    const ctrl = new ApiControllers.ARBGetSubscriptionController(jsonRequest);
+    this.setCtrlSettings(ctrl);
+    let result = null;
+
+    const apiResponse = await runCtrl(ctrl);
+    const response = new ApiContracts.ARBGetSubscriptionResponse(apiResponse);
+
+    if (
+      response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK
+    ) {
+      this.logger.debug(
+        'Subscription Name : ' + response.getSubscription().getName()
+      );
+      result = response.getSubscription();
+      this.logger.debug(
+        'Message Code : ' + response.getMessages().getMessage()[0].getCode()
+      );
+      this.logger.debug(
+        'Message Text : ' + response.getMessages().getMessage()[0].getText()
+      );
+    } else {
+      throw createError(response);
+    }
+    return result;
+  }
+
   async getTransactionDetails(transactionId: string): Promise<TODO_ANY | null> {
     const merchantAuthenticationType = this.createMerchantAuthenticationType();
     const getRequest = new ApiContracts.GetTransactionDetailsRequest();

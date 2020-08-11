@@ -18,6 +18,7 @@ import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor from './processors/CommonProcessor';
 import BigCommerceProcessor from './processors/BigCommerceProcessor';
 import IssuedProcessor from './processors/IssuedProcessor';
+import { TODO_ANY } from './Helper';
 
 dotenvProxy();
 
@@ -99,6 +100,13 @@ export function createFetcherDetails(authNetProxy: AuthNetProxy) {
     const transactionDetails = await limiter.schedule(async () =>
       authNetProxy.getTransactionDetails(transactionId)
     );
+    if (!transactionDetails.order.description) {
+      const subscriptionData = await limiter.schedule(async () =>
+        authNetProxy.getSubscription(transactionDetails.subscription.id)
+      );
+      transactionDetails.order.description = subscriptionData.name;
+      transactionDetails.subscriptionData = subscriptionData;
+    }
     await Helper.saveTransactionsDetailsJson(transactionDetails);
     return transactionDetails;
   }

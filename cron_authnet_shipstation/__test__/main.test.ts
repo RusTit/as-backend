@@ -10,6 +10,7 @@ import {
 import { isApprovedTransaction} from '../src/filters'
 import { TODO_ANY, } from '../src/Helper';
 import ShipStationProxy from "../src/ShipStationProxy";
+import CommonProcessor from "../src/processors/CommonProcessor";
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', 'output');
 /**
@@ -69,6 +70,16 @@ describe('main tests', () => {
     const transactionsDetails = await Promise.all(ids.map(createFetcherDetails(authNetProxy)));
     const bigCommerceProcessor = createBigCommerceProcessor(shipStationProxy.tagsList);
     const orders = await bigCommerceProcessor.process(transactionsDetails);
+    expect(orders.orderTrans.length).toBeGreaterThan(0);
+  });
+  it('test common processor', async () => {
+    const ids = ['42162684664'];
+    const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
+    const transactionsDetails = await Promise.all(ids.map(createFetcherDetails(authNetProxy)));
+    const processor = new CommonProcessor(shipStationProxy.tagsList);
+    const orders = await processor.process(transactionsDetails);
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
 });
