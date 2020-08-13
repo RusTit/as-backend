@@ -18,7 +18,7 @@ import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor from './processors/CommonProcessor';
 import BigCommerceProcessor from './processors/BigCommerceProcessor';
 import IssuedProcessor from './processors/IssuedProcessor';
-import { TODO_ANY } from './Helper';
+import VoidedProcessor from './processors/VoidedProcessor';
 
 dotenvProxy();
 
@@ -220,6 +220,7 @@ export async function dbProcessor(): Promise<void> {
   const orderTransTotal: OrderTransactionPair[] = [];
   const processors: Processor[] = [
     new IssuedProcessor(),
+    new VoidedProcessor(),
     createBigCommerceProcessor(shipStationProxy.tagsList),
     new CommonProcessor(shipStationProxy.tagsList),
   ];
