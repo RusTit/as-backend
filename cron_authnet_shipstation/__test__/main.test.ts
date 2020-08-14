@@ -11,7 +11,6 @@ import {
 } from '../src/main';
 import { isApprovedTransaction } from '../src/filters';
 import { TODO_ANY } from '../src/Helper';
-import ShipStationProxy from '../src/ShipStationProxy';
 import CommonProcessor from '../src/processors/CommonProcessor';
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', 'output');
@@ -45,7 +44,7 @@ describe('main tests', () => {
   beforeAll(async () => {
     jest.setTimeout(LONG_ASYNC_DELAY);
     return;
-    const shipStationProxy = createShipStationProxy();
+    /*    const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
     transactions = await LoadTransactionsFromOutputFolder();
     if (transactions.length === 0) {
@@ -56,7 +55,7 @@ describe('main tests', () => {
         authNetProxy
       );
     }
-    transactions = transactions.filter(isApprovedTransaction);
+    transactions = transactions.filter(isApprovedTransaction);*/
   });
   beforeEach(() => {
     jest.setTimeout(LONG_ASYNC_DELAY);
