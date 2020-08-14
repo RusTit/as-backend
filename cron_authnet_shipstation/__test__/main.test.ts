@@ -1,16 +1,18 @@
 import fs from 'fs/promises';
 import path from 'path';
 import {
-  createAuthNetProxy, createBigCommerceProcessor, createFetcherDetails,
+  createAuthNetProxy,
+  createBigCommerceProcessor,
+  createFetcherDetails,
   createShipStationProxy,
   getAuthTransactionDetailsArray,
   getBatchIdArray,
   init,
 } from '../src/main';
-import { isApprovedTransaction} from '../src/filters'
-import { TODO_ANY, } from '../src/Helper';
-import ShipStationProxy from "../src/ShipStationProxy";
-import CommonProcessor from "../src/processors/CommonProcessor";
+import { isApprovedTransaction } from '../src/filters';
+import { TODO_ANY } from '../src/Helper';
+import ShipStationProxy from '../src/ShipStationProxy';
+import CommonProcessor from '../src/processors/CommonProcessor';
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', 'output');
 /**
@@ -67,8 +69,12 @@ describe('main tests', () => {
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
-    const transactionsDetails = await Promise.all(ids.map(createFetcherDetails(authNetProxy)));
-    const bigCommerceProcessor = createBigCommerceProcessor(shipStationProxy.tagsList);
+    const transactionsDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
+    const bigCommerceProcessor = createBigCommerceProcessor(
+      shipStationProxy.tagsList
+    );
     const orders = await bigCommerceProcessor.process(transactionsDetails);
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
@@ -77,7 +83,21 @@ describe('main tests', () => {
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
-    const transactionsDetails = await Promise.all(ids.map(createFetcherDetails(authNetProxy)));
+    const transactionsDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
+    const processor = new CommonProcessor(shipStationProxy.tagsList);
+    const orders = await processor.process(transactionsDetails);
+    expect(orders.orderTrans.length).toBeGreaterThan(0);
+  });
+  it('test common combined processor', async () => {
+    const ids = ['62502465548', '62502466092'];
+    const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
+    const transactionsDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
     const processor = new CommonProcessor(shipStationProxy.tagsList);
     const orders = await processor.process(transactionsDetails);
     expect(orders.orderTrans.length).toBeGreaterThan(0);

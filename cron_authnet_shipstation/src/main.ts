@@ -4,7 +4,6 @@ import moment from 'moment';
 import config from './config';
 import Bottleneck from 'bottleneck';
 import Logger from './logger';
-import dotenvProxy from './dotenvProxy';
 import AuthNetProxy from './AuthNetProxy';
 import ShipStationProxy, { ProductTag } from './ShipStationProxy';
 import * as Helper from './Helper';
@@ -19,8 +18,16 @@ import CommonProcessor from './processors/CommonProcessor';
 import BigCommerceProcessor from './processors/BigCommerceProcessor';
 import IssuedProcessor from './processors/IssuedProcessor';
 import VoidedProcessor from './processors/VoidedProcessor';
-
-dotenvProxy();
+import {
+  BIGCOMMERCE_ACCESS_TOKEN,
+  BIGCOMMERCE_CLIENT_ID,
+  BIGCOMMERCE_STORE_HASH,
+  AUTHNET_API_LOGIN_ID,
+  AUTHNET_ENVIRONMENT,
+  AUTHNET_TRANSACTION_KEY,
+  SHIPSTATION_API_KEY,
+  SHIPSTATION_API_SECRET,
+} from './env-vars';
 
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   maxConcurrent: 100,
@@ -28,39 +35,6 @@ const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
 };
 
 const limiter = new Bottleneck(LIMITER_OPTIONS);
-
-const AUTHNET_API_LOGIN_ID: string = env
-  .get('AUTHNET_API_LOGIN_ID')
-  .required()
-  .asString();
-const AUTHNET_TRANSACTION_KEY: string = env
-  .get('AUTHNET_TRANSACTION_KEY')
-  .required()
-  .asString();
-const AUTHNET_ENVIRONMENT: string = env
-  .get('AUTHNET_ENVIRONMENT')
-  .default('prod')
-  .asString();
-const SHIPSTATION_API_KEY: string = env
-  .get('SHIPSTATION_API_KEY')
-  .required()
-  .asString();
-const SHIPSTATION_API_SECRET: string = env
-  .get('SHIPSTATION_API_SECRET')
-  .required()
-  .asString();
-const BIGCOMMERCE_ACCESS_TOKEN: string = env
-  .get('BIGCOMMERCE_ACCESS_TOKEN')
-  .required()
-  .asString();
-const BIGCOMMERCE_CLIENT_ID: string = env
-  .get('BIGCOMMERCE_CLIENT_ID')
-  .required()
-  .asString();
-const BIGCOMMERCE_STORE_HASH: string = env
-  .get('BIGCOMMERCE_STORE_HASH')
-  .required()
-  .asString();
 
 const logger = Logger('src/main.ts');
 
