@@ -91,7 +91,7 @@ describe('main tests', () => {
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
   it('test common combined processor', async () => {
-    const ids = ['62502465548', '62502466092'];
+    const ids = ['62502466092', '62502465548'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
@@ -99,7 +99,10 @@ describe('main tests', () => {
       ids.map(createFetcherDetails(authNetProxy))
     );
     const processor = new CommonProcessor(shipStationProxy.tagsList);
-    const orders = await processor.process(transactionsDetails);
-    expect(orders.orderTrans.length).toBeGreaterThan(0);
+    const oneOrderArr = await processor.process(transactionsDetails);
+    expect(oneOrderArr.orderTrans.length).toBeGreaterThan(0);
+    transactionsDetails[0].transactionStatus = 'myStatus';
+    const zeroOrderArr = await processor.process(transactionsDetails);
+    expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
 });

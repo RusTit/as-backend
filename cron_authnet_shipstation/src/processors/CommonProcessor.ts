@@ -242,9 +242,12 @@ export default class CommonProcessor extends Processor {
 
   async process(transactionDetails: TODO_ANY[]): Promise<ProcessorResult> {
     await this.init();
-    this.logger.info(`Total transactions count: ${transactionDetails.length}`);
+    const sortedTransactions = transactionDetails.sort(
+      (a, b) => a.transId - b.transId
+    );
+    this.logger.info(`Total transactions count: ${sortedTransactions.length}`);
     const combinedTransactions = combineTransactions<Helper.TODO_ANY>(
-      transactionDetails
+      sortedTransactions
     );
     this.logger.info(
       `Combined transactions count: ${combinedTransactions.length}`
