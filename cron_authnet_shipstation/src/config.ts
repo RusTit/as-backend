@@ -6,7 +6,11 @@ export default {
       console: {
         type: 'stdout',
       },
-      filelog: { type: 'dateFile', filename: 'all-the-logs.log' },
+      filelog: {
+        type: 'dateFile',
+        filename: 'logs/all-the-logs.log',
+        compress: true,
+      },
     },
     categories: {
       default: {
