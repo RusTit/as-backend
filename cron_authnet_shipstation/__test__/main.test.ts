@@ -99,7 +99,7 @@ describe('main tests', () => {
     );
     const processor = new CommonProcessor(shipStationProxy.tagsList);
     const oneOrderArr = await processor.process(transactionsDetails);
-    expect(oneOrderArr.orderTrans.length).toBeGreaterThan(0);
+    expect(oneOrderArr.orderTrans.length).toBe(1);
     transactionsDetails[0].transactionStatus = 'myStatus';
     const zeroOrderArr = await processor.process(transactionsDetails);
     expect(zeroOrderArr.orderTrans.length).toBe(0);
