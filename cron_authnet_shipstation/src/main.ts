@@ -184,6 +184,17 @@ export function createBigCommerceProcessor(
   );
 }
 
+export function createProcessors(
+  shipStationProxy: ShipStationProxy
+): Processor[] {
+  return [
+    new IssuedProcessor(),
+    new VoidedProcessor(),
+    createBigCommerceProcessor(shipStationProxy.tagsList),
+    new CommonProcessor(shipStationProxy.tagsList),
+  ];
+}
+
 export async function dbProcessor(): Promise<void> {
   const { shipStationProxy, authNetProxy } = await CreateAndInitCore();
   const records = await getDbTransactionsCreated();
@@ -192,12 +203,7 @@ export async function dbProcessor(): Promise<void> {
     ids.map(createFetcherDetails(authNetProxy))
   );
   const orderTransTotal: OrderTransactionPair[] = [];
-  const processors: Processor[] = [
-    new IssuedProcessor(),
-    new VoidedProcessor(),
-    createBigCommerceProcessor(shipStationProxy.tagsList),
-    new CommonProcessor(shipStationProxy.tagsList),
-  ];
+  const processors: Processor[] = createProcessors(shipStationProxy);
   for (const processor of processors) {
     const { orderTrans, skipped } = await processor.process(transactionDetails);
     transactionDetails = skipped;

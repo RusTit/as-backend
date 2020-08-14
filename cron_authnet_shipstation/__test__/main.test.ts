@@ -4,6 +4,7 @@ import {
   createAuthNetProxy,
   createBigCommerceProcessor,
   createFetcherDetails,
+  createProcessors,
   createShipStationProxy,
   getAuthTransactionDetailsArray,
   getBatchIdArray,
@@ -12,6 +13,7 @@ import {
 import { isApprovedTransaction } from '../src/filters';
 import { TODO_ANY } from '../src/Helper';
 import CommonProcessor from '../src/processors/CommonProcessor';
+import Processor, { OrderTransactionPair } from '../src/processors/Processor';
 
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '..', 'output');
 /**
@@ -103,5 +105,25 @@ describe('main tests', () => {
     transactionsDetails[0].transactionStatus = 'myStatus';
     const zeroOrderArr = await processor.process(transactionsDetails);
     expect(zeroOrderArr.orderTrans.length).toBe(0);
+  });
+  it('test combined all processors', async () => {
+    const ids = ['62502466092', '62502465548'];
+    const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
+    let transactionDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
+    transactionDetails[0].transactionStatus = 'myStatus';
+    const orderTransTotal: OrderTransactionPair[] = [];
+    const processors: Processor[] = createProcessors(shipStationProxy);
+    for (const processor of processors) {
+      const { orderTrans, skipped } = await processor.process(
+        transactionDetails
+      );
+      transactionDetails = skipped;
+      orderTransTotal.push(...orderTrans);
+    }
+    expect(orderTransTotal.length).toBe(1);
   });
 });
