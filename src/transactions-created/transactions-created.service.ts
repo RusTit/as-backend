@@ -8,7 +8,7 @@ import { AuthnetService } from '../authnet/authnet.service';
 export class TransactionsCreatedService {
   constructor(
     @InjectRepository(TransactionCreatedEntity)
-    private transactionCreatedEntityRepository: Repository<
+    private readonly transactionCreatedEntityRepository: Repository<
       TransactionCreatedEntity
     >,
     private readonly authnetService: AuthnetService,
