@@ -14,6 +14,7 @@ import { AllExceptionsFilter } from './AllExceptionsFilter';
 import { TransactionsProcessedModule } from './transactions-processed/transactions-processed.module';
 import { TransactionsIssuesModule } from './transactions-issues/transactions-issues.module';
 import { UiModule } from './ui/ui.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { UiModule } from './ui/ui.module';
     TransactionsProcessedModule,
     TransactionsIssuesModule,
     UiModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [
