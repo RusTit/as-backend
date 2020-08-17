@@ -1,7 +1,9 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { TransactionsProcessedService } from './transactions-processed.service';
 import { ListTransactionsQuery, TransactionProcessedResultDto } from './dtos';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('transactions')
 @Controller('transactions-processed')
 export class TransactionsProcessedController {
   constructor(

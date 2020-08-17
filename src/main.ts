@@ -14,11 +14,11 @@ async function bootstrap() {
     .setTitle('AuthNet transactions handler')
     .setDescription('The webhook trap and backend for authnet transactions')
     .setVersion('1.0')
-    .addTag('authnet')
     .addBearerAuth({
       bearerFormat: 'jwt',
       type: 'http',
     })
+    .addCookieAuth()
     .build();
   const viewsPath = join(__dirname, 'views');
   app.set('views', viewsPath);

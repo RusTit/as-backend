@@ -43,6 +43,7 @@ export class ProductNewDto {
 
   @ApiProperty({
     required: false,
+    enum: ['inches', 'centimeters'],
   })
   dimUnits: DimensionUnits | null;
 
@@ -53,39 +54,16 @@ export class ProductNewDto {
 
   @ApiProperty({
     required: false,
+    enum: ['pounds', 'ounces', 'grams'],
   })
   weightUnits: Units | null;
 }
 
 export class ProductEditDto extends ProductNewDto {}
 
-export class ProductDto {
+export class ProductDto extends ProductNewDto {
   @ApiProperty()
   id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty()
-  sku: string;
-
-  @ApiProperty()
-  width: number | null;
-
-  @ApiProperty()
-  height: number | null;
-
-  @ApiProperty()
-  length: number | null;
-
-  @ApiProperty()
-  dimUnits: DimensionUnits | null;
-
-  @ApiProperty()
-  weight: number | null;
-
-  @ApiProperty()
-  weightUnits: Units | null;
 
   @ApiProperty()
   createdAt: Date;

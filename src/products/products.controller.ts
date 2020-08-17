@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import {
@@ -18,12 +19,17 @@ import {
   ProductEditDto,
 } from './dtos';
 import { OperationResultDto } from '../dtos';
+import { AuthenticatedGuard } from '../auth/authenticated.guard';
+import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiCookieAuth()
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
+  @UseGuards(AuthenticatedGuard)
   async findAll(
     @Query() options?: ListProductsQuery,
   ): Promise<Array<ProductDto>> {
@@ -31,6 +37,7 @@ export class ProductsController {
   }
 
   @Get(':id')
+  @UseGuards(AuthenticatedGuard)
   async getDetailsByDbId(@Param('id') id: number): Promise<ProductDto> {
     const dbProduct = await this.productsService.getDetailsByDbId(id);
     if (!dbProduct) {
@@ -43,6 +50,7 @@ export class ProductsController {
   }
 
   @Post()
+  @UseGuards(AuthenticatedGuard)
   async createNewProduct(
     @Body() productNewDto: ProductNewDto,
   ): Promise<OperationResultDto> {
@@ -53,6 +61,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @UseGuards(AuthenticatedGuard)
   async updateProduct(
     @Param('id') id: number,
     @Body() productEditDto: ProductEditDto,
@@ -73,6 +82,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthenticatedGuard)
   async deleteProduct(@Param('id') id: number): Promise<OperationResultDto> {
     if (!(await this.productsService.deleteProductById(id))) {
       throw new HttpException(
