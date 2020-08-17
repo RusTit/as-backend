@@ -12,6 +12,9 @@ import { mockRepository as mockRProcessed } from '../transactions-processed/Tran
 import { UiService } from './ui.service';
 import { TransactionsIssuesService } from '../transactions-issues/transactions-issues.service';
 import { TransactionsProcessedService } from '../transactions-processed/transactions-processed.service';
+import { ProductsService } from '../products/products.service';
+import { mockRepository as mockProduct } from '../products/Product.mock';
+import { ProductEntity } from '../products/Product.entity';
 
 describe('Ui Controller', () => {
   let controller: UiController;
@@ -24,6 +27,7 @@ describe('Ui Controller', () => {
         TransactionsCreatedService,
         TransactionsIssuesService,
         TransactionsProcessedService,
+        ProductsService,
         {
           provide: getRepositoryToken(TransactionCreatedEntity),
           useValue: mockRCreated,
@@ -35,6 +39,10 @@ describe('Ui Controller', () => {
         {
           provide: getRepositoryToken(TransactionProcessedEntity),
           useValue: mockRProcessed,
+        },
+        {
+          provide: getRepositoryToken(ProductEntity),
+          useValue: mockProduct,
         },
         UiService,
       ],
