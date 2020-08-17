@@ -6,6 +6,9 @@ import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssue
 import { TransactionsProcessedService } from '../transactions-processed/transactions-processed.service';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 import { ListTransactionsQuery } from './dtos';
+import { ProductsService } from '../products/products.service';
+import { ProductEntity } from '../products/Product.entity';
+import { ListProductsQuery } from '../products/dtos';
 
 @Injectable()
 export class UiService {
@@ -13,7 +16,14 @@ export class UiService {
     private readonly transactionsCreatedService: TransactionsCreatedService,
     private readonly transactionsIssuesService: TransactionsIssuesService,
     private readonly transactionsProcessedService: TransactionsProcessedService,
+    private readonly productsService: ProductsService,
   ) {}
+
+  async getArrayOfProducts(
+    options?: ListProductsQuery,
+  ): Promise<ProductEntity[]> {
+    return this.productsService.findAll(options.skip, options.take);
+  }
 
   async getArrayOfTransactionsCreated(
     options?: ListTransactionsQuery,

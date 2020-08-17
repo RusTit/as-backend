@@ -13,6 +13,7 @@ import { LoginGuard } from '../auth/login.guard';
 import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { ListTransactionsQuery } from './dtos';
+import { ListProductsQuery } from '../products/dtos';
 
 @Controller('ui')
 export class UiController {
@@ -58,6 +59,16 @@ export class UiController {
       options,
     );
     return { transactionList };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/products')
+  @Render('products')
+  async productsList(@Query() options?: ListProductsQuery) {
+    const productsList = await this.uiService.getArrayOfProducts(options);
+    return {
+      productsList,
+    };
   }
 
   @Get('/logout')
