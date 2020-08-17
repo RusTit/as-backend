@@ -10,7 +10,7 @@ import { ProductTag, UnknownProduct } from '../ShipStationProxy';
 import path from 'path';
 import fs from 'fs/promises';
 import CsvParse from 'csv-parse';
-import { moveIssuedTransaction } from '../db';
+import { moveIssuedTransaction, getProductsFromTheDb } from '../db';
 
 const combineRules: Array<CombineRule> = [
   new CompactRule(),
@@ -46,12 +46,7 @@ export default class CommonProcessor extends Processor {
     this.tagsList = tagsList;
   }
 
-  async init(): Promise<void> {
-    if (this.isInit) {
-      return;
-    }
-    this.logger.info('Initialization');
-    this.isInit = true;
+  async getProductsFromTheCSV(): Promise<Product[]> {
     const PRODUCTS_CSV_PATH = path.resolve(
       __dirname,
       '..',
@@ -62,7 +57,7 @@ export default class CommonProcessor extends Processor {
     const productsData = await fs.readFile(PRODUCTS_CSV_PATH, {
       encoding: 'utf8',
     });
-    const products: Array<Product> = await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       CsvParse(
         productsData,
         {
@@ -78,6 +73,15 @@ export default class CommonProcessor extends Processor {
         }
       );
     });
+  }
+
+  async init(): Promise<void> {
+    if (this.isInit) {
+      return;
+    }
+    this.logger.info('Initialization');
+    this.isInit = true;
+    const products = await getProductsFromTheDb();
     for (const product of products) {
       this.products.set(product.name, product);
     }

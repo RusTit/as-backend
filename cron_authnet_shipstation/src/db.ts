@@ -3,6 +3,7 @@ import { TransactionCreatedEntity } from './entities/TransactionCreated.entity';
 import { TransactionProcessedEntity } from './entities/TransactionProcessed.entity';
 import { TransactionIssuesEntity } from './entities/TransactionIssues.entity';
 import * as Helper from './Helper';
+import { ProductEntity } from './entities/Product.entity';
 
 let connection: Connection | undefined;
 export async function initDbConnection(): Promise<Connection> {
@@ -22,6 +23,12 @@ export async function getDbTransactionsCreated(): Promise<
       transactionId: 'ASC',
     },
   });
+}
+
+export async function getProductsFromTheDb(): Promise<ProductEntity[]> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(ProductEntity);
+  return repository.find({});
 }
 
 export async function moveProcessedTransaction(
