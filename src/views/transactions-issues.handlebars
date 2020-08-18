@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{> header }}
+  <title>Transactions Created</title>
+</head>
+<body>
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">transactionId</th>
+    <th scope="col">issueObject</th>
+    <th scope="col">createdAt</th>
+    <th scope="col">updatedAt</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{#each transactionList}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <th>{{this.transactionId}}</th>
+      <th>{{json this.issueObject}}</th>
+      <th>{{this.createdAt}}</th>
+      <th>{{this.updatedAt}}</th>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+</body>
+</html>

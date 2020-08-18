@@ -22,9 +22,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    /*
     this.errorsService.saveError(exception).finally(() => {
       Logger.debug('Error is saved');
     });
+*/
 
     response.status(status).json({
       statusCode: status,

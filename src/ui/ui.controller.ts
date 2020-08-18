@@ -71,6 +71,13 @@ export class UiController {
     };
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @Get('/products/new')
+  @Render('product/newProduct')
+  async createNewProduct() {
+    return;
+  }
+
   @Get('/logout')
   logout(@Request() req, @Res() res: Response) {
     req.logout();

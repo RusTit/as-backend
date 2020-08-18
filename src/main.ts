@@ -7,6 +7,7 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import * as redis from 'redis';
 import * as connectRedis from 'connect-redis';
+import * as exphbs from 'express-handlebars';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -20,9 +21,6 @@ async function bootstrap() {
     })
     .addCookieAuth()
     .build();
-  const viewsPath = join(__dirname, 'views');
-  app.set('views', viewsPath);
-  app.set('view engine', 'ejs');
 
   const RedisStore = connectRedis(session);
   const redisClient = redis.createClient({
@@ -48,6 +46,22 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
+
+  app.useStaticAssets(join(__dirname, 'public'));
+  app.set('views', join(__dirname, 'views'));
+  const hbs = exphbs.create({
+    layoutsDir: join(__dirname, 'views', 'layouts'),
+    partialsDir: join(__dirname, 'views', 'partials'),
+    defaultLayout: false,
+    helpers: {
+      json: function (context) {
+        return JSON.stringify(context);
+      },
+    },
+  });
+  app.engine('handlebars', hbs.engine);
+  app.set('view engine', 'handlebars');
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
