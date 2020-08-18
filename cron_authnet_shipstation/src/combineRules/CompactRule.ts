@@ -1,7 +1,7 @@
 import CombineRule from './CombineRule';
 import { TODO_ANY } from '../Helper';
 
-const COMPACT_DESCRIPTION_STRING = 'Compact Upgrade';
+const COMPACT_DESCRIPTION_STRING = ['Compact Upgrade', 'COmpact'];
 
 export default class CompactRule extends CombineRule {
   constructor() {

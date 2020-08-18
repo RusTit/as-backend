@@ -5,10 +5,22 @@ import { TODO_ANY } from '../Helper';
 
 export default abstract class CombineRule {
   protected readonly logger: Logger;
-  protected DESCRIPTION_TO_MATCH?: string;
+  protected DESCRIPTION_TO_MATCH?: string[];
 
   protected constructor(logCategory: string) {
     this.logger = LoggerFactory(logCategory);
+  }
+
+  private matchToDescription(description: string): boolean {
+    if (!this.DESCRIPTION_TO_MATCH) {
+      throw new Error('Descriptions array is not set in the child');
+    }
+    for (const desc_match of this.DESCRIPTION_TO_MATCH) {
+      if (description.includes(desc_match)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   abstract isAcceptable(transaction: TODO_ANY): boolean;
@@ -35,7 +47,7 @@ export default abstract class CombineRule {
       let isAdded = false;
       if (
         typeof description === 'string' &&
-        description.includes(this.DESCRIPTION_TO_MATCH as string)
+        this.matchToDescription(description)
       ) {
         const iterColor = CommonProcessor.getColorFromTheDescription(
           transaction.order.description

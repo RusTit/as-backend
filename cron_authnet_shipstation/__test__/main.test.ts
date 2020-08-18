@@ -92,7 +92,7 @@ describe('main tests', () => {
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
   it('test common combined processor', async () => {
-    const ids = ['62502466092', '62502465548'];
+    const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
@@ -107,14 +107,14 @@ describe('main tests', () => {
     expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
   it('test combined all processors', async () => {
-    const ids = ['62502466092', '62502465548'];
+    const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
     let transactionDetails = await Promise.all(
       ids.map(createFetcherDetails(authNetProxy))
     );
-    transactionDetails[0].transactionStatus = 'myStatus';
+    // transactionDetails[0].transactionStatus = 'myStatus';
     const orderTransTotal: OrderTransactionPair[] = [];
     const processors: Processor[] = createProcessors(shipStationProxy);
     for (const processor of processors) {
