@@ -45,6 +45,10 @@ export class ProductsService {
     private readonly productEntityRepository: Repository<ProductEntity>,
   ) {}
 
+  async findById(id: number): Promise<ProductEntity> {
+    return this.productEntityRepository.findOne(id);
+  }
+
   async findAll(skip = 0, take = 100): Promise<ProductEntity[]> {
     return this.productEntityRepository.find({
       skip,

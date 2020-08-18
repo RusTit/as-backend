@@ -7,6 +7,9 @@ import {
   UseGuards,
   Request,
   Query,
+  Param,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { LoginGuard } from '../auth/login.guard';
@@ -76,6 +79,22 @@ export class UiController {
   @Render('products/newProduct')
   async createNewProduct() {
     return;
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('/products/:id')
+  @Render('products/editProduct')
+  async getProductItem(@Param('id') id: number) {
+    const product = await this.uiService.getProductById(id);
+    if (!product) {
+      throw new HttpException(
+        `Product not found by db id: ${id}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return {
+      product,
+    };
   }
 
   @Get('/logout')

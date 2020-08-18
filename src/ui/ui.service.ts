@@ -45,4 +45,8 @@ export class UiService {
   ): Promise<TransactionIssuesEntity[]> {
     return this.transactionsIssuesService.findAll(options.skip, options.take);
   }
+
+  async getProductById(id: number): Promise<ProductEntity> {
+    return this.productsService.findById(id);
+  }
 }

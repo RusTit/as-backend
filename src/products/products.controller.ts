@@ -60,7 +60,7 @@ export class ProductsController {
     };
   }
 
-  @Put(':id')
+  @Post(':id') // todo: this should be put, but for now let's use post
   @UseGuards(AuthenticatedGuard)
   async updateProduct(
     @Param('id') id: number,
