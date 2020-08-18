@@ -73,7 +73,7 @@ export class UiController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('/products/new')
-  @Render('product/newProduct')
+  @Render('products/newProduct')
   async createNewProduct() {
     return;
   }

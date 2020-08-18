@@ -1,9 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductEntity } from './Product.entity';
+import { DimensionUnits, ProductEntity, Units } from './Product.entity';
 import { ProductEditDto, ProductNewDto } from './dtos';
-import { DeleteResult } from 'typeorm/index';
+
+function validationString(value: any): string | null {
+  if (typeof value == 'string' && value.trim().length) {
+    return value.trim();
+  }
+  return null;
+}
+
+function validationFloat(value: any): number | null {
+  if (typeof value == 'string' && value.trim().length) {
+    const floatResult = parseFloat(value.trim());
+    if (Number.isNaN(floatResult)) {
+      return null;
+    }
+    return floatResult;
+  }
+  return null;
+}
 
 function setFieldsFromThePayload(
   dbEntity: ProductEntity,
@@ -11,12 +28,14 @@ function setFieldsFromThePayload(
 ) {
   dbEntity.name = productEditDto.name;
   dbEntity.sku = productEditDto.sku;
-  dbEntity.weight = productEditDto.weight;
-  dbEntity.height = productEditDto.height;
-  dbEntity.length = productEditDto.length;
-  dbEntity.dimUnits = productEditDto.dimUnits;
-  dbEntity.width = productEditDto.width;
-  dbEntity.weightUnits = productEditDto.weightUnits;
+  dbEntity.weight = validationFloat(productEditDto.weight);
+  dbEntity.height = validationFloat(productEditDto.height);
+  dbEntity.length = validationFloat(productEditDto.length);
+  dbEntity.dimUnits = validationString(
+    productEditDto.dimUnits,
+  ) as DimensionUnits;
+  dbEntity.width = validationFloat(productEditDto.width);
+  dbEntity.weightUnits = validationString(productEditDto.weightUnits) as Units;
 }
 
 @Injectable()
