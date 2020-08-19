@@ -15,6 +15,7 @@ import { TransactionsProcessedModule } from './transactions-processed/transactio
 import { TransactionsIssuesModule } from './transactions-issues/transactions-issues.module';
 import { UiModule } from './ui/ui.module';
 import { ProductsModule } from './products/products.module';
+import { BigcomhookModule } from './bigcomhook/bigcomhook.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ProductsModule } from './products/products.module';
     TransactionsIssuesModule,
     UiModule,
     ProductsModule,
+    BigcomhookModule,
   ],
   controllers: [AppController],
   providers: [
