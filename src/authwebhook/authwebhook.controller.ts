@@ -1,8 +1,10 @@
 import { Body, Controller, Post, HttpCode, Logger } from '@nestjs/common';
 import { WebhookDto, WebhookResultDto } from './dtos';
 import { AuthwebhookService } from './authwebhook.service';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('authwebhook')
+@ApiTags('webhook')
 export class AuthwebhookController {
   constructor(private authwebhookService: AuthwebhookService) {}
 
