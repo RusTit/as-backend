@@ -22,6 +22,40 @@ const BASE_URL = 'https://api.bigcommerce.com';
 
 const NET_TIMEOUT = 30000;
 
+export interface NewHook {
+  scope: SupportedEvents;
+  destination: string;
+  is_active: boolean;
+  headers: Record<string, string>;
+}
+
+export interface WebHook extends NewHook {
+  id?: number;
+  client_id?: string;
+  store_hash?: string;
+  created_at?: number;
+  updated_at?: number;
+}
+
+export type OrderWebhookEvents =
+  | 'store/order/*'
+  | 'store/order/created'
+  | 'store/order/updated'
+  | 'store/order/archived'
+  | 'store/order/statusUpdated'
+  | 'store/order/message/created'
+  | 'store/order/refund/created';
+
+export type ProductWebhookEvents =
+  | 'store/product/*'
+  | 'store/product/deleted'
+  | 'store/product/created'
+  | 'store/product/updated'
+  | 'store/product/inventory/updated'
+  | 'store/product/inventory/order/updated';
+
+export type SupportedEvents = OrderWebhookEvents | ProductWebhookEvents;
+
 export default class BigCommerceProxy {
   private readonly limiter: Bottleneck;
   private readonly logger: Logger;
@@ -89,6 +123,41 @@ export default class BigCommerceProxy {
   async getOrder(id: string): Promise<TODO_ANY> {
     return this.makeRawRequest(
       `${BASE_URL}/stores/${this.store_hash}/v2/orders/${id}`
+    );
+  }
+
+  async getAllHooks(): Promise<WebHook[]> {
+    return this.makeRawRequest(
+      `${BASE_URL}/stores/${this.store_hash}/v2/hooks`
+    );
+  }
+
+  async getHookById(id: string): Promise<WebHook> {
+    return this.makeRawRequest(
+      `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`
+    );
+  }
+
+  async createHook(payload: NewHook): Promise<WebHook> {
+    const url = `${BASE_URL}/stores/${this.store_hash}/v2/hooks`;
+    const response = await this.limiter.schedule(() =>
+      needle('post', url, payload, this.needleOptions)
+    );
+    if (response.statusCode === 200) {
+      return response.body;
+    } else {
+      throw new Error(
+        `Invalid response code: ${
+          response.statusCode
+        } (${url}) with response: ${JSON.stringify(response.body)}`
+      );
+    }
+  }
+
+  async deleteHookById(id: string): Promise<WebHook> {
+    return this.makeRawRequest(
+      `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`,
+      'delete'
     );
   }
 }

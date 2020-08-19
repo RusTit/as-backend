@@ -7,7 +7,8 @@
     "prebuild": "rimraf dist",
     "build": "tsc --build tsconfig.json",
     "prestart": "npm run build",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "custom:hooks": "npm run prebuild && npm run build && node dist/custom/bigCommerceHookHandler.js"
   },
   "repository": {
     "type": "git",
