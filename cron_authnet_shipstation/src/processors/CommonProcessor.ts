@@ -213,7 +213,17 @@ export default class CommonProcessor extends Processor {
       throw new Error(`Cannot create items for transaction`);
     }
     const amountPaid = this.getAmountPaidForItems(items);
-    const firstProduct = this.products.get(items[0].name as string) as Product;
+    let productWithUnits: Product | null = null;
+    for (const item of items) {
+      const tempProduct = this.products.get(item.name as string) as Product;
+      if (typeof tempProduct?.height === 'number') {
+        productWithUnits = tempProduct;
+        break;
+      }
+    }
+    if (!productWithUnits) {
+      throw new Error('Product with units not found.');
+    }
     const result: Order = {
       billTo,
       customerUsername: CommonProcessor.getCustomerUsername(transactionDetails),
@@ -228,15 +238,15 @@ export default class CommonProcessor extends Processor {
       tagIds: this.getTagsIdArr(transactionDetails),
       items,
       dimensions: {
-        height: firstProduct.height,
-        width: firstProduct.width,
-        length: firstProduct.length,
-        units: firstProduct.dimUnits,
+        height: productWithUnits.height,
+        width: productWithUnits.width,
+        length: productWithUnits.length,
+        units: productWithUnits.dimUnits,
       },
       weight: {
-        units: firstProduct.weightUnits,
-        value: firstProduct.weight,
-        WeightUnits: firstProduct.weight,
+        units: productWithUnits.weightUnits,
+        value: productWithUnits.weight,
+        WeightUnits: productWithUnits.weight,
       },
       amountPaid,
     };

@@ -1,5 +1,6 @@
 import { Body, Controller, Post, HttpCode, Logger } from '@nestjs/common';
-import { WebhookDto, WebhookResultDto } from './dtos';
+import { WebhookDto } from './dtos';
+import { WebhookResultDto } from '../dtos';
 import { AuthwebhookService } from './authwebhook.service';
 import { ApiTags } from '@nestjs/swagger';
 

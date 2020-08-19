@@ -7,3 +7,10 @@ export class OperationResultDto {
   @ApiProperty()
   error?: string;
 }
+
+export class WebhookResultDto {
+  @ApiProperty()
+  status: string;
+  @ApiProperty()
+  err?: string;
+}

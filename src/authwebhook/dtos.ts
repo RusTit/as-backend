@@ -79,10 +79,3 @@ export class WebhookDto {
   @ApiProperty()
   payload: TransactionPayloadDto;
 }
-
-export class WebhookResultDto {
-  @ApiProperty()
-  status: string;
-  @ApiProperty()
-  err?: string;
-}
