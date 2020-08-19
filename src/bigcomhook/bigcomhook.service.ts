@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import BigCommerceProxy from './BigCommerceProxy';
+import { Repository } from 'typeorm';
 import { WebhookUpdatedDto } from './dtos';
 import {
   Address,
@@ -10,6 +11,9 @@ import {
   Weight,
 } from './ShipStationTypes';
 import ShipStationProxy, { ProductTag } from './ShipStationProxy';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
+import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
 const {
   BIGCOMMERCE_STORE_HASH,
@@ -31,7 +35,12 @@ type OrderDataPair = {
 @Injectable()
 export class BigcomhookService {
   private readonly bigCommerceProxy: BigCommerceProxy;
-  constructor() {
+  constructor(
+    @InjectRepository(TransactionIssuesEntity)
+    private transactionIssuesEntity: Repository<TransactionIssuesEntity>,
+    @InjectRepository(TransactionProcessedEntity)
+    private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
+  ) {
     this.bigCommerceProxy = new BigCommerceProxy(
       BIGCOMMERCE_STORE_HASH,
       BIGCOMMERCE_CLIENT_ID,
@@ -202,6 +211,7 @@ export class BigcomhookService {
       payload.data.status.new_status_id === AwaitingFulfillment &&
       payload.data.status.previous_status_id === AwaitingPayment
     ) {
+      let transactionId = '';
       try {
         const shipStationProxy = new ShipStationProxy(
           SHIPSTATION_API_KEY,
@@ -212,15 +222,31 @@ export class BigcomhookService {
           payload,
           shipStationProxy.tagsList,
         );
+        transactionId = transaction;
         Logger.log(`Processing order: ${order.orderNumber}`);
         const shipStationResponse = await shipStationProxy.createOrUpdateOrder(
           order,
         );
         Logger.log(`Order saved: ${order.orderNumber}`);
-        // await moveProcessedTransaction(transactionId, shipStationResponse);
+        const dbProcessed = new TransactionProcessedEntity();
+        dbProcessed.transactionId = transaction;
+        dbProcessed.orderObject = shipStationResponse;
+        dbProcessed.labelObject = {
+          todo: 'temp stub',
+        };
+        await this.transactionProcessedEntity.save(dbProcessed);
       } catch (e) {
-        // await moveIssuedTransaction(transactionId, e);
         Logger.error(e);
+        if (transactionId) {
+          const issue = e;
+          const dbIssues = new TransactionIssuesEntity();
+          dbIssues.transactionId = transactionId;
+          dbIssues.issueObject = {
+            error: issue,
+            message: issue.message,
+          };
+          await this.transactionIssuesEntity.save(dbIssues);
+        }
       }
     }
   }
