@@ -1,4 +1,5 @@
-import needle, { NeedleOptions } from 'needle';
+import * as needle from 'needle';
+import { NeedleOptions } from 'needle';
 import Bottleneck from 'bottleneck';
 import { Order, LabelForOrder } from './ShipStationTypes';
 import { Logger } from '@nestjs/common';

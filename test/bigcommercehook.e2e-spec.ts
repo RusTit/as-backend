@@ -1,16 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { random } from 'faker';
 import * as request from 'supertest';
 import { AppModule } from './../src/app.module';
-import { WebhookDto } from '../src/authwebhook/dtos';
+import { WebhookUpdatedDto } from '../src/bigcomhook/dtos';
 
 /**
  * Two minutes for jest test case.
  */
 const LONG_ASYNC_DELAY = 120000;
 
-describe('Authwebhook (e2e)', () => {
+describe('BigCommerceHook (e2e)', () => {
   let app: INestApplication;
 
   beforeEach(async () => {
@@ -23,24 +22,24 @@ describe('Authwebhook (e2e)', () => {
     await app.init();
   });
 
-  it('/authwebhook (POST)', () => {
-    const payload: WebhookDto = {
-      notificationId: 'd0e8e7fe-c3e7-4add-a480-27bc5ce28a18',
-      eventType: 'net.authorize.payment.authcapture.created',
-      eventDate: new Date().toJSON(),
-      webhookId: random.uuid(),
-      payload: {
-        responseCode: 1,
-        merchantReferenceId: '19102146534003137356',
-        authCode: 'LZ6I19',
-        avsResponse: 'Y',
-        authAmount: 45.0,
-        entityName: 'transaction',
-        id: random.number({ min: 1000000, max: 9999999 }).toString(),
+  it('/bigcomhook (POST)', () => {
+    const payload: WebhookUpdatedDto = {
+      scope: 'store/order/statusUpdated',
+      store_id: '1025646',
+      data: {
+        type: 'order',
+        id: 34091,
+        status: {
+          previous_status_id: 7,
+          new_status_id: 11,
+        },
       },
+      hash: '7ee67cd1cf2ca60bc1aa9e5fe957d2de373be4ca',
+      created_at: 1561479335,
+      producer: 'stores/{store_hash}',
     };
     return request(app.getHttpServer())
-      .post('/authwebhook')
+      .post('/bigcomhook')
       .send(payload)
       .expect(200)
       .expect({ status: 'WebHook was successfully processed' });

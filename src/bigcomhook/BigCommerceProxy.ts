@@ -1,5 +1,6 @@
 import Bottleneck from 'bottleneck';
-import needle, { NeedleHttpVerbs, NeedleOptions } from 'needle';
+import * as needle from 'needle';
+import { NeedleHttpVerbs, NeedleOptions } from 'needle';
 import { Address } from './ShipStationTypes';
 
 type TODO_ANY = any;

@@ -248,6 +248,10 @@ export class BigcomhookService {
           await this.transactionIssuesEntity.save(dbIssues);
         }
       }
+    } else {
+      Logger.debug(
+        `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
+      );
     }
   }
 }
