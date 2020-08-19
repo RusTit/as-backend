@@ -18,6 +18,7 @@ import CommonProcessor from './processors/CommonProcessor';
 import BigCommerceProcessor from './processors/BigCommerceProcessor';
 import IssuedProcessor from './processors/IssuedProcessor';
 import VoidedProcessor from './processors/VoidedProcessor';
+import BigCommerceSkipProcessor from './processors/BigCommerceSkipProcessor';
 import {
   BIGCOMMERCE_ACCESS_TOKEN,
   BIGCOMMERCE_CLIENT_ID,
@@ -190,7 +191,8 @@ export function createProcessors(
   return [
     new IssuedProcessor(),
     new VoidedProcessor(),
-    createBigCommerceProcessor(shipStationProxy.tagsList),
+    new BigCommerceSkipProcessor(),
+    // createBigCommerceProcessor(shipStationProxy.tagsList),
     new CommonProcessor(shipStationProxy.tagsList),
   ];
 }
