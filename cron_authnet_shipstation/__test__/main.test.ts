@@ -126,4 +126,7 @@ describe('main tests', () => {
     }
     expect(orderTransTotal.length).toBe(1);
   });
+  it('test product not found on all processors', async () => {
+    const ids = ['62514027450'];
+  });
 });

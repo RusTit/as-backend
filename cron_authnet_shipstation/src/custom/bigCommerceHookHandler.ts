@@ -11,7 +11,7 @@ const proxy = new BigCommerceProxy(
   BIGCOMMERCE_ACCESS_TOKEN
 );
 
-const hookPath = 'http://104.248.112.61/bigcomhook';
+const hookPath = 'https://tacticaltrapsshipping.com/bigcomhook';
 
 const main = async () => {
   const webHooks = await proxy.getAllHooks();

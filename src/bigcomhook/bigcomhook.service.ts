@@ -157,14 +157,22 @@ export class BigcomhookService {
     return [...tags.values()];
   }
 
+  async checkTheBigCommerceOrder(orderBigCommerce: TODO_ANY): Promise<boolean> {
+    if (orderBigCommerce.payment_method === 'Amazon Pay') {
+      throw new Error(`Amazon Pay transaction`);
+    }
+    return true;
+  }
+
+  async getBigCommerceOrder(orderId: string): Promise<TODO_ANY> {
+    return this.bigCommerceProxy.getOrder(orderId);
+  }
+
   async generateOrder(
-    payload: WebhookUpdatedDto,
+    orderId: number,
+    orderBigCommerce: TODO_ANY,
     tagsList: Map<string, ProductTag>,
   ): Promise<OrderDataPair> {
-    const orderId = payload.data.id;
-    const orderBigCommerce = await this.bigCommerceProxy.getOrder(
-      orderId.toString(),
-    );
     const billing_address: Address = this.getAddress(
       orderBigCommerce.billing_address,
     );
@@ -218,18 +226,25 @@ export class BigcomhookService {
           SHIPSTATION_API_SECRET,
         );
         await shipStationProxy.init();
-        const { order, transaction } = await this.generateOrder(
-          payload,
+        const orderBigCommerce = await this.getBigCommerceOrder(
+          payload.data.id.toString(),
+        );
+        transactionId = orderBigCommerce.payment_provider_id;
+        if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
+          return null;
+        }
+        const { order } = await this.generateOrder(
+          payload.data.id,
+          orderBigCommerce,
           shipStationProxy.tagsList,
         );
-        transactionId = transaction;
         Logger.log(`Processing order: ${order.orderNumber}`);
         const shipStationResponse = await shipStationProxy.createOrUpdateOrder(
           order,
         );
         Logger.log(`Order saved: ${order.orderNumber}`);
         const dbProcessed = new TransactionProcessedEntity();
-        dbProcessed.transactionId = transaction;
+        dbProcessed.transactionId = transactionId;
         dbProcessed.orderObject = shipStationResponse;
         dbProcessed.labelObject = {
           todo: 'temp stub',

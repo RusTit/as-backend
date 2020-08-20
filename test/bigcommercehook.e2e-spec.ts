@@ -28,7 +28,7 @@ describe('BigCommerceHook (e2e)', () => {
       store_id: '1025646',
       data: {
         type: 'order',
-        id: 34091,
+        id: 22216, // 34091
         status: {
           previous_status_id: 7,
           new_status_id: 11,
