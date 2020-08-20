@@ -128,5 +128,22 @@ describe('main tests', () => {
   });
   it('test product not found on all processors', async () => {
     const ids = ['62514027450'];
+    const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
+    let transactionDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
+    // transactionDetails[0].transactionStatus = 'myStatus';
+    const orderTransTotal: OrderTransactionPair[] = [];
+    const processors: Processor[] = createProcessors(shipStationProxy);
+    for (const processor of processors) {
+      const { orderTrans, skipped } = await processor.process(
+        transactionDetails
+      );
+      transactionDetails = skipped;
+      orderTransTotal.push(...orderTrans);
+    }
+    expect(orderTransTotal.length).toBe(1);
   });
 });
