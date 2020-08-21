@@ -1,9 +1,12 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { TransactionsProcessedService } from './transactions-processed.service';
 import { ListTransactionsQuery, TransactionProcessedResultDto } from './dtos';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('transactions')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('transactions-processed')
 export class TransactionsProcessedController {
   constructor(

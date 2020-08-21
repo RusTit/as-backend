@@ -17,6 +17,7 @@ import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { ListTransactionsQuery } from './dtos';
 import { ListProductsQuery } from '../products/dtos';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller('ui')
 export class UiController {
@@ -35,6 +36,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/transactions-created')
   @Render('transactions-created')
   async transactionsCreatedList(@Query() options?: ListTransactionsQuery) {
@@ -45,6 +47,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/transactions-issues')
   @Render('transactions-issues')
   async transactionsIssuesList(@Query() options?: ListTransactionsQuery) {
@@ -55,6 +58,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/transactions-processed')
   @Render('transactions-processed')
   async transactionsProcessedList(@Query() options?: ListTransactionsQuery) {
@@ -65,6 +69,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/products')
   @Render('products')
   async productsList(@Query() options?: ListProductsQuery) {
@@ -75,6 +80,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/products/new')
   @Render('products/newProduct')
   async createNewProduct() {
@@ -82,6 +88,7 @@ export class UiController {
   }
 
   @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
   @Get('/products/:id')
   @Render('products/editProduct')
   async getProductItem(@Param('id') id: number) {

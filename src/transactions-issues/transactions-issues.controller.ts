@@ -1,9 +1,12 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { TransactionsIssuesService } from './transactions-issues.service';
 import { ListTransactionsQuery, TransactionIssuesResultDto } from './dtos';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('transactions')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @Controller('transactions-issues')
 export class TransactionsIssuesController {
   constructor(
