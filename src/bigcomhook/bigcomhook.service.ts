@@ -23,8 +23,12 @@ const {
   SHIPSTATION_API_SECRET,
 } = process.env;
 
-const AwaitingFulfillment = 11;
-const AwaitingPayment = 7;
+enum OrderStatus {
+  Incomplete = 0,
+  Pending = 1,
+  AwaitingPayment = 7,
+  AwaitingFulfillment = 11,
+}
 
 type TODO_ANY = any;
 type OrderDataPair = {
@@ -158,9 +162,9 @@ export class BigcomhookService {
   }
 
   async checkTheBigCommerceOrder(orderBigCommerce: TODO_ANY): Promise<boolean> {
-    if (orderBigCommerce.payment_method === 'Amazon Pay') {
+    /*    if (orderBigCommerce.payment_method === 'Amazon Pay') {
       throw new Error(`Amazon Pay transaction`);
-    }
+    }*/
     return true;
   }
 
@@ -214,11 +218,21 @@ export class BigcomhookService {
     };
   }
 
+  isValidStatusId(payload: WebhookUpdatedDto): boolean {
+    const { new_status_id, previous_status_id } = payload.data.status;
+    if (new_status_id == OrderStatus.AwaitingFulfillment) {
+      switch (previous_status_id) {
+        case OrderStatus.Incomplete:
+        case OrderStatus.Pending:
+        case OrderStatus.AwaitingPayment:
+          return true;
+      }
+    }
+    return false;
+  }
+
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
-    if (
-      payload.data.status.new_status_id === AwaitingFulfillment &&
-      payload.data.status.previous_status_id === AwaitingPayment
-    ) {
+    if (this.isValidStatusId(payload)) {
       let transactionId = '';
       try {
         const shipStationProxy = new ShipStationProxy(
