@@ -43,9 +43,6 @@ export class BigcomhookService {
       BIGCOMMERCE_CLIENT_ID,
     } = process.env;
     Logger.debug(`BigcomhookService`);
-    Logger.debug(
-      `${BIGCOMMERCE_STORE_HASH} - ${BIGCOMMERCE_CLIENT_ID} - ${BIGCOMMERCE_ACCESS_TOKEN}`,
-    );
     this.bigCommerceProxy = new BigCommerceProxy(
       BIGCOMMERCE_STORE_HASH,
       BIGCOMMERCE_CLIENT_ID,
@@ -239,9 +236,6 @@ export class BigcomhookService {
       try {
         Logger.debug(payload);
         const { SHIPSTATION_API_KEY, SHIPSTATION_API_SECRET } = process.env;
-        Logger.debug(
-          `ShipStation: ${SHIPSTATION_API_KEY} - ${SHIPSTATION_API_SECRET}`,
-        );
         const shipStationProxy = new ShipStationProxy(
           SHIPSTATION_API_KEY,
           SHIPSTATION_API_SECRET,
