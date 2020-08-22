@@ -15,14 +15,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
-const {
-  BIGCOMMERCE_STORE_HASH,
-  BIGCOMMERCE_ACCESS_TOKEN,
-  BIGCOMMERCE_CLIENT_ID,
-  SHIPSTATION_API_KEY,
-  SHIPSTATION_API_SECRET,
-} = process.env;
-
 enum OrderStatus {
   Incomplete = 0,
   Pending = 1,
@@ -45,6 +37,11 @@ export class BigcomhookService {
     @InjectRepository(TransactionProcessedEntity)
     private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
   ) {
+    const {
+      BIGCOMMERCE_STORE_HASH,
+      BIGCOMMERCE_ACCESS_TOKEN,
+      BIGCOMMERCE_CLIENT_ID,
+    } = process.env;
     Logger.debug(`BigcomhookService`);
     Logger.debug(
       `${BIGCOMMERCE_STORE_HASH} - ${BIGCOMMERCE_CLIENT_ID} - ${BIGCOMMERCE_ACCESS_TOKEN}`,
@@ -241,6 +238,7 @@ export class BigcomhookService {
       let transactionId = '';
       try {
         Logger.debug(payload);
+        const { SHIPSTATION_API_KEY, SHIPSTATION_API_SECRET } = process.env;
         Logger.debug(
           `ShipStation: ${SHIPSTATION_API_KEY} - ${SHIPSTATION_API_SECRET}`,
         );
