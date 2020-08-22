@@ -45,6 +45,10 @@ export class BigcomhookService {
     @InjectRepository(TransactionProcessedEntity)
     private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
   ) {
+    Logger.debug(`BigcomhookService`);
+    Logger.debug(
+      `${BIGCOMMERCE_STORE_HASH} - ${BIGCOMMERCE_CLIENT_ID} - ${BIGCOMMERCE_ACCESS_TOKEN}`,
+    );
     this.bigCommerceProxy = new BigCommerceProxy(
       BIGCOMMERCE_STORE_HASH,
       BIGCOMMERCE_CLIENT_ID,
@@ -236,12 +240,17 @@ export class BigcomhookService {
     if (this.isValidStatusId(payload)) {
       let transactionId = '';
       try {
+        Logger.debug(payload);
+        Logger.debug(
+          `ShipStation: ${SHIPSTATION_API_KEY} - ${SHIPSTATION_API_SECRET}`,
+        );
         const shipStationProxy = new ShipStationProxy(
           SHIPSTATION_API_KEY,
           SHIPSTATION_API_SECRET,
         );
         Logger.debug(`Init ShipStation`);
         await shipStationProxy.init();
+        Logger.debug('Get bigcommerce order');
         const orderBigCommerce = await this.getBigCommerceOrder(
           payload.data.id.toString(),
         );
