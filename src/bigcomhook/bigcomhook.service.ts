@@ -220,6 +220,7 @@ export class BigcomhookService {
 
   isValidStatusId(payload: WebhookUpdatedDto): boolean {
     const { new_status_id, previous_status_id } = payload.data.status;
+    Logger.log(`isValidStatusId: ${previous_status_id}, ${new_status_id}`);
     if (new_status_id == OrderStatus.AwaitingFulfillment) {
       switch (previous_status_id) {
         case OrderStatus.Incomplete:
@@ -239,13 +240,16 @@ export class BigcomhookService {
           SHIPSTATION_API_KEY,
           SHIPSTATION_API_SECRET,
         );
+        Logger.debug(`Init ShipStation`);
         await shipStationProxy.init();
         const orderBigCommerce = await this.getBigCommerceOrder(
           payload.data.id.toString(),
         );
         transactionId = orderBigCommerce.payment_provider_id;
+        Logger.debug(`Processing transaction id: ${transactionId}`);
         if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
-          return null;
+          Logger.warn(`Can't process this kind of transactions.`);
+          return;
         }
         const { order } = await this.generateOrder(
           payload.data.id,
