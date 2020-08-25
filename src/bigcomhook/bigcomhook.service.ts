@@ -270,7 +270,6 @@ export class BigcomhookService {
         };
         await this.transactionProcessedEntity.save(dbProcessed);
       } catch (e) {
-        Logger.error(e);
         if (transactionId) {
           const issue = e;
           const dbIssues = new TransactionIssuesEntity();
@@ -281,6 +280,7 @@ export class BigcomhookService {
           };
           await this.transactionIssuesEntity.save(dbIssues);
         }
+        throw e;
       }
     } else {
       Logger.debug(
