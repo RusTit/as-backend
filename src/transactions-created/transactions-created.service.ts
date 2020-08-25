@@ -33,8 +33,8 @@ export class TransactionsCreatedService {
       const newDbRow = new TransactionCreatedEntity();
       newDbRow.transactionId = id;
       newDbRow.price = transactionDetails.settleAmount;
-      newDbRow.customerName = transactionDetails.customer?.email || null;
-      newDbRow.customerEmail = `${transactionDetails.billTo.firstName} ${transactionDetails.billTo.lastName}`;
+      newDbRow.customerEmail = transactionDetails.customer?.email || null;
+      newDbRow.customerName = `${transactionDetails.billTo.firstName} ${transactionDetails.billTo.lastName}`;
       await this.transactionCreatedEntityRepository.save(newDbRow);
     }
   }
