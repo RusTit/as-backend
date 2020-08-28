@@ -149,10 +149,38 @@ export interface AdvancedOptions {
   billToMyOtherAccount: string;
 }
 
+export type SortBy = 'OrderDate' | 'ModifyDate' | 'CreateDate';
+
+export type SortDir = 'ASC' | 'DESC';
+
+export interface ListOrdersQuery {
+  customerName?: string;
+  itemKeyword?: string;
+  createDateStart?: string;
+  createDateEnd?: string;
+  modifyDateStart?: string;
+  modifyDateEnd?: string;
+  orderDateStart?: string;
+  orderDateEnd?: string;
+  orderNumber?: string;
+  orderStatus?: OrderStatus;
+  paymentDateStart?: string;
+  paymentDateEnd?: string;
+  storeId?: string;
+  sortBy?: SortBy;
+  sortDir?: SortDir;
+  page?: string;
+  /*
+  Max value is 500.
+   */
+  pageSize?: string;
+}
+
 /**
  * https://www.shipstation.com/docs/api/orders/create-update-order/
  */
 export interface Order {
+  orderId?: number; // exist in result object (after creating of new order)
   orderNumber: string;
   orderKey?: string;
   orderDate: string;

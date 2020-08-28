@@ -1,7 +1,7 @@
 import * as needle from 'needle';
 import { NeedleOptions } from 'needle';
 import Bottleneck from 'bottleneck';
-import { Order, LabelForOrder } from './ShipStationTypes';
+import { Order, LabelForOrder, ListOrdersQuery } from './ShipStationTypes';
 import { Logger } from '@nestjs/common';
 
 export type TODO_ANY = any;
@@ -30,7 +30,7 @@ export class UnknownProduct extends Error {
 
 const NET_TIMEOUT = 30000;
 
-export default class ShipStationProxy {
+export class ShipStationProxy {
   private readonly needleOptions: NeedleOptions;
   private readonly limiter: Bottleneck;
   public readonly tagsList: Map<string, ProductTag>;
@@ -121,5 +121,38 @@ export default class ShipStationProxy {
     } else {
       throw new Error(`Invalid response code: ${response.statusCode}`);
     }
+  }
+
+  async getListOrders(params: ListOrdersQuery): Promise<Order[]> {
+    const url = `${SHIPSTATION_DOMAIN}/orders`;
+    let query = '';
+    for (const [key, value] of Object.entries(params)) {
+      query += `${key}=${value}`;
+    }
+    const full_url = url + query ? `?${query}` : query;
+    Logger.debug(full_url);
+    const response = await this.limiter.schedule(() =>
+      needle('get', full_url, null, this.needleOptions),
+    );
+    if (response.statusCode === 200) {
+      const { body } = response;
+      return body.orders as Order[];
+    } else {
+      throw new Error(`Invalid response code: ${response.statusCode}`);
+    }
+  }
+
+  async deleteOrder(orderId: string | number): Promise<boolean> {
+    Logger.debug(`Deleting orderId: ${orderId}`);
+    const full_url = `${SHIPSTATION_DOMAIN}/orders/${orderId}`;
+    const response = await this.limiter.schedule(() =>
+      needle('delete', full_url, null, this.needleOptions),
+    );
+    if (response.statusCode === 200 && response.body.success === true) {
+      return true;
+    }
+    throw new Error(
+      `Invalid response code: ${response.statusCode} ${response.body}`,
+    );
   }
 }
