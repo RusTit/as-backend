@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import BigCommerceProxy from './BigCommerceProxy';
 import { Repository } from 'typeorm';
 import { WebhookUpdatedDto } from './dtos';
@@ -30,25 +30,14 @@ type OrderDataPair = {
 
 @Injectable()
 export class BigcomhookService {
-  private readonly bigCommerceProxy: BigCommerceProxy;
   constructor(
     @InjectRepository(TransactionIssuesEntity)
     private transactionIssuesEntity: Repository<TransactionIssuesEntity>,
     @InjectRepository(TransactionProcessedEntity)
     private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
-  ) {
-    const {
-      BIGCOMMERCE_STORE_HASH,
-      BIGCOMMERCE_ACCESS_TOKEN,
-      BIGCOMMERCE_CLIENT_ID,
-    } = process.env;
-    Logger.debug(`BigcomhookService`);
-    this.bigCommerceProxy = new BigCommerceProxy(
-      BIGCOMMERCE_STORE_HASH,
-      BIGCOMMERCE_CLIENT_ID,
-      BIGCOMMERCE_ACCESS_TOKEN,
-    );
-  }
+    @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
+    @Inject('BigCommerceProxy') private bigCommerceProxy: BigCommerceProxy,
+  ) {}
 
   getCustomerName(bigCommerceAddress: TODO_ANY): string {
     return `${bigCommerceAddress.first_name} ${bigCommerceAddress.last_name}`;
@@ -235,13 +224,6 @@ export class BigcomhookService {
       let transactionId = '';
       try {
         Logger.debug(payload);
-        const { SHIPSTATION_API_KEY, SHIPSTATION_API_SECRET } = process.env;
-        const shipStationProxy = new ShipStationProxy(
-          SHIPSTATION_API_KEY,
-          SHIPSTATION_API_SECRET,
-        );
-        Logger.debug(`Init ShipStation`);
-        await shipStationProxy.init();
         Logger.debug('Get bigcommerce order');
         const orderBigCommerce = await this.getBigCommerceOrder(
           payload.data.id.toString(),
@@ -255,10 +237,10 @@ export class BigcomhookService {
         const { order } = await this.generateOrder(
           payload.data.id,
           orderBigCommerce,
-          shipStationProxy.tagsList,
+          this.shipStationProxy.tagsList,
         );
         Logger.log(`Processing order: ${order.orderNumber}`);
-        const shipStationResponse = await shipStationProxy.createOrUpdateOrder(
+        const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
           order,
         );
         Logger.log(`Order saved: ${order.orderNumber}`);

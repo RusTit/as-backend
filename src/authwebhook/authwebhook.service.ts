@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { WebhookDto } from './dtos';
 import { TransactionsCreatedService } from '../transactions-created/transactions-created.service';
 import { AuthnetService } from '../authnet/authnet.service';
@@ -9,6 +9,7 @@ export class AuthwebhookService {
   constructor(
     private transactionsCreatedService: TransactionsCreatedService,
     private authnetService: AuthnetService,
+    @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
   ) {}
 
   async processWebhookPayload(payload: WebhookDto): Promise<void> {
@@ -31,21 +32,15 @@ export class AuthwebhookService {
       payload.payload.id,
     );
     const orderNumber = transactionDetails.order.invoiceNumber;
-    const { SHIPSTATION_API_KEY, SHIPSTATION_API_SECRET } = process.env;
-    const shipStationProxy = new ShipStationProxy(
-      SHIPSTATION_API_KEY,
-      SHIPSTATION_API_SECRET,
-    );
-    Logger.debug(`Init ShipStation`);
-    await shipStationProxy.init();
-    const orders = await shipStationProxy.getListOrders({
+
+    const orders = await this.shipStationProxy.getListOrders({
       orderNumber: `${orderNumber}`,
       pageSize: `500`, // to avoid paging issues
     });
     await Promise.all(
       orders.map(async (order) => {
         const { orderId } = order;
-        await shipStationProxy.deleteOrder(orderId);
+        await this.shipStationProxy.deleteOrder(orderId);
       }),
     );
   }
