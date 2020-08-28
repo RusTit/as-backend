@@ -8,6 +8,14 @@ export class AuthwebhookService {
 
   async processWebhookPayload(payload: WebhookDto): Promise<void> {
     Logger.debug(payload);
-    await this.transactionsCreatedService.createNew(payload.payload.id);
+    switch (payload.eventType) {
+      case 'net.authorize.payment.authcapture.created':
+      case 'net.authorize.payment.capture.created':
+        await this.transactionsCreatedService.createNew(payload.payload.id);
+        break;
+      case 'net.authorize.payment.refund.created':
+      case 'net.authorize.payment.void.created':
+        break;
+    }
   }
 }
