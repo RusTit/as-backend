@@ -10,7 +10,7 @@ import {
   Order,
   Weight,
 } from './ShipStationTypes';
-import ShipStationProxy, { ProductTag } from './ShipStationProxy';
+import { ShipStationProxy, ProductTag } from './ShipStationProxy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
