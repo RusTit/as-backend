@@ -32,7 +32,7 @@ export class AuthwebhookService {
       payload.payload.id,
     );
     const orderNumber = transactionDetails.order.invoiceNumber;
-
+    await this.shipStationProxy.init();
     const orders = await this.shipStationProxy.getListOrders({
       orderNumber: `${orderNumber}`,
       pageSize: `500`, // to avoid paging issues

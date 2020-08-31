@@ -54,9 +54,6 @@ export class ShipStationProxy {
   }
 
   async init(): Promise<void> {
-    if (this.tagsList.size) {
-      return;
-    }
     const response = await this.limiter.schedule(async () =>
       needle(
         'get',
@@ -66,6 +63,7 @@ export class ShipStationProxy {
       ),
     );
     if (response.statusCode === 200) {
+      this.tagsList.clear();
       const { body } = response;
       for (const item of body) {
         const tagItem = item as ProductTag;

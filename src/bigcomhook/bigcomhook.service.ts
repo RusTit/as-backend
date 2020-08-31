@@ -234,6 +234,7 @@ export class BigcomhookService {
           Logger.warn(`Can't process this kind of transactions.`);
           return;
         }
+        await this.shipStationProxy.init();
         const { order } = await this.generateOrder(
           payload.data.id,
           orderBigCommerce,
