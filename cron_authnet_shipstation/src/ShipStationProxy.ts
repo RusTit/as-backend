@@ -9,7 +9,7 @@ const SHIPSTATION_DOMAIN = 'https://ssapi.shipstation.com';
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   reservoir: 30, // initial value
   reservoirRefreshAmount: 30,
-  reservoirRefreshInterval: 60 * 1000, // must be divisible by 250
+  reservoirRefreshInterval: 90 * 1000, // must be divisible by 250
 
   // also use maxConcurrent and/or minTime for safety
   // maxConcurrent: 1,
