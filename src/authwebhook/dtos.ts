@@ -54,6 +54,12 @@ export class TransactionPayloadDto extends PayloadDto {
     example: '60020981676',
   })
   id: string;
+
+  @ApiProperty({
+    required: false,
+    example: '184994',
+  })
+  invoiceNumber?: string;
 }
 
 export class WebhookDto {

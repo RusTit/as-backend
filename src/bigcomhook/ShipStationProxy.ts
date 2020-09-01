@@ -135,7 +135,7 @@ export class ShipStationProxy {
     for (const [key, value] of Object.entries(params)) {
       query += `${key}=${value}`;
     }
-    const full_url = url + query ? `?${query}` : query;
+    const full_url = `${url}${query ? `?${query}` : query}`;
     Logger.debug(full_url);
     const response = await this.limiter.schedule(() =>
       needle('get', full_url, null, this.needleOptions),
