@@ -1,6 +1,7 @@
 import Processor, { ProcessorResult } from './Processor';
 import { TODO_ANY } from '../Helper';
 import { isBigCommerceTransaction } from './BigCommerceProcessor';
+import { removeTransactionFromTheCreated } from '../db';
 
 export default class BigCommerceSkipProcessor extends Processor {
   constructor() {
@@ -14,6 +15,11 @@ export default class BigCommerceSkipProcessor extends Processor {
     );
     this.logger.info(
       `BigCommerce total transactions count: ${bigCommerceTransactions.length}`
+    );
+    await Promise.all(
+      bigCommerceTransactions.map(async tranDetails => {
+        await removeTransactionFromTheCreated(tranDetails.transId);
+      })
     );
     const bigCommerceSetOfTransactions = new Set(bigCommerceTransactions);
     const skipped = transactionDetails.filter(

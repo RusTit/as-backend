@@ -13,7 +13,7 @@ import {
 import { ProductTag } from '../ShipStationProxy';
 
 export function isBigCommerceTransaction(transaction: TODO_ANY): boolean {
-  return transaction.solution?.name?.toLowerCase() === 'bigcommerce';
+  return transaction.solution?.name?.toLowerCase().includes('bigcommerce');
 }
 
 export default class BigCommerceProcessor extends Processor {

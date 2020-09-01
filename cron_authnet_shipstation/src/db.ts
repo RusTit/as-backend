@@ -31,6 +31,17 @@ export async function getProductsFromTheDb(): Promise<ProductEntity[]> {
   return repository.find({});
 }
 
+export async function removeTransactionFromTheCreated(
+  transId: number | string
+): Promise<void> {
+  const con = await initDbConnection();
+  await con.transaction(async (transactionalEntityManager: EntityManager) => {
+    await transactionalEntityManager.delete(TransactionCreatedEntity, {
+      transactionId: transId,
+    });
+  });
+}
+
 export async function moveProcessedTransaction(
   transactionDetails: Helper.TODO_ANY,
   orderResponsePayload: Helper.TODO_ANY,
