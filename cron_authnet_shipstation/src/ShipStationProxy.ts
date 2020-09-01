@@ -73,7 +73,11 @@ export default class ShipStationProxy {
         this.tagsList.set(tagItem.name, tagItem);
       }
     } else {
-      throw new Error(`Invalid response code: ${response.statusCode}`);
+      throw new Error(
+        `Invalid response code: ${
+          response.statusCode
+        } with response: ${JSON.stringify(response.body)}`
+      );
     }
   }
 
@@ -120,7 +124,11 @@ export default class ShipStationProxy {
     if (response.statusCode === 200) {
       return response.body;
     } else {
-      throw new Error(`Invalid response code: ${response.statusCode}`);
+      throw new Error(
+        `Invalid response code: ${
+          response.statusCode
+        } with response: ${JSON.stringify(response.body)}`
+      );
     }
   }
 }
