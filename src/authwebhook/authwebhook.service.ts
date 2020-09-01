@@ -3,6 +3,7 @@ import { WebhookDto } from './dtos';
 import { TransactionsCreatedService } from '../transactions-created/transactions-created.service';
 import { AuthnetService } from '../authnet/authnet.service';
 import { ShipStationProxy } from '../bigcomhook/ShipStationProxy';
+import { TransactionsIssuesService } from '../transactions-issues/transactions-issues.service';
 
 @Injectable()
 export class AuthwebhookService {
@@ -10,6 +11,7 @@ export class AuthwebhookService {
     private transactionsCreatedService: TransactionsCreatedService,
     private authnetService: AuthnetService,
     @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
+    private readonly transactionsIssuesService: TransactionsIssuesService,
   ) {}
 
   async processWebhookPayload(payload: WebhookDto): Promise<void> {
@@ -27,7 +29,9 @@ export class AuthwebhookService {
   }
 
   async processRefundVoidedTransactions(payload: WebhookDto): Promise<void> {
-    Logger.debug(`Processing refund/voided transactions`);
+    Logger.debug(
+      `Processing refund/voided transactions: ${payload.payload.id}`,
+    );
     try {
       const orderNumber = payload.payload.invoiceNumber;
       await this.shipStationProxy.init();
@@ -44,7 +48,12 @@ export class AuthwebhookService {
         }),
       );
     } catch (e) {
-      Logger.error(e);
+      const issue = e as Error;
+      Logger.error(`${issue.message}, ${issue.stack}`);
+      await this.transactionsIssuesService.createNewIssuesEntity(
+        payload.payload.id,
+        e,
+      );
     }
   }
 }

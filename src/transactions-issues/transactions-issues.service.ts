@@ -38,4 +38,14 @@ export class TransactionsIssuesService {
     }
     return result;
   }
+
+  async createNewIssuesEntity(
+    id: number | string,
+    issue: Error,
+  ): Promise<void> {
+    const newTransactionIssue = new TransactionIssuesEntity();
+    newTransactionIssue.issueObject = issue;
+    newTransactionIssue.transactionId = id.toString();
+    await this.transactionIssuesEntity.save(newTransactionIssue);
+  }
 }
