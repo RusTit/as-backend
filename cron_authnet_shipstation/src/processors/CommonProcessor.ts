@@ -174,12 +174,28 @@ export default class CommonProcessor extends Processor {
     return `${transactionDetails.billTo.firstName} ${transactionDetails.billTo.lastName}`;
   }
 
+  getSubMatchTag(color: string): ProductTag | undefined {
+    const keys = this.tagsList.keys();
+    let keyMatch: string | undefined = undefined;
+    for (const key of keys) {
+      if (color.includes(key)) {
+        keyMatch = key;
+      }
+    }
+    if (keyMatch) {
+      return this.tagsList.get(keyMatch);
+    }
+  }
+
   getTagsIdArr(transactionDetails: TODO_ANY): number[] {
     const color = CommonProcessor.getColorFromTheDescription(
       transactionDetails.order.description
     );
     if (typeof color === 'string') {
-      const tag = this.tagsList.get(color);
+      let tag = this.tagsList.get(color);
+      if (!tag) {
+        tag = this.getSubMatchTag(color);
+      }
       if (tag) {
         return [tag.tagId];
       } else {

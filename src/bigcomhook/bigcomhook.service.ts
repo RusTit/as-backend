@@ -132,6 +132,22 @@ export class BigcomhookService {
     }
   }
 
+  getSubMatchTag(
+    tagsList: Map<string, ProductTag>,
+    color: string,
+  ): ProductTag | undefined {
+    const keys = tagsList.keys();
+    let keyMatch: string | undefined = undefined;
+    for (const key of keys) {
+      if (color.includes(key)) {
+        keyMatch = key;
+      }
+    }
+    if (keyMatch) {
+      return tagsList.get(keyMatch);
+    }
+  }
+
   getTagsIds(
     tagsList: Map<string, ProductTag>,
     productsBigCommerce: Array<TODO_ANY>,
@@ -139,7 +155,10 @@ export class BigcomhookService {
     const tags: Set<number> = new Set();
     for (const product of productsBigCommerce) {
       product.product_options.forEach((option: TODO_ANY) => {
-        const item = tagsList.get(option.display_value);
+        let item = tagsList.get(option.display_value);
+        if (!item) {
+          item = this.getSubMatchTag(tagsList, option.display_value);
+        }
         if (item) {
           tags.add(item.tagId);
         }
