@@ -132,6 +132,22 @@ export default class BigCommerceProxy {
     );
   }
 
+  async updateHookById(id: string | number, payload: WebHook): Promise<WebHook> {
+    const url = `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`;
+    const response = await this.limiter.schedule(() =>
+      needle('put', url, payload, this.needleOptions)
+    );
+    if (response.statusCode === 200) {
+      return response.body;
+    } else {
+      throw new Error(
+        `Invalid response code: ${
+          response.statusCode
+        } (${url}) with response: ${JSON.stringify(response.body)}`
+      );
+    }
+  }
+
   async getHookById(id: string): Promise<WebHook> {
     return this.makeRawRequest(
       `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`
