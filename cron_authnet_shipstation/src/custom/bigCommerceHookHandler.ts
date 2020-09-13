@@ -29,10 +29,9 @@ const main = async () => {
     if (hook && !hook.is_active) {
       hook.is_active = true;
       const result = await proxy.updateHookById(hookId, hook);
-      debugger;
+      console.log(result);
     }
   }
-  debugger;
 };
 
 main().catch(e => console.error(e));

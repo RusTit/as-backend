@@ -11,6 +11,12 @@ import path from 'path';
 import fs from 'fs/promises';
 import CsvParse from 'csv-parse';
 import { moveIssuedTransaction, getProductsFromTheDb } from '../db';
+import { PreProcessor } from '../preprocessors/PreProcessor';
+import { StandartRFIDLock } from '../preprocessors/combined/StandartRFIDLock';
+import { BluetoothLock } from '../preprocessors/combined/BluetoothLock';
+import { BiometricFingerprintLock } from '../preprocessors/combined/BiometricFingerprintLock';
+import { BluetoothSoloLock } from '../preprocessors/solo/BluetoothSoloLock';
+import { BiometricFingerprintSoloLock } from '../preprocessors/solo/BiometricFingerprintSoloLock';
 
 const combineRules: Array<CombineRule> = [
   new CompactRule(),
@@ -40,10 +46,19 @@ export function combineTransactions<T>(
 }
 
 export default class CommonProcessor extends Processor {
+  private readonly preProcessors: PreProcessor[];
+
   constructor(tagsList: Map<string, ProductTag>) {
     super('CommonProcessor');
     this.products = new Map<string, Product>();
     this.tagsList = tagsList;
+    this.preProcessors = [
+      new StandartRFIDLock(),
+      new BluetoothLock(),
+      new BiometricFingerprintLock(),
+      new BluetoothSoloLock(),
+      new BiometricFingerprintSoloLock(),
+    ];
   }
 
   async getProductsFromTheCSV(): Promise<Product[]> {
@@ -270,6 +285,22 @@ export default class CommonProcessor extends Processor {
     return result;
   }
 
+  runPreProcessors(transactionDetails: TODO_ANY): TODO_ANY[] {
+    let points = 0;
+    let preProcessorMatch: PreProcessor | undefined;
+    for (const preProcessor of this.preProcessors) {
+      const [valid, pPoints] = preProcessor.canWork(transactionDetails);
+      if (valid && pPoints > points) {
+        points = pPoints;
+        preProcessorMatch = preProcessor;
+      }
+    }
+    if (preProcessorMatch) {
+      preProcessorMatch.process(transactionDetails);
+    }
+    return transactionDetails;
+  }
+
   async process(transactionDetails: TODO_ANY[]): Promise<ProcessorResult> {
     await this.init();
     const sortedTransactions = transactionDetails.sort(
@@ -288,10 +319,13 @@ export default class CommonProcessor extends Processor {
     this.logger.info(
       `Approved transactions count: ${approvedTransactions.length}`
     );
+    const preProcessedTransactions = approvedTransactions.map(tr =>
+      this.runPreProcessors(tr)
+    );
     const transformed = [];
     const orderTrans: OrderTransactionPair[] = [];
     const issuedTrans = new Set<TODO_ANY>();
-    for (const transaction of approvedTransactions) {
+    for (const transaction of preProcessedTransactions) {
       try {
         const order = this.transformData(transaction);
         orderTrans.push({
