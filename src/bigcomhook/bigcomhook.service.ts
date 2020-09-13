@@ -178,11 +178,11 @@ export class BigcomhookService {
     return this.bigCommerceProxy.getOrder(orderId);
   }
 
-  async generateOrder(
+  async generateOrders(
     orderId: number,
     orderBigCommerce: TODO_ANY,
     tagsList: Map<string, ProductTag>,
-  ): Promise<OrderDataPair> {
+  ): Promise<OrderDataPair[]> {
     const billing_address: Address = this.getAddress(
       orderBigCommerce.billing_address,
     );
@@ -202,7 +202,7 @@ export class BigcomhookService {
     const weight = this.getWeight(productsBigCommerce);
 
     const transactionId = orderBigCommerce.payment_provider_id;
-    const order: Order = {
+    const orderBase: Order = {
       billTo: billing_address,
       customerUsername: this.getCustomerName(orderBigCommerce.billing_address),
       customerEmail: orderBigCommerce.billing_address.email,
@@ -213,15 +213,24 @@ export class BigcomhookService {
       paymentMethod: orderBigCommerce.payment_method,
       shipTo: shipping_address,
       tagIds: this.getTagsIds(tagsList, productsBigCommerce),
-      items,
       amountPaid,
       dimensions,
       weight,
     };
-    return {
-      order,
-      transaction: transactionId,
-    };
+    const result: OrderDataPair[] = [];
+    for (let index = 0; index < items.length; ++index) {
+      const item = items[index];
+      const orderIter: Order = {
+        items: [item],
+        ...orderBase,
+      };
+      orderIter.orderNumber += `-${index + 1}`;
+      result.push({
+        order: orderIter,
+        transaction: transactionId,
+      });
+    }
+    return result;
   }
 
   isValidStatusId(payload: WebhookUpdatedDto): boolean {
@@ -254,19 +263,24 @@ export class BigcomhookService {
           return;
         }
         await this.shipStationProxy.init();
-        const { order } = await this.generateOrder(
+        const orderDataPairs = await this.generateOrders(
           payload.data.id,
           orderBigCommerce,
           this.shipStationProxy.tagsList,
         );
-        Logger.log(`Processing order: ${order.orderNumber}`);
-        const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
-          order,
+        const shipStationResponses = await Promise.all(
+          orderDataPairs.map(async ({ order }) => {
+            Logger.log(`Processing order: ${order.orderNumber}`);
+            const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
+              order,
+            );
+            Logger.log(`Order saved: ${order.orderNumber}`);
+            return shipStationResponse;
+          }),
         );
-        Logger.log(`Order saved: ${order.orderNumber}`);
         const dbProcessed = new TransactionProcessedEntity();
         dbProcessed.transactionId = transactionId;
-        dbProcessed.orderObject = shipStationResponse;
+        dbProcessed.orderObject = shipStationResponses;
         dbProcessed.labelObject = {
           todo: 'temp stub',
         };
