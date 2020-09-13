@@ -128,7 +128,10 @@ describe('main tests', () => {
     expect(orderTransTotal.length).toBe(1);
   });
   it('test product not found on all processors', async () => {
-    const ids = ['62514027450'];
+    const ids = [
+      '62545980127',
+      '42216840795'
+    ];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
