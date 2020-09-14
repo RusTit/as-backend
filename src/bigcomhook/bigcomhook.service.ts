@@ -224,7 +224,9 @@ export class BigcomhookService {
         items: [item],
         ...orderBase,
       };
-      orderIter.orderNumber += `-${index + 1}`;
+      if (items.length > 1) {
+        orderIter.orderNumber += `-${index + 1}`;
+      }
       result.push({
         order: orderIter,
         transaction: transactionId,
