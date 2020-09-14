@@ -256,6 +256,8 @@ export class BigcomhookService {
         const orderBigCommerce = await this.getBigCommerceOrder(
           payload.data.id.toString(),
         );
+        Logger.debug('Bigcommerce order object');
+        Logger.debug(orderBigCommerce);
         transactionId = orderBigCommerce.payment_provider_id;
         Logger.debug(`Processing transaction id: ${transactionId}`);
         if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
