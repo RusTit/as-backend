@@ -45,6 +45,15 @@ export function combineTransactions<T>(
   return transactions;
 }
 
+export const colorSpecialCases = new Map<string, string>();
+colorSpecialCases.set('Country-Pine', 'Country Pine');
+export function converColorName(name: string): string {
+  if (colorSpecialCases.has(name)) {
+    return colorSpecialCases.get(name) as string;
+  }
+  return name;
+}
+
 export default class CommonProcessor extends Processor {
   private readonly preProcessors: PreProcessor[];
 
@@ -203,10 +212,11 @@ export default class CommonProcessor extends Processor {
   }
 
   getTagsIdArr(transactionDetails: TODO_ANY): number[] {
-    const color = CommonProcessor.getColorFromTheDescription(
+    let color = CommonProcessor.getColorFromTheDescription(
       transactionDetails.order.description
     );
     if (typeof color === 'string') {
+      color = converColorName(color);
       let tag = this.tagsList.get(color);
       if (!tag) {
         tag = this.getSubMatchTag(color);

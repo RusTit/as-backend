@@ -28,6 +28,15 @@ type OrderDataPair = {
   transaction: string;
 };
 
+export const colorSpecialCases = new Map<string, string>();
+colorSpecialCases.set('Country-Pine', 'Country Pine');
+export function converColorName(name: string): string {
+  if (colorSpecialCases.has(name)) {
+    return colorSpecialCases.get(name) as string;
+  }
+  return name;
+}
+
 @Injectable()
 export class BigcomhookService {
   constructor(
@@ -155,9 +164,11 @@ export class BigcomhookService {
     const tags: Set<number> = new Set();
     for (const product of productsBigCommerce) {
       product.product_options.forEach((option: TODO_ANY) => {
-        let item = tagsList.get(option.display_value);
+        let color = option.display_value;
+        color = converColorName(color);
+        let item = tagsList.get(color);
         if (!item) {
-          item = this.getSubMatchTag(tagsList, option.display_value);
+          item = this.getSubMatchTag(tagsList, color);
         }
         if (item) {
           tags.add(item.tagId);
