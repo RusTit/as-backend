@@ -280,13 +280,17 @@ export class BigcomhookService {
             return shipStationResponse;
           }),
         );
-        const dbProcessed = new TransactionProcessedEntity();
-        dbProcessed.transactionId = transactionId;
-        dbProcessed.orderObject = shipStationResponses;
-        dbProcessed.labelObject = {
-          todo: 'temp stub',
-        };
-        await this.transactionProcessedEntity.save(dbProcessed);
+        if (transactionId) {
+          const dbProcessed = new TransactionProcessedEntity();
+          dbProcessed.transactionId = transactionId;
+          dbProcessed.orderObject = shipStationResponses;
+          dbProcessed.labelObject = {
+            todo: 'temp stub',
+          };
+          await this.transactionProcessedEntity.save(dbProcessed);
+        } else {
+          Logger.warn(`Order: ${payload.data.id} has not transaction id.`);
+        }
       } catch (e) {
         if (transactionId) {
           const issue = e;

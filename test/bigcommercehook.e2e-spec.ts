@@ -24,19 +24,19 @@ describe('BigCommerceHook (e2e)', () => {
 
   it('/bigcomhook (POST)', () => {
     const payload: WebhookUpdatedDto = {
+      created_at: 1599828823,
+      store_id: '1000249567',
+      producer: 'stores/jkfuhlnu8d',
       scope: 'store/order/statusUpdated',
-      store_id: '1025646',
+      hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
       data: {
         type: 'order',
-        id: 22216, // 34091
+        id: 35626,
         status: {
-          previous_status_id: 7,
+          previous_status_id: 0,
           new_status_id: 11,
         },
       },
-      hash: '7ee67cd1cf2ca60bc1aa9e5fe957d2de373be4ca',
-      created_at: 1561479335,
-      producer: 'stores/{store_hash}',
     };
     return request(app.getHttpServer())
       .post('/bigcomhook')
