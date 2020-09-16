@@ -306,7 +306,7 @@ export default class CommonProcessor extends Processor {
       }
     }
     if (preProcessorMatch) {
-      preProcessorMatch.process(transactionDetails);
+      return preProcessorMatch.process(transactionDetails);
     }
     return transactionDetails;
   }
@@ -332,7 +332,6 @@ export default class CommonProcessor extends Processor {
     const preProcessedTransactions = approvedTransactions.map(tr =>
       this.runPreProcessors(tr)
     );
-    const transformed = [];
     const orderTrans: OrderTransactionPair[] = [];
     const issuedTrans = new Set<TODO_ANY>();
     for (const transaction of preProcessedTransactions) {
@@ -342,7 +341,6 @@ export default class CommonProcessor extends Processor {
           order,
           transaction,
         });
-        transformed.push(transaction);
       } catch (e) {
         this.logger.warn(`Error while transforming item`);
         this.logger.warn(e);
@@ -350,7 +348,7 @@ export default class CommonProcessor extends Processor {
         issuedTrans.add(transaction);
       }
     }
-    const transformedFlat = transformed.flat();
+    const transformedFlat = approvedTransactions.flat();
     const result: ProcessorResult = {
       orderTrans,
       skipped: transactionDetails.filter(
