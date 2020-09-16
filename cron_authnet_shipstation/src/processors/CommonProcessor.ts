@@ -335,17 +335,26 @@ export default class CommonProcessor extends Processor {
     const orderTrans: OrderTransactionPair[] = [];
     const issuedTrans = new Set<TODO_ANY>();
     for (const transaction of preProcessedTransactions) {
+      const originalApproved = approvedTransactions.find(tr => {
+        if (Array.isArray(tr)) {
+          return tr.includes(transaction);
+        }
+        return tr === transaction;
+      });
       try {
         const order = this.transformData(transaction);
         orderTrans.push({
           order,
-          transaction,
+          transaction: originalApproved,
         });
       } catch (e) {
         this.logger.warn(`Error while transforming item`);
         this.logger.warn(e);
-        await moveIssuedTransaction(transaction, e);
-        issuedTrans.add(transaction);
+        await moveIssuedTransaction(originalApproved, e);
+        const trs = Array.isArray(originalApproved)
+          ? originalApproved
+          : [originalApproved];
+        trs.forEach(tr => issuedTrans.add(tr));
       }
     }
     const transformedFlat = approvedTransactions.flat();
