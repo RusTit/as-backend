@@ -192,6 +192,18 @@ export class BigcomhookService {
     return orderBigCommerce;
   }
 
+  static splitProductsIntoIndividuals(productsBigCommerce: any[]): any[] {
+    const result = [];
+    for (const item of productsBigCommerce) {
+      const quantity = item.quantity;
+      item.quantity = 1;
+      for (let i = 0; i < quantity; ++i) {
+        result.push(item);
+      }
+    }
+    return result;
+  }
+
   async generateOrders(
     orderId: number,
     orderBigCommerce: TODO_ANY,
@@ -209,7 +221,10 @@ export class BigcomhookService {
       : billing_address;
     const transactionId = orderBigCommerce.payment_provider_id;
     const result: OrderDataPair[] = [];
-    for (const product of productsBigCommerce) {
+    const splitBGProducts = BigcomhookService.splitProductsIntoIndividuals(
+      productsBigCommerce,
+    );
+    for (const product of splitBGProducts) {
       const items = this.getOrderItems([product]);
       if (items.length === 0) {
         throw new Error(`Cannot create items for transaction`);
@@ -235,9 +250,6 @@ export class BigcomhookService {
         weight,
         items,
       };
-      if (productsBigCommerce.length > 1) {
-        order.orderNumber += `-${result.length + 1}`;
-      }
       result.push({
         order,
         transaction: transactionId,
