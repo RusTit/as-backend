@@ -229,7 +229,7 @@ export class BigcomhookService {
         orderStatus: 'awaiting_shipment',
         paymentMethod: orderBigCommerce.payment_method,
         shipTo: shipping_address,
-        tagIds: this.getTagsIds(tagsList, productsBigCommerce),
+        tagIds: this.getTagsIds(tagsList, [product]),
         amountPaid,
         dimensions,
         weight,
