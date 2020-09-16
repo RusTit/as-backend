@@ -186,7 +186,10 @@ export class BigcomhookService {
   }
 
   async getBigCommerceOrder(orderId: string): Promise<TODO_ANY> {
-    return this.bigCommerceProxy.getOrder(orderId);
+    const orderBigCommerce = await this.bigCommerceProxy.getOrder(orderId);
+    Logger.debug('Bigcommerce order object');
+    Logger.debug(orderBigCommerce);
+    return orderBigCommerce;
   }
 
   async generateOrders(
@@ -204,42 +207,39 @@ export class BigcomhookService {
     const shipping_address = shippingBigCommerce
       ? this.getAddress(shippingBigCommerce)
       : billing_address;
-    const items = this.getOrderItems(productsBigCommerce);
-    if (items.length === 0) {
-      throw new Error(`Cannot create items for transaction`);
-    }
-    const amountPaid = this.getAmountPaidForItems(items);
-    const dimensions = this.getDimensions(productsBigCommerce);
-    const weight = this.getWeight(productsBigCommerce);
-
     const transactionId = orderBigCommerce.payment_provider_id;
-    const orderBase: Order = {
-      billTo: billing_address,
-      customerUsername: this.getCustomerName(orderBigCommerce.billing_address),
-      customerEmail: orderBigCommerce.billing_address.email,
-      orderDate: new Date(orderBigCommerce.date_created).toJSON(),
-      paymentDate: new Date(orderBigCommerce.date_modified).toJSON(),
-      orderNumber: orderId.toString(),
-      orderStatus: 'awaiting_shipment',
-      paymentMethod: orderBigCommerce.payment_method,
-      shipTo: shipping_address,
-      tagIds: this.getTagsIds(tagsList, productsBigCommerce),
-      amountPaid,
-      dimensions,
-      weight,
-    };
     const result: OrderDataPair[] = [];
-    for (let index = 0; index < items.length; ++index) {
-      const item = items[index];
-      const orderIter: Order = {
-        items: [item],
-        ...orderBase,
+    for (const product of productsBigCommerce) {
+      const items = this.getOrderItems([product]);
+      if (items.length === 0) {
+        throw new Error(`Cannot create items for transaction`);
+      }
+      const amountPaid = this.getAmountPaidForItems(items);
+      const dimensions = this.getDimensions([product]);
+      const weight = this.getWeight([product]);
+      const order: Order = {
+        billTo: billing_address,
+        customerUsername: this.getCustomerName(
+          orderBigCommerce.billing_address,
+        ),
+        customerEmail: orderBigCommerce.billing_address.email,
+        orderDate: new Date(orderBigCommerce.date_created).toJSON(),
+        paymentDate: new Date(orderBigCommerce.date_modified).toJSON(),
+        orderNumber: orderId.toString(),
+        orderStatus: 'awaiting_shipment',
+        paymentMethod: orderBigCommerce.payment_method,
+        shipTo: shipping_address,
+        tagIds: this.getTagsIds(tagsList, productsBigCommerce),
+        amountPaid,
+        dimensions,
+        weight,
+        items,
       };
-      if (items.length > 1) {
-        orderIter.orderNumber += `-${index + 1}`;
+      if (productsBigCommerce.length > 1) {
+        order.orderNumber += `-${result.length + 1}`;
       }
       result.push({
-        order: orderIter,
+        order,
         transaction: transactionId,
       });
     }
@@ -269,8 +269,6 @@ export class BigcomhookService {
         const orderBigCommerce = await this.getBigCommerceOrder(
           payload.data.id.toString(),
         );
-        Logger.debug('Bigcommerce order object');
-        Logger.debug(orderBigCommerce);
         transactionId = orderBigCommerce.payment_provider_id;
         Logger.debug(`Processing transaction id: ${transactionId}`);
         if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
