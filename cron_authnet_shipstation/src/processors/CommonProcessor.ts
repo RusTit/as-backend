@@ -336,7 +336,9 @@ export default class CommonProcessor extends Processor {
     const issuedTrans = new Set<TODO_ANY>();
     for (const transaction of preProcessedTransactions) {
       const originalApproved = approvedTransactions.find(tr => {
-        if (Array.isArray(tr)) {
+        if (Array.isArray(transaction)) {
+          return tr === transaction;
+        } else if (Array.isArray(tr)) {
           return tr.includes(transaction);
         }
         return tr === transaction;
