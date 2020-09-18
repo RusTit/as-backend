@@ -16,7 +16,8 @@ export default abstract class CombineRule {
       throw new Error('Descriptions array is not set in the child');
     }
     for (const desc_match of this.DESCRIPTION_TO_MATCH) {
-      if (description.includes(desc_match)) {
+      // if (description.includes(desc_match)) {
+      if (description.startsWith(desc_match)) {
         return true;
       }
     }
