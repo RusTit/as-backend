@@ -198,6 +198,7 @@ export class BigcomhookService {
     productsBigCommerce: any[],
   ): Promise<any[]> {
     const result = [];
+    const sameOrder = [];
     await Promise.all(
       productsBigCommerce.map(async (item) => {
         const productDetails = await this.bigCommerceProxy.getProductDetails(
@@ -209,7 +210,7 @@ export class BigcomhookService {
             WHITE_LIST_CATEGORIES_NOT_SPLIT.includes(cat),
           ) !== undefined;
         if (shouldSkip) {
-          result.push(item);
+          sameOrder.push(item);
         } else {
           const quantity = item.quantity;
           item.quantity = 1;
@@ -219,6 +220,9 @@ export class BigcomhookService {
         }
       }),
     );
+    if (sameOrder.length) {
+      result.push(sameOrder);
+    }
     return result;
   }
 
@@ -242,14 +246,17 @@ export class BigcomhookService {
     const splitBGProducts = await this.splitProductsIntoIndividuals(
       productsBigCommerce,
     );
-    for (const product of splitBGProducts) {
-      const items = this.getOrderItems([product]);
+    for (const productOrArr of splitBGProducts) {
+      const products = Array.isArray(productOrArr)
+        ? productOrArr
+        : [productOrArr];
+      const items = this.getOrderItems(products);
       if (items.length === 0) {
         throw new Error(`Cannot create items for transaction`);
       }
       const amountPaid = this.getAmountPaidForItems(items);
-      const dimensions = this.getDimensions([product]);
-      const weight = this.getWeight([product]);
+      const dimensions = this.getDimensions(products);
+      const weight = this.getWeight(products);
       const order: Order = {
         billTo: billing_address,
         customerUsername: this.getCustomerName(
@@ -262,7 +269,7 @@ export class BigcomhookService {
         orderStatus: 'awaiting_shipment',
         paymentMethod: orderBigCommerce.payment_method,
         shipTo: shipping_address,
-        tagIds: this.getTagsIds(tagsList, [product]),
+        tagIds: this.getTagsIds(tagsList, products),
         amountPaid,
         dimensions,
         weight,
