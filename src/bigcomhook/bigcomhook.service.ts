@@ -37,6 +37,8 @@ export function converColorName(name: string): string {
   return name;
 }
 
+export const WHITE_LIST_CATEGORIES_NOT_SPLIT = [33];
+
 @Injectable()
 export class BigcomhookService {
   constructor(
@@ -192,15 +194,31 @@ export class BigcomhookService {
     return orderBigCommerce;
   }
 
-  static splitProductsIntoIndividuals(productsBigCommerce: any[]): any[] {
+  async splitProductsIntoIndividuals(
+    productsBigCommerce: any[],
+  ): Promise<any[]> {
     const result = [];
-    for (const item of productsBigCommerce) {
-      const quantity = item.quantity;
-      item.quantity = 1;
-      for (let i = 0; i < quantity; ++i) {
-        result.push(item);
-      }
-    }
+    await Promise.all(
+      productsBigCommerce.map(async (item) => {
+        const productDetails = await this.bigCommerceProxy.getProductDetails(
+          item.product_id,
+        );
+        const categories: number[] = productDetails.data.categories;
+        const shouldSkip =
+          categories.find((cat) =>
+            WHITE_LIST_CATEGORIES_NOT_SPLIT.includes(cat),
+          ) !== undefined;
+        if (shouldSkip) {
+          result.push(item);
+        } else {
+          const quantity = item.quantity;
+          item.quantity = 1;
+          for (let i = 0; i < quantity; ++i) {
+            result.push(item);
+          }
+        }
+      }),
+    );
     return result;
   }
 
@@ -221,7 +239,7 @@ export class BigcomhookService {
       : billing_address;
     const transactionId = orderBigCommerce.payment_provider_id;
     const result: OrderDataPair[] = [];
-    const splitBGProducts = BigcomhookService.splitProductsIntoIndividuals(
+    const splitBGProducts = await this.splitProductsIntoIndividuals(
       productsBigCommerce,
     );
     for (const product of splitBGProducts) {

@@ -151,4 +151,26 @@ describe('main tests', () => {
     }
     expect(orderTransTotal.length).toBe(1);
   });
+  it('test invalid combined issue', async () => {
+    const ids = [
+      '62545598738', '62545897683'
+    ];
+    const authNetProxy = createAuthNetProxy();
+    const shipStationProxy = createShipStationProxy();
+    await init(shipStationProxy);
+    let transactionDetails = await Promise.all(
+      ids.map(createFetcherDetails(authNetProxy))
+    );
+    // transactionDetails[0].transactionStatus = 'myStatus';
+    const orderTransTotal: OrderTransactionPair[] = [];
+    const processors: Processor[] = createProcessors(shipStationProxy);
+    for (const processor of processors) {
+      const { orderTrans, skipped } = await processor.process(
+        transactionDetails
+      );
+      transactionDetails = skipped;
+      orderTransTotal.push(...orderTrans);
+    }
+    expect(orderTransTotal.length).toBe(1);
+  });
 });

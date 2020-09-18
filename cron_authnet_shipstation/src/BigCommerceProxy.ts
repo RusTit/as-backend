@@ -132,7 +132,10 @@ export default class BigCommerceProxy {
     );
   }
 
-  async updateHookById(id: string | number, payload: WebHook): Promise<WebHook> {
+  async updateHookById(
+    id: string | number,
+    payload: WebHook
+  ): Promise<WebHook> {
     const url = `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`;
     const response = await this.limiter.schedule(() =>
       needle('put', url, payload, this.needleOptions)
@@ -174,6 +177,12 @@ export default class BigCommerceProxy {
     return this.makeRawRequest(
       `${BASE_URL}/stores/${this.store_hash}/v2/hooks/${id}`,
       'delete'
+    );
+  }
+
+  async getAllCategories() {
+    return this.makeRawRequest(
+      `${BASE_URL}/stores/${this.store_hash}/v3/catalog/categories`
     );
   }
 }

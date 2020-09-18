@@ -158,4 +158,10 @@ export default class BigCommerceProxy {
       'delete',
     );
   }
+
+  async getProductDetails(id: string): Promise<any> {
+    return this.makeRawRequest(
+      `${BASE_URL}/stores/${this.store_hash}/v3/catalog/products/${id}`,
+    );
+  }
 }

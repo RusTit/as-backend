@@ -17,7 +17,7 @@ import { BluetoothLock } from '../preprocessors/combined/BluetoothLock';
 import { BiometricFingerprintLock } from '../preprocessors/combined/BiometricFingerprintLock';
 import { BluetoothSoloLock } from '../preprocessors/solo/BluetoothSoloLock';
 import { BiometricFingerprintSoloLock } from '../preprocessors/solo/BiometricFingerprintSoloLock';
-import {GeneralCombinedPreProcessor} from "../preprocessors/combined/GeneralCombinedPreProcessor";
+import { GeneralCombinedPreProcessor } from '../preprocessors/combined/GeneralCombinedPreProcessor';
 
 const combineRules: Array<CombineRule> = [
   new CompactRule(),

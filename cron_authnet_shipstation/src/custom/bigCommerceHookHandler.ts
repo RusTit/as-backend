@@ -14,7 +14,13 @@ const proxy = new BigCommerceProxy(
 const hookPath = 'https://tacticaltrapsshipping.com/bigcomhook';
 const hookId = 20761619;
 
+const categories = async () => {
+  const allCategories = await proxy.getAllCategories();
+  debugger;
+};
+
 const main = async () => {
+  await categories();
   const webHooks = await proxy.getAllHooks();
   if (webHooks.length === 0) {
     const result = await proxy.createHook({
