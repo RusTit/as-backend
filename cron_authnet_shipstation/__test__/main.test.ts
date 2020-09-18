@@ -107,7 +107,7 @@ describe('main tests', () => {
     expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
   it('test combined all processors', async () => {
-    const ids = ['62557415095', '62557414469'];
+    const ids = ['62562580823', '62562581080'];
     // const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
