@@ -3,6 +3,16 @@
 <head>
   {{> header }}
   <title>Transactions Issues</title>
+  <script>
+    function deleteTransactionIssues(id) {
+      fetch(`/transactions-issues/${id}`, {
+        method: 'delete'
+      }).then(response => {
+        console.log(response.json());
+        location.reload(true);
+      });
+    }
+  </script>
 </head>
 <body>
 <table class="table">
@@ -13,6 +23,7 @@
     <th scope="col">issueObject</th>
     <th scope="col">createdAt</th>
     <th scope="col">updatedAt</th>
+    <th scope="col">operation</th>
   </tr>
   </thead>
   <tbody>
@@ -23,6 +34,9 @@
       <th>{{this.issueObject.message}}</th>
       <th>{{this.createdAt}}</th>
       <th>{{this.updatedAt}}</th>
+      <th scope="col">
+        <a href="#" class="btn btn-danger" role="button" onclick="deleteTransactionIssues({{{this.id}}})">Del</a>
+      </th>
     </tr>
   {{/each}}
   </tbody>

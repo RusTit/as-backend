@@ -48,4 +48,13 @@ export class TransactionsIssuesService {
     newTransactionIssue.transactionId = id.toString();
     await this.transactionIssuesEntity.save(newTransactionIssue);
   }
+
+  async deleteTransactionById(id: number): Promise<boolean> {
+    const dbEntity = await this.transactionIssuesEntity.findOne(id);
+    if (!dbEntity) {
+      return false;
+    }
+    await this.transactionIssuesEntity.remove(dbEntity);
+    return true;
+  }
 }

@@ -1,11 +1,18 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Delete,
+  Param,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TransactionsIssuesService } from './transactions-issues.service';
 import { ListTransactionsQuery, TransactionIssuesResultDto } from './dtos';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthenticatedGuard } from '../auth/authenticated.guard';
 
 @ApiTags('transactions')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AuthenticatedGuard)
 @ApiBearerAuth()
 @Controller('transactions-issues')
 export class TransactionsIssuesController {
@@ -23,5 +30,10 @@ export class TransactionsIssuesController {
   @Get(':id')
   async getDetailsByDbId(@Param('id') id: number): Promise<any> {
     return this.transactionsIssuesService.getDetailsByDbId(id);
+  }
+
+  @Delete(':id')
+  async deleteTransaction(@Param('id') id: number): Promise<any> {
+    return this.transactionsIssuesService.deleteTransactionById(id);
   }
 }
