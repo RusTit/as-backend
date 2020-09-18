@@ -48,10 +48,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useStaticAssets(join(__dirname, 'public'));
-  app.set('views', join(__dirname, 'views'));
+  const viewsDirectory = join(__dirname, '..', 'views');
+  app.set('views', viewsDirectory);
   const hbs = exphbs.create({
-    layoutsDir: join(__dirname, 'views', 'layouts'),
-    partialsDir: join(__dirname, 'views', 'partials'),
+    layoutsDir: join(viewsDirectory, 'layouts'),
+    partialsDir: join(viewsDirectory, 'partials'),
     defaultLayout: false,
     helpers: {
       json: function (context) {

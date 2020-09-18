@@ -8,7 +8,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "postbuild": "npm run copy:templates && npm run copy:public",
+    "postbuild": "npm run copy:public",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -21,7 +21,6 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm:migrate:run": "typeorm migration:run",
-    "copy:templates": "copyfiles -u 1 src/views/*.handlebars src/views/**/*.handlebars dist",
     "copy:public": "copyfiles -u 1 src/public/*.* src/public/**/*.* dist"
   },
   "dependencies": {
@@ -59,9 +58,9 @@
     "@types/bcrypt": "^3.0.0",
     "@types/express": "^4.17.8",
     "@types/faker": "^5.1.0",
-    "@types/jest": "^26.0.13",
+    "@types/jest": "^26.0.14",
     "@types/needle": "^2.0.4",
-    "@types/node": "^14.10.2",
+    "@types/node": "^14.11.1",
     "@types/passport-jwt": "^3.0.3",
     "@types/passport-local": "^1.0.33",
     "@types/supertest": "^2.0.8",
@@ -74,7 +73,7 @@
     "faker": "^5.1.0",
     "husky": "^4.3.0",
     "jest": "^26.4.2",
-    "lint-staged": "^10.3.0",
+    "lint-staged": "^10.4.0",
     "prettier": "^2.1.2",
     "supertest": "^4.0.2",
     "ts-jest": "^26.3.0",
