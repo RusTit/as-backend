@@ -138,9 +138,12 @@ export default class CommonProcessor extends Processor {
     if (!description) {
       return;
     }
-    const colorPart = description.split(' ').find(s => s.startsWith('color:'));
+    const colorPart = description
+      .split(' ')
+      .map(s => s.trim())
+      .find(s => s.startsWith('color:'));
     if (colorPart) {
-      const parts = colorPart.trim().split(':');
+      const parts = colorPart.split(':');
       if (parts.length === 2) {
         const [_, color] = parts;
         return color;
