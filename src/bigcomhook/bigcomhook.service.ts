@@ -376,7 +376,7 @@ export class BigcomhookService {
 
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
     const { new_status_id, previous_status_id } = payload.data.status;
-    Logger.log(`isValidStatusId: ${previous_status_id}, ${new_status_id}`);
+    Logger.log(`handleHook: ${previous_status_id}, ${new_status_id}`);
     if (new_status_id == OrderStatus.AwaitingFulfillment) {
       switch (previous_status_id) {
         case OrderStatus.Incomplete:
