@@ -17,7 +17,6 @@ import { UiModule } from './ui/ui.module';
 import { ProductsModule } from './products/products.module';
 import { BigcomhookModule } from './bigcomhook/bigcomhook.module';
 import { SystemHealthModule } from './system-health/system-health.module';
-import { SytemHealthController } from './sytem-health/sytem-health.controller';
 
 @Module({
   imports: [
@@ -38,7 +37,7 @@ import { SytemHealthController } from './sytem-health/sytem-health.controller';
     BigcomhookModule,
     SystemHealthModule,
   ],
-  controllers: [AppController, SytemHealthController],
+  controllers: [AppController],
   providers: [
     AppService,
     {
