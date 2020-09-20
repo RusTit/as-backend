@@ -87,17 +87,23 @@ export class BigcomhookService {
   }
 
   getOrderItems(productsBigCommerce: Array<TODO_ANY>): OrderItem[] {
+    // const colors = Array.from(this.shipStationProxy.tagsList.keys());
     return productsBigCommerce.map(
       (product: TODO_ANY): OrderItem => {
         const weight = parseFloat(product.weight);
-        const itemOptions: ItemOption[] = product.product_options.map(
-          (option: TODO_ANY): ItemOption => {
-            return {
-              name: 'color',
-              value: option.display_value,
-            };
-          },
-        );
+        const itemOptions: ItemOption[] = product.product_options
+          // .filter((option) => colors.includes(option.display_value))
+          .map(
+            (option: TODO_ANY): ItemOption => {
+              return {
+                name:
+                  option.display_name === 'Select Finish:'
+                    ? 'Color'
+                    : option.display_name,
+                value: option.display_value,
+              };
+            },
+          );
         return {
           name: product.name,
           sku: product.sku,
