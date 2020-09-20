@@ -1,16 +1,16 @@
 import Processor, { OrderTransactionPair, ProcessorResult } from './Processor';
+import * as Helper from '../Helper';
 import { TODO_ANY } from '../Helper';
 import CombineRule from '../combineRules/CombineRule';
 import CompactRule from '../combineRules/CompactRule';
 import HardwoodRule from '../combineRules/HardwoodRule';
-import * as Helper from '../Helper';
 import { isApprovedTransaction } from '../filters';
 import { Address, Order, OrderItem, Product } from '../ShipStationTypes';
 import { ProductTag, UnknownProduct } from '../ShipStationProxy';
 import path from 'path';
 import fs from 'fs/promises';
 import CsvParse from 'csv-parse';
-import { moveIssuedTransaction, getProductsFromTheDb } from '../db';
+import { getProductsFromTheDb, moveIssuedTransaction } from '../db';
 import { PreProcessor } from '../preprocessors/PreProcessor';
 import { StandartRFIDLock } from '../preprocessors/combined/StandartRFIDLock';
 import { BluetoothLock } from '../preprocessors/combined/BluetoothLock';
@@ -138,21 +138,23 @@ export default class CommonProcessor extends Processor {
     if (!description) {
       return;
     }
-    const position = description.lastIndexOf(':');
-    if (position === -1) {
-      return;
+    const colorPart = description.split(' ').find(s => s.startsWith('color:'));
+    if (colorPart) {
+      const parts = colorPart.trim().split(':');
+      if (parts.length === 2) {
+        const [_, color] = parts;
+        return color;
+      }
     }
-    return description.slice(position + 1).trim();
   }
 
-  matchProductForTransaction(transaction: TODO_ANY): Product | undefined {
-    const keys = this.products.keys();
-    let productKey;
-    let points = 0;
-    const { description } = transaction.order;
+  matchProductForDescription(description?: string): Product | undefined {
     if (!description) {
       return;
     }
+    const keys = this.products.keys();
+    let productKey;
+    let points = 0;
     for (const key of keys) {
       if (points < key.length && description.includes(key)) {
         productKey = key;
@@ -160,16 +162,21 @@ export default class CommonProcessor extends Processor {
       }
     }
     if (productKey) {
-      return this.products.get(productKey);
+      const product = { ...this.products.get(productKey) } as Product;
+      product.name = description
+        .split(' ')
+        .filter(part => !part.includes('color:'))
+        .join(' ');
+      return product;
     }
   }
 
   getOrderItems(arrTransactions: Array<TODO_ANY>): OrderItem[] {
     const result: OrderItem[] = [];
     for (const transaction of arrTransactions) {
-      const product = this.matchProductForTransaction(transaction);
+      const { description } = transaction.order;
+      const product = this.matchProductForDescription(description);
       if (!product) {
-        const { description } = transaction.order;
         const message = `App cannot process transactions with description: ${description}`;
         this.logger.warn(message);
         this.logger.warn(JSON.stringify(transaction));
@@ -232,6 +239,16 @@ export default class CommonProcessor extends Processor {
     return [];
   }
 
+  getProductWithUnits(items: OrderItem[]): Product {
+    for (const item of items) {
+      const tempProduct = this.matchProductForDescription(item.name);
+      if (typeof tempProduct?.height === 'number') {
+        return tempProduct;
+      }
+    }
+    throw new Error('Product with units not found.');
+  }
+
   transformData(transactionDetails: TODO_ANY | Array<TODO_ANY>): Order {
     const arr = Array.isArray(transactionDetails)
       ? transactionDetails
@@ -256,17 +273,7 @@ export default class CommonProcessor extends Processor {
       throw new Error(`Cannot create items for transaction`);
     }
     const amountPaid = this.getAmountPaidForItems(items);
-    let productWithUnits: Product | null = null;
-    for (const item of items) {
-      const tempProduct = this.products.get(item.name as string) as Product;
-      if (typeof tempProduct?.height === 'number') {
-        productWithUnits = tempProduct;
-        break;
-      }
-    }
-    if (!productWithUnits) {
-      throw new Error('Product with units not found.');
-    }
+    const productWithUnits = this.getProductWithUnits(items);
     const result: Order = {
       billTo,
       customerUsername: CommonProcessor.getCustomerUsername(transactionDetails),

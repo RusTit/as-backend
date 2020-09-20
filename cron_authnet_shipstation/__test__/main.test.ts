@@ -80,7 +80,8 @@ describe('main tests', () => {
     expect(orders.orderTrans.length).toBeGreaterThan(0);
   });
   it('test common processor', async () => {
-    const ids = ['42162684664'];
+    // const ids = ['62561845356'];
+    const ids = ['42178860037'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
