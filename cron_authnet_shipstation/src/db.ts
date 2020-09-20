@@ -2,6 +2,7 @@ import { Connection, createConnection, EntityManager } from 'typeorm';
 import { TransactionCreatedEntity } from './entities/TransactionCreated.entity';
 import { TransactionProcessedEntity } from './entities/TransactionProcessed.entity';
 import { TransactionIssuesEntity } from './entities/TransactionIssues.entity';
+import { SystemHealthEntity } from './entities/SystemHealth.entity';
 import * as Helper from './Helper';
 import { ProductEntity } from './entities/Product.entity';
 
@@ -101,4 +102,12 @@ export function convertRecordsIntoArrayOfTransactionsIds(
   records: TransactionCreatedEntity[]
 ): Array<string> {
   return records.map(record => record.transactionId);
+}
+
+export async function saveSystemEventEvent(message: string): Promise<void> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(SystemHealthEntity);
+  const newRow = new SystemHealthEntity();
+  newRow.message = message;
+  await repository.save(newRow);
 }

@@ -1,5 +1,6 @@
 import * as env from 'env-var';
 import dotenvProxy from './dotenvProxy';
+import config from './config';
 
 dotenvProxy();
 
@@ -34,4 +35,8 @@ export const BIGCOMMERCE_CLIENT_ID: string = env
 export const BIGCOMMERCE_STORE_HASH: string = env
   .get('BIGCOMMERCE_STORE_HASH')
   .required()
+  .asString();
+export const TIMEZONE = env
+  .get('CRON_TIMEZONE')
+  .default(config.Cron.Timezone)
   .asString();

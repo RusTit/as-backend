@@ -28,7 +28,9 @@ import {
   AUTHNET_TRANSACTION_KEY,
   SHIPSTATION_API_KEY,
   SHIPSTATION_API_SECRET,
+  TIMEZONE,
 } from './env-vars';
+import { TaskCheckBGHook } from './TaskCheckBGHook';
 
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   maxConcurrent: 100,
@@ -246,10 +248,6 @@ const schedule = env
   .get('CRON_SCHEDULE')
   .default(config.Cron.Schedule)
   .asString();
-const timezone = env
-  .get('CRON_TIMEZONE')
-  .default(config.Cron.Timezone)
-  .asString();
 
 const runOnInit = require.main === module;
 /**
@@ -260,10 +258,11 @@ const job = new CronJob(
   dbFlow,
   null,
   false,
-  timezone,
+  TIMEZONE,
   null,
   runOnInit
 );
+const jobs = [job, TaskCheckBGHook];
 if (require.main === module) {
-  job.start();
+  jobs.forEach(j => j.start());
 }
