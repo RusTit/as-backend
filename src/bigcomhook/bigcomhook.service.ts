@@ -15,11 +15,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
-enum OrderStatus {
+// https://developer.bigcommerce.com/api-reference/orders/orders-api/order-status/getorderstatus
+export enum OrderStatus {
   Incomplete = 0,
   Pending = 1,
+  Shipped = 2,
+  PartiallyShipped = 3,
+  Refunded = 4,
+  Cancelled = 5,
+  Declined = 6,
   AwaitingPayment = 7,
+  AwaitingPickup = 8,
+  AwaitingShipment = 9,
+  Completed = 10,
   AwaitingFulfillment = 11,
+  ManualVerificationRequired = 12,
+  Disputed = 13,
+  PartiallyRefunded = 14,
 }
 
 type TODO_ANY = any;
@@ -283,7 +295,86 @@ export class BigcomhookService {
     return result;
   }
 
-  isValidStatusId(payload: WebhookUpdatedDto): boolean {
+  async createShipStationOrder(payload: WebhookUpdatedDto): Promise<void> {
+    let transactionId = '';
+    try {
+      Logger.debug(payload);
+      Logger.debug('Get bigcommerce order');
+      const orderBigCommerce = await this.getBigCommerceOrder(
+        payload.data.id.toString(),
+      );
+      transactionId = orderBigCommerce.payment_provider_id;
+      Logger.debug(`Processing transaction id: ${transactionId}`);
+      if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
+        Logger.warn(`Can't process this kind of transactions.`);
+        return;
+      }
+      await this.shipStationProxy.init();
+      const orderDataPairs = await this.generateOrders(
+        payload.data.id,
+        orderBigCommerce,
+        this.shipStationProxy.tagsList,
+      );
+      const shipStationResponses = await Promise.all(
+        orderDataPairs.map(async ({ order }) => {
+          Logger.log(`Processing order: ${order.orderNumber}`);
+          const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
+            order,
+          );
+          Logger.log(`Order saved: ${order.orderNumber}`);
+          return shipStationResponse;
+        }),
+      );
+      if (transactionId) {
+        const dbProcessed = new TransactionProcessedEntity();
+        dbProcessed.transactionId = transactionId;
+        dbProcessed.orderObject = shipStationResponses;
+        dbProcessed.labelObject = {
+          todo: 'temp stub',
+        };
+        await this.transactionProcessedEntity.save(dbProcessed);
+      } else {
+        Logger.warn(`Order: ${payload.data.id} has not transaction id.`);
+      }
+    } catch (e) {
+      Logger.error(e);
+      if (transactionId) {
+        const issue = e;
+        const dbIssues = new TransactionIssuesEntity();
+        dbIssues.transactionId = transactionId;
+        dbIssues.issueObject = {
+          error: issue,
+          message: issue.message,
+        };
+        await this.transactionIssuesEntity.save(dbIssues);
+      }
+    }
+  }
+
+  async deleteShipStationOrder(payload: WebhookUpdatedDto): Promise<void> {
+    const orderNumber = payload.data.id.toString();
+    Logger.debug(`Processing refund/voided orderNumber BG: ${orderNumber}`);
+    try {
+      await this.shipStationProxy.init();
+      const orders = await this.shipStationProxy.getListOrders({
+        orderNumber: `${orderNumber}`,
+        pageSize: `500`, // to avoid paging issues
+      });
+      Logger.debug(`Found ${orders.length} orders for ${orderNumber}`);
+      await Promise.all(
+        orders.map(async (order) => {
+          const { orderId } = order;
+          Logger.debug(`Deleting ${orderId} (${orderNumber})`);
+          await this.shipStationProxy.deleteOrder(orderId);
+        }),
+      );
+    } catch (e) {
+      const issue = e as Error;
+      Logger.error(`${issue.message}, ${issue.stack}`);
+    }
+  }
+
+  async handleHook(payload: WebhookUpdatedDto): Promise<void> {
     const { new_status_id, previous_status_id } = payload.data.status;
     Logger.log(`isValidStatusId: ${previous_status_id}, ${new_status_id}`);
     if (new_status_id == OrderStatus.AwaitingFulfillment) {
@@ -291,71 +382,17 @@ export class BigcomhookService {
         case OrderStatus.Incomplete:
         case OrderStatus.Pending:
         case OrderStatus.AwaitingPayment:
-          return true;
+          return this.createShipStationOrder(payload);
       }
     }
-    return false;
-  }
-
-  async handleHook(payload: WebhookUpdatedDto): Promise<void> {
-    if (this.isValidStatusId(payload)) {
-      let transactionId = '';
-      try {
-        Logger.debug(payload);
-        Logger.debug('Get bigcommerce order');
-        const orderBigCommerce = await this.getBigCommerceOrder(
-          payload.data.id.toString(),
-        );
-        transactionId = orderBigCommerce.payment_provider_id;
-        Logger.debug(`Processing transaction id: ${transactionId}`);
-        if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
-          Logger.warn(`Can't process this kind of transactions.`);
-          return;
-        }
-        await this.shipStationProxy.init();
-        const orderDataPairs = await this.generateOrders(
-          payload.data.id,
-          orderBigCommerce,
-          this.shipStationProxy.tagsList,
-        );
-        const shipStationResponses = await Promise.all(
-          orderDataPairs.map(async ({ order }) => {
-            Logger.log(`Processing order: ${order.orderNumber}`);
-            const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
-              order,
-            );
-            Logger.log(`Order saved: ${order.orderNumber}`);
-            return shipStationResponse;
-          }),
-        );
-        if (transactionId) {
-          const dbProcessed = new TransactionProcessedEntity();
-          dbProcessed.transactionId = transactionId;
-          dbProcessed.orderObject = shipStationResponses;
-          dbProcessed.labelObject = {
-            todo: 'temp stub',
-          };
-          await this.transactionProcessedEntity.save(dbProcessed);
-        } else {
-          Logger.warn(`Order: ${payload.data.id} has not transaction id.`);
-        }
-      } catch (e) {
-        if (transactionId) {
-          const issue = e;
-          const dbIssues = new TransactionIssuesEntity();
-          dbIssues.transactionId = transactionId;
-          dbIssues.issueObject = {
-            error: issue,
-            message: issue.message,
-          };
-          await this.transactionIssuesEntity.save(dbIssues);
-        }
-        throw e;
-      }
-    } else {
-      Logger.debug(
-        `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
-      );
+    switch (new_status_id) {
+      case OrderStatus.Refunded:
+      case OrderStatus.Cancelled:
+      case OrderStatus.Declined:
+        return this.deleteShipStationOrder(payload);
     }
+    Logger.debug(
+      `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
+    );
   }
 }
