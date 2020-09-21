@@ -341,11 +341,6 @@ export class BigcomhookService {
               order.advancedOptions.customField3 = value;
               break;
           }
-
-          const fieldName = group.fieldName ? group.fieldName : 'customField1';
-          order.advancedOptions[fieldName] = group.customName
-            ? group.customName
-            : group.name;
         }
       }
       return pair;
