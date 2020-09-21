@@ -2,10 +2,15 @@
 <html lang="en">
 <head>
   {{> header }}
-  <title>Products</title>
+  <title>Grouping</title>
   <script>
     function deleteGroup(id) {
-
+      fetch(`/grouping/${id}`, {
+        method: 'delete'
+      }).then(response => {
+        console.log(response.json());
+        location.reload(true);
+      });
     }
   </script>
 </head>
