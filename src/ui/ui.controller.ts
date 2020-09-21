@@ -16,7 +16,7 @@ import { LoginGuard } from '../auth/login.guard';
 import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { ListTransactionsQuery } from './dtos';
-import { ListProductsQuery } from '../products/dtos';
+import { ListGroupingQuery, ListProductsQuery } from '../products/dtos';
 import { ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller('ui')
@@ -76,6 +76,17 @@ export class UiController {
     const productsList = await this.uiService.getArrayOfProducts(options);
     return {
       productsList,
+    };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  @Get('/grouping')
+  @Render('grouping')
+  async groupsList(@Query() options?: ListGroupingQuery) {
+    const groupingList = await this.uiService.getArrayOfGroups(options);
+    return {
+      groupingList,
     };
   }
 

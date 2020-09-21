@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{> header }}
+  <title>Products</title>
+  <script>
+    function deleteGroup(id) {
+
+    }
+  </script>
+</head>
+<body>
+{{> menu }}
+<a href="grouping/new" class="btn btn-primary" role="button">Create new Group</a>
+<table class="table">
+  <thead>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">name</th>
+    <th scope="col">productNameGlob</th>
+    <th scope="col">productSkuGlob</th>
+    <th scope="col">customName</th>
+    <th scope="col">fieldName</th>
+    <th scope="col">createdAt</th>
+    <th scope="col">updatedAt</th>
+    <th scope="col">operation</th>
+  </tr>
+  </thead>
+  <tbody>
+  {{#each groupingList}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <th scope="row">{{this.name}}</th>
+      <th scope="row">{{this.productNameGlob}}</th>
+      <th scope="row">{{this.productSkuGlob}}</th>
+      <th scope="row">{{this.customName}}</th>
+      <th scope="row">{{this.fieldName}}</th>
+      <th scope="row">{{this.createdAt}}</th>
+      <th scope="row">{{this.updatedAt}}</th>
+      <th scope="col">
+        <a href="./grouping/{{{this.id}}}" class="btn btn-primary" role="button">Edit</a>
+        <a href="#" class="btn btn-danger" role="button" onclick="deleteGroup({{{this.id}}})">Del</a>
+      </th>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>
+</body>
+</html>

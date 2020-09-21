@@ -5,6 +5,7 @@ import { TransactionsCreatedModule } from '../transactions-created/transactions-
 import { TransactionsIssuesModule } from '../transactions-issues/transactions-issues.module';
 import { TransactionsProcessedModule } from '../transactions-processed/transactions-processed.module';
 import { ProductsModule } from '../products/products.module';
+import { GroupingModule } from '../grouping/grouping.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { ProductsModule } from '../products/products.module';
     TransactionsIssuesModule,
     TransactionsProcessedModule,
     ProductsModule,
+    GroupingModule,
   ],
   providers: [UiService],
   controllers: [UiController],

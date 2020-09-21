@@ -8,7 +8,9 @@ import { TransactionProcessedEntity } from '../transactions-processed/Transactio
 import { ListTransactionsQuery } from './dtos';
 import { ProductsService } from '../products/products.service';
 import { ProductEntity } from '../products/Product.entity';
-import { ListProductsQuery } from '../products/dtos';
+import { ListGroupingQuery, ListProductsQuery } from '../products/dtos';
+import { GroupingService } from '../grouping/grouping.service';
+import { GroupEntity } from '../grouping/Group.entity';
 
 @Injectable()
 export class UiService {
@@ -17,7 +19,12 @@ export class UiService {
     private readonly transactionsIssuesService: TransactionsIssuesService,
     private readonly transactionsProcessedService: TransactionsProcessedService,
     private readonly productsService: ProductsService,
+    private readonly groupingService: GroupingService,
   ) {}
+
+  async getArrayOfGroups(options?: ListGroupingQuery): Promise<GroupEntity[]> {
+    return this.groupingService.findAll(options.skip, options.take);
+  }
 
   async getArrayOfProducts(
     options?: ListProductsQuery,
