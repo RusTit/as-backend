@@ -311,6 +311,9 @@ export class BigcomhookService {
     const groups = await this.groupingService.findAll(0, 1000);
     return orderDataPairs.map((pair) => {
       const { order } = pair;
+      if (!order.items || order.items.length === 0) {
+        return pair;
+      }
       for (const group of groups) {
         if (
           anymatch(
@@ -325,8 +328,24 @@ export class BigcomhookService {
           if (!order.advancedOptions) {
             order.advancedOptions = {} as AdvancedOptions;
           }
+          const value = group.customName ? group.customName : group.name;
+          switch (group.fieldName) {
+            default:
+            case 'customField1':
+              order.advancedOptions.customField1 = value;
+              break;
+            case 'customField2':
+              order.advancedOptions.customField2 = value;
+              break;
+            case 'customField3':
+              order.advancedOptions.customField3 = value;
+              break;
+          }
+
           const fieldName = group.fieldName ? group.fieldName : 'customField1';
-          order[fieldName] = group.customName ? group.customName : group.name;
+          order.advancedOptions[fieldName] = group.customName
+            ? group.customName
+            : group.name;
         }
       }
       return pair;

@@ -5,6 +5,7 @@ import { TransactionIssuesEntity } from './entities/TransactionIssues.entity';
 import { SystemHealthEntity } from './entities/SystemHealth.entity';
 import * as Helper from './Helper';
 import { ProductEntity } from './entities/Product.entity';
+import { GroupEntity } from './entities/Group.entity';
 
 let connection: Connection | undefined;
 export async function initDbConnection(): Promise<Connection> {
@@ -110,4 +111,10 @@ export async function saveSystemEventEvent(message: string): Promise<void> {
   const newRow = new SystemHealthEntity();
   newRow.message = message;
   await repository.save(newRow);
+}
+
+export async function getAllGroups(): Promise<GroupEntity[]> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(GroupEntity);
+  return repository.find();
 }

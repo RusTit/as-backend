@@ -1,4 +1,5 @@
 import { CronJob } from 'cron';
+import anymatch from 'anymatch';
 import * as env from 'env-var';
 import moment from 'moment';
 import config from './config';
@@ -12,6 +13,7 @@ import {
   getDbTransactionsCreated,
   moveIssuedTransaction,
   moveProcessedTransaction,
+  getAllGroups,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor from './processors/CommonProcessor';
@@ -31,6 +33,7 @@ import {
   TIMEZONE,
 } from './env-vars';
 import { TaskCheckBGHook } from './TaskCheckBGHook';
+import { AdvancedOptions } from './ShipStationTypes';
 
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   maxConcurrent: 100,
@@ -199,6 +202,48 @@ export function createProcessors(
   ];
 }
 
+async function postProcessOrders(
+  orderDataPairs: OrderTransactionPair[]
+): Promise<OrderTransactionPair[]> {
+  const groups = await getAllGroups();
+  return orderDataPairs.map(pair => {
+    const { order } = pair;
+    if (!order.items || order.items.length === 0) {
+      return pair;
+    }
+    for (const group of groups) {
+      if (
+        anymatch(
+          group.productNameGlob,
+          order.items.map(item => item.name)
+        ) &&
+        anymatch(
+          group.productSkuGlob,
+          order.items.map(item => item.sku)
+        )
+      ) {
+        if (!order.advancedOptions) {
+          order.advancedOptions = {} as AdvancedOptions;
+        }
+        const value = group.customName ? group.customName : group.name;
+        switch (group.fieldName) {
+          default:
+          case 'customField1':
+            order.advancedOptions.customField1 = value;
+            break;
+          case 'customField2':
+            order.advancedOptions.customField2 = value;
+            break;
+          case 'customField3':
+            order.advancedOptions.customField3 = value;
+            break;
+        }
+      }
+    }
+    return pair;
+  });
+}
+
 export async function dbProcessor(): Promise<void> {
   const { shipStationProxy, authNetProxy } = await CreateAndInitCore();
   const records = await getDbTransactionsCreated();
@@ -213,8 +258,9 @@ export async function dbProcessor(): Promise<void> {
     transactionDetails = skipped;
     orderTransTotal.push(...orderTrans);
   }
+  const processedOrdersPair = await postProcessOrders(orderTransTotal);
   await Promise.all(
-    orderTransTotal.map(async pair => {
+    processedOrdersPair.map(async pair => {
       const { order, transaction } = pair;
       try {
         logger.info(`Processing order: ${order.orderNumber}`);
