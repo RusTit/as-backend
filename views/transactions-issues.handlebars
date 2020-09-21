@@ -33,8 +33,8 @@
       <th scope="row">{{this.id}}</th>
       <th>{{this.transactionId}}</th>
       <th>{{this.issueObject.message}}</th>
-      <th>{{this.createdAt}}</th>
-      <th>{{this.updatedAt}}</th>
+      <th>{{humanDates this.createdAt}}</th>
+      <th>{{humanDates this.updatedAt}}</th>
       <th scope="col">
         <a href="#" class="btn btn-danger" role="button" onclick="deleteTransactionIssues({{{this.id}}})">Del</a>
       </th>

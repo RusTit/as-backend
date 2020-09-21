@@ -26,8 +26,8 @@
       <th>{{this.price}}</th>
       <th>{{this.customerName}}</th>
       <th>{{this.customerEmail}}</th>
-      <th>{{this.createdAt}}</th>
-      <th>{{this.updatedAt}}</th>
+      <th>{{humanDates this.createdAt}}</th>
+      <th>{{humanDates this.updatedAt}}</th>
     </tr>
   {{/each}}
   </tbody>

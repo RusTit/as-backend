@@ -8,6 +8,7 @@ import * as passport from 'passport';
 import * as redis from 'redis';
 import * as connectRedis from 'connect-redis';
 import * as exphbs from 'express-handlebars';
+import * as momentJs from 'moment';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -57,6 +58,12 @@ async function bootstrap() {
     helpers: {
       json: function (context) {
         return JSON.stringify(context);
+      },
+      humanDates: function (context) {
+        if (context instanceof Date) {
+          return momentJs(context).format('dddd, MMMM Do YYYY, h:mm:ss a');
+        }
+        return context;
       },
     },
   });

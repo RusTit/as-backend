@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Query,
+  Redirect,
   UseGuards,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -48,6 +49,7 @@ export class ProductsController {
   }
 
   @Post()
+  @Redirect('/ui/products')
   async createNewProduct(
     @Body() productNewDto: ProductNewDto,
   ): Promise<OperationResultDto> {
@@ -58,6 +60,7 @@ export class ProductsController {
   }
 
   @Post(':id') // todo: this should be put, but for now let's use post
+  @Redirect('/ui/products')
   async updateProduct(
     @Param('id') id: number,
     @Body() productEditDto: ProductEditDto,
