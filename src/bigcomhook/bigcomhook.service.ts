@@ -9,11 +9,14 @@ import {
   Dimensions,
   Order,
   Weight,
+  AdvancedOptions,
 } from './ShipStationTypes';
 import { ShipStationProxy, ProductTag } from './ShipStationProxy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
+import { GroupingService } from '../grouping/grouping.service';
+import anymatch from 'anymatch';
 
 // https://developer.bigcommerce.com/api-reference/orders/orders-api/order-status/getorderstatus
 export enum OrderStatus {
@@ -60,6 +63,7 @@ export class BigcomhookService {
     private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
     @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
     @Inject('BigCommerceProxy') private bigCommerceProxy: BigCommerceProxy,
+    private readonly groupingService: GroupingService,
   ) {}
 
   getCustomerName(bigCommerceAddress: TODO_ANY): string {
@@ -301,6 +305,34 @@ export class BigcomhookService {
     return result;
   }
 
+  async postProcessOrders(
+    orderDataPairs: OrderDataPair[],
+  ): Promise<OrderDataPair[]> {
+    const groups = await this.groupingService.findAll(0, 1000);
+    return orderDataPairs.map((pair) => {
+      const { order } = pair;
+      for (const group of groups) {
+        if (
+          anymatch(
+            group.productNameGlob,
+            order.items.map((item) => item.name),
+          ) &&
+          anymatch(
+            group.productSkuGlob,
+            order.items.map((item) => item.sku),
+          )
+        ) {
+          if (!order.advancedOptions) {
+            order.advancedOptions = {} as AdvancedOptions;
+          }
+          const fieldName = group.fieldName ? group.fieldName : 'customField1';
+          order[fieldName] = group.customName ? group.customName : group.name;
+        }
+      }
+      return pair;
+    });
+  }
+
   async createShipStationOrder(payload: WebhookUpdatedDto): Promise<void> {
     let transactionId = '';
     try {
@@ -321,8 +353,11 @@ export class BigcomhookService {
         orderBigCommerce,
         this.shipStationProxy.tagsList,
       );
+      const processedOrderDataPair = await this.postProcessOrders(
+        orderDataPairs,
+      );
       const shipStationResponses = await Promise.all(
-        orderDataPairs.map(async ({ order }) => {
+        processedOrderDataPair.map(async ({ order }) => {
           Logger.log(`Processing order: ${order.orderNumber}`);
           const shipStationResponse = await this.shipStationProxy.createOrUpdateOrder(
             order,

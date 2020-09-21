@@ -31,7 +31,7 @@ describe('BigCommerceHook (e2e)', () => {
       hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
       data: {
         type: 'order',
-        id: 35624, // 35797, // 35791, // 35626 - no transactionId,
+        id: 35209, // 35797, // 35791, // 35626 - no transactionId,
         status: {
           previous_status_id: 0,
           new_status_id: 11,

@@ -32,6 +32,7 @@
     "@nestjs/platform-express": "^7.4.4",
     "@nestjs/swagger": "^4.6.0",
     "@nestjs/typeorm": "^7.1.4",
+    "anymatch": "^3.1.1",
     "authorizenet": "^1.0.7",
     "bcrypt": "^5.0.0",
     "bottleneck": "^2.19.5",

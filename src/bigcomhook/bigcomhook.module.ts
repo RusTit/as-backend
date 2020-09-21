@@ -6,6 +6,7 @@ import { TransactionProcessedEntity } from '../transactions-processed/Transactio
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { ShipStationProxy } from './ShipStationProxy';
 import BigCommerceProxy from './BigCommerceProxy';
+import { GroupingModule } from '../grouping/grouping.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import BigCommerceProxy from './BigCommerceProxy';
       TransactionProcessedEntity,
       TransactionIssuesEntity,
     ]),
+    GroupingModule,
   ],
   providers: [
     BigcomhookService,
