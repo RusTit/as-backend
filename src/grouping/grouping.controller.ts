@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Redirect,
   UseGuards,
 } from '@nestjs/common';
 import { GroupingService } from './grouping.service';
@@ -22,6 +23,7 @@ export class GroupingController {
   constructor(private readonly groupingService: GroupingService) {}
 
   @Post()
+  @Redirect('/ui/grouping')
   async createNewGroup(
     @Body() groupNewDto: GroupNewDto,
   ): Promise<OperationResultDto> {
@@ -32,6 +34,7 @@ export class GroupingController {
   }
 
   @Post(':id') // todo: this should be put, but for now let's use post
+  @Redirect('/ui/grouping')
   async updateGroup(
     @Param('id') id: number,
     @Body() productEditDto: GroupingEditDto,
