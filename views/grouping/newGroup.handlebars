@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {{> header }}
+  <title>New group</title>
+</head>
+<body>
+{{> menu }}
+<form method="post" action="/grouping/">
+  <div class="form-group">
+    <label for="inputGroupName">Group name</label>
+    <input type="text" class="form-control" id="inputGroupName" aria-describedby="GroupNameHelp"
+           placeholder="Group name" required name="name">
+    <small id="groupNameHelp" class="form-text text-muted">Please enter group name.</small>
+  </div>
+  <div class="form-group">
+    <label for="inputProductNameGlobName">Product Name Glob</label>
+    <input type="text" class="form-control" id="inputProductNameGlobName" aria-describedby="ProductNameGlobNameHelp"
+           placeholder="Product Name Glob" required name="productNameGlob">
+    <small id="productNameGlobHelp" class="form-text text-muted">Please enter Product Name Glob.</small>
+  </div>
+  <div class="form-group">
+    <label for="inputProductSkuGlob">Product Sku Glob</label>
+    <input type="text" class="form-control" id="inputProductSkuGlob" aria-describedby="ProductSkuGlobHelp"
+           placeholder="Product Sku Glob" required name="productSkuGlob">
+    <small id="productSkuGlobHelp" class="form-text text-muted">Please enter Product Sku Glob.</small>
+  </div>
+  <div class="form-group">
+    <label for="inputCustomName">Custom Name</label>
+    <input type="text" class="form-control" id="inputCustomName" aria-describedby="CustomNameHelp"
+           placeholder="Custom Name" name="customName">
+    <small id="customNameHelp" class="form-text text-muted">Please enter Custom Name.</small>
+  </div>
+  <div class="form-group">
+    <label for="inputFieldName">Field Name</label>
+    <input type="text" class="form-control" id="inputFieldName" aria-describedby="FieldNameHelp"
+           placeholder="Field Name" name="fieldName">
+    <small id="fieldNameHelp" class="form-text text-muted">Please enter Field Name.</small>
+  </div>
+  <button type="submit" class="btn btn-primary">Create new Group</button>
+</form>
+</body>
+</html>

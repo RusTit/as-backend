@@ -16,7 +16,8 @@ import { LoginGuard } from '../auth/login.guard';
 import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { ListTransactionsQuery } from './dtos';
-import { ListGroupingQuery, ListProductsQuery } from '../products/dtos';
+import { ListProductsQuery } from '../products/dtos';
+import { ListGroupingQuery } from '../grouping/dtos';
 import { ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller('ui')
@@ -95,6 +96,14 @@ export class UiController {
   @Get('/products/new')
   @Render('products/newProduct')
   async createNewProduct() {
+    return;
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  @Get('/grouping/new')
+  @Render('grouping/newGroup')
+  async createNewGroup() {
     return;
   }
 

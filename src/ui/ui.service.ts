@@ -8,7 +8,8 @@ import { TransactionProcessedEntity } from '../transactions-processed/Transactio
 import { ListTransactionsQuery } from './dtos';
 import { ProductsService } from '../products/products.service';
 import { ProductEntity } from '../products/Product.entity';
-import { ListGroupingQuery, ListProductsQuery } from '../products/dtos';
+import { ListProductsQuery } from '../products/dtos';
+import { ListGroupingQuery } from '../grouping/dtos';
 import { GroupingService } from '../grouping/grouping.service';
 import { GroupEntity } from '../grouping/Group.entity';
 

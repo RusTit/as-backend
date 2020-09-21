@@ -15,20 +15,6 @@ export class ListProductsQuery {
   take?: number;
 }
 
-export class ListGroupingQuery {
-  @ApiProperty({
-    required: false,
-    default: 0,
-  })
-  skip?: number;
-
-  @ApiProperty({
-    required: false,
-    default: 100,
-  })
-  take?: number;
-}
-
 export class ProductNewDto {
   @ApiProperty({
     required: true,
