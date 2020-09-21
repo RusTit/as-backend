@@ -40,3 +40,16 @@ export class GroupNewDto {
   })
   fieldName?: string;
 }
+
+export class GroupingEditDto extends GroupNewDto {}
+
+export class GroupingDto extends GroupNewDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty()
+  updatedAt: Date;
+}

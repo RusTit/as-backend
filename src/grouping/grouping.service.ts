@@ -2,9 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GroupEntity } from './Group.entity';
 import { Repository } from 'typeorm';
-import { GroupNewDto } from './dtos';
+import { GroupNewDto, GroupingEditDto } from './dtos';
 
-function setFields(groupNewDto: GroupNewDto, dbRow: GroupEntity): GroupEntity {
+function setFieldsFromThePayload(
+  groupNewDto: GroupNewDto,
+  dbRow: GroupEntity,
+): GroupEntity {
   dbRow.name = groupNewDto.name;
   dbRow.productNameGlob = groupNewDto.productNameGlob;
   dbRow.productSkuGlob = groupNewDto.productSkuGlob;
@@ -27,7 +30,33 @@ export class GroupingService {
   }
 
   async createNewGroup(groupNewDto: GroupNewDto): Promise<void> {
-    const newDbRow = setFields(groupNewDto, new GroupEntity());
+    const newDbRow = setFieldsFromThePayload(groupNewDto, new GroupEntity());
     await this.groupEntityRepository.save(newDbRow);
+  }
+
+  async findById(id: number): Promise<GroupEntity> {
+    return this.groupEntityRepository.findOne(id);
+  }
+
+  async updateGroupingData(
+    id: number,
+    groupingEditDto: GroupingEditDto,
+  ): Promise<GroupEntity | null> {
+    const dbEntity = await this.groupEntityRepository.findOne(id);
+    if (!dbEntity) {
+      return dbEntity;
+    }
+    setFieldsFromThePayload(groupingEditDto, dbEntity);
+    await this.groupEntityRepository.save(dbEntity);
+    return dbEntity;
+  }
+
+  async deleteGroupById(id: number): Promise<boolean> {
+    const dbEntity = await this.groupEntityRepository.findOne(id);
+    if (!dbEntity) {
+      return false;
+    }
+    await this.groupEntityRepository.remove(dbEntity);
+    return true;
   }
 }

@@ -124,6 +124,23 @@ export class UiController {
     };
   }
 
+  @UseGuards(AuthenticatedGuard)
+  @ApiCookieAuth()
+  @Get('/grouping/:id')
+  @Render('grouping/editGroup')
+  async getGroupingItem(@Param('id') id: number) {
+    const group = await this.uiService.getGroupById(id);
+    if (!group) {
+      throw new HttpException(
+        `Group not found by db id: ${id}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return {
+      group,
+    };
+  }
+
   @Get('/logout')
   logout(@Request() req, @Res() res: Response) {
     req.logout();

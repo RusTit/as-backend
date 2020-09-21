@@ -57,4 +57,8 @@ export class UiService {
   async getProductById(id: number): Promise<ProductEntity> {
     return this.productsService.findById(id);
   }
+
+  async getGroupById(id: number): Promise<GroupEntity> {
+    return this.groupingService.findById(id);
+  }
 }
