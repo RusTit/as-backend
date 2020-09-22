@@ -131,10 +131,9 @@ export class ShipStationProxy {
 
   async getListOrders(params: ListOrdersQuery): Promise<Order[]> {
     const url = `${SHIPSTATION_DOMAIN}/orders`;
-    let query = '';
-    for (const [key, value] of Object.entries(params)) {
-      query += `${key}=${value}`;
-    }
+    const query = Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
     const full_url = `${url}${query ? `?${query}` : query}`;
     Logger.debug(full_url);
     const response = await this.limiter.schedule(() =>
