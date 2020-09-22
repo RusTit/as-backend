@@ -108,7 +108,7 @@ describe('main tests', () => {
     expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
   it('test combined all processors', async () => {
-    const ids = ['62562580823', '62562581080'];
+    const ids = ['62568853213', '62568860528'];
     // const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
@@ -130,10 +130,7 @@ describe('main tests', () => {
     await shipStationProxy.createOrUpdateOrder(orderTransTotal[0].order);
   });
   it('test product not found on all processors', async () => {
-    const ids = [
-      '62545980127',
-      '42216840795'
-    ];
+    const ids = ['62545980127', '42216840795'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
@@ -153,9 +150,7 @@ describe('main tests', () => {
     expect(orderTransTotal.length).toBe(1);
   });
   it('test invalid combined issue', async () => {
-    const ids = [
-      '62545598738', '62545897683'
-    ];
+    const ids = ['62545598738', '62545897683'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);

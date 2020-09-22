@@ -17,7 +17,10 @@ import { BluetoothLock } from '../preprocessors/combined/BluetoothLock';
 import { BiometricFingerprintLock } from '../preprocessors/combined/BiometricFingerprintLock';
 import { BluetoothSoloLock } from '../preprocessors/solo/BluetoothSoloLock';
 import { BiometricFingerprintSoloLock } from '../preprocessors/solo/BiometricFingerprintSoloLock';
-import { GeneralCombinedPreProcessor } from '../preprocessors/combined/GeneralCombinedPreProcessor';
+import {
+  extractMetaFromDescription,
+  GeneralCombinedPreProcessor,
+} from '../preprocessors/combined/GeneralCombinedPreProcessor';
 
 const combineRules: Array<CombineRule> = [
   new CompactRule(),
@@ -160,16 +163,21 @@ export default class CommonProcessor extends Processor {
     let points = 0;
     for (const key of keys) {
       if (points < key.length && description.includes(key)) {
-        productKey = key;
-        points = productKey.length;
+        const product = this.products.get(key);
+        if (typeof product?.height === 'number') {
+          productKey = key;
+          points = productKey.length;
+        }
       }
     }
     if (productKey) {
       const product = { ...this.products.get(productKey) } as Product;
-      product.name = description
-        .split(' ')
-        .filter(part => !part.includes('color:'))
+      const [name, meta] = extractMetaFromDescription(description);
+      const metaStr = Array.from(meta.entries())
+        .filter(([K]) => K !== 'color')
+        .map(([K, V]) => `${K}:${V}`)
         .join(' ');
+      product.name = `${name} ${metaStr}`;
       return product;
     }
   }
@@ -185,9 +193,10 @@ export default class CommonProcessor extends Processor {
         this.logger.warn(JSON.stringify(transaction));
         throw new UnknownProduct(message);
       }
-      const color = CommonProcessor.getColorFromTheDescription(
+      const [_, meta] = extractMetaFromDescription(
         transaction.order.description
       );
+      const color = meta.get('color');
       const item: OrderItem = {
         name: product.name,
         sku: product.sku,

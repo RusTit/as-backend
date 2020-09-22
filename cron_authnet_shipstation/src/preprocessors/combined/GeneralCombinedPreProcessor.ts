@@ -11,24 +11,58 @@ export const SECOND_TRANSACTIONS_DESCRIPTION_STRING = [
   'Hardwood',
 ];
 
+export function extractMetaFromDescription(
+  description: string
+): [string, Map<string, string>] {
+  const result = new Map<string, string>();
+  const words = description.split(' ');
+  let metaFound = false;
+  const descWords: string[] = [];
+  const metaWords: string[] = [];
+  words.forEach(word => {
+    if (metaFound) {
+      metaWords.push(word);
+    } else if (word.includes(':')) {
+      metaFound = true;
+      metaWords.push(word);
+    } else {
+      descWords.push(word);
+    }
+  });
+  let currentWord = '';
+  for (const word of metaWords) {
+    let value = '';
+    if (word.includes(':')) {
+      const [kWord, kValue] = word.split(':');
+      currentWord = kWord;
+      value = kValue;
+    } else {
+      value = word;
+    }
+    let rValue = result.get(currentWord);
+    if (typeof rValue === 'undefined') {
+      rValue = value;
+    } else {
+      rValue += ` ${value}`;
+    }
+    result.set(currentWord, rValue);
+  }
+  const cleanDescription = descWords.join(' ');
+  return [cleanDescription, result];
+}
+
 export function generateCombinedDescription(
   mainTransaction: TODO_ANY,
   upgradeTransaction: TODO_ANY
 ): string {
   const mainTransactionDescription = mainTransaction.order.description;
-  const separatorMain = mainTransactionDescription.lastIndexOf(' ');
-  const mainDescriptionPart = mainTransactionDescription.slice(
-    0,
-    separatorMain
+  const [mainDescriptionPart, metaMap] = extractMetaFromDescription(
+    mainTransactionDescription
   );
-  const colorDescriptionPart = mainTransactionDescription.slice(
-    separatorMain + 1
-  );
+  const colorDescriptionPart = `color:${metaMap.get('color')}`;
   const upgradeTransactionDescription = upgradeTransaction.order.description;
-  const separatorUpgrade = upgradeTransactionDescription.lastIndexOf(' ');
-  const upgradeDescriptionPart = upgradeTransactionDescription.slice(
-    0,
-    separatorUpgrade
+  const [upgradeDescriptionPart] = extractMetaFromDescription(
+    upgradeTransactionDescription
   );
   return `${mainDescriptionPart} [${upgradeDescriptionPart}] ${colorDescriptionPart}`;
 }
