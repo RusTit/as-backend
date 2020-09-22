@@ -54,6 +54,14 @@ export function converColorName(name: string): string {
 
 export const WHITE_LIST_CATEGORIES_NOT_SPLIT = [33];
 
+export function helperClearItemTaxAndShipping(items: OrderItem[]): OrderItem[] {
+  return items.map((item) => {
+    item.taxAmount = undefined;
+    item.shippingAmount = undefined;
+    return item;
+  });
+}
+
 @Injectable()
 export class BigcomhookService {
   constructor(
@@ -120,21 +128,46 @@ export class BigcomhookService {
           },
           options: itemOptions,
           shippingAmount: parseFloat(product.fixed_shipping_cost),
+          taxAmount: parseFloat(product.price_tax),
         };
       },
     );
   }
 
-  protected getAmountPaidForItems(items: OrderItem[]): number {
-    let amountPaid = 0;
+  protected getTaxAmount(items: OrderItem[]): number {
+    let total = 0;
     items.forEach((item) => {
-      const unitPrice =
-        typeof item.unitPrice === 'undefined' ? 0 : item.unitPrice;
-      const shippingAmount =
-        typeof item.shippingAmount === 'undefined' ? 0 : item.shippingAmount;
-      amountPaid = amountPaid + unitPrice + shippingAmount;
+      if (Number.isFinite(item.taxAmount)) {
+        total += item.taxAmount;
+      }
     });
-    return amountPaid;
+    return total;
+  }
+
+  protected getShippingAmount(items: OrderItem[]): number {
+    let total = 0;
+    items.forEach((item) => {
+      if (Number.isFinite(item.shippingAmount)) {
+        total += item.shippingAmount;
+      }
+    });
+    return total;
+  }
+
+  protected getAmountPaidForItems(items: OrderItem[]): number {
+    let total = 0;
+    items.forEach((item) => {
+      if (Number.isFinite(item.unitPrice)) {
+        total += item.unitPrice;
+      }
+      if (Number.isFinite(item.shippingAmount)) {
+        total += item.shippingAmount;
+      }
+      if (Number.isFinite(item.taxAmount)) {
+        total += item.taxAmount;
+      }
+    });
+    return total;
   }
 
   getDimensions(productsBigCommerce: Array<TODO_ANY>): Dimensions | undefined {
@@ -277,8 +310,11 @@ export class BigcomhookService {
         throw new Error(`Cannot create items for transaction`);
       }
       const amountPaid = this.getAmountPaidForItems(items);
+      const shippingAmount = this.getShippingAmount(items);
+      const taxAmount = this.getTaxAmount(items);
       const dimensions = this.getDimensions(products);
       const weight = this.getWeight(products);
+      const cleanedItems = helperClearItemTaxAndShipping(items);
       const order: Order = {
         billTo: billing_address,
         customerUsername: this.getCustomerName(
@@ -293,9 +329,11 @@ export class BigcomhookService {
         shipTo: shipping_address,
         tagIds: this.getTagsIds(tagsList, products),
         amountPaid,
+        taxAmount,
+        shippingAmount,
         dimensions,
         weight,
-        items,
+        items: cleanedItems,
       };
       result.push({
         order,
