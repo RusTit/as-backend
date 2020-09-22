@@ -116,8 +116,15 @@ export class BigcomhookService {
               };
             },
           );
+        let name = product.name;
+        if (name === 'The Tactical Barrel') {
+          const parts = product.product_options.map((option) => {
+            return `${option.display_name}:${option.display_value}`;
+          });
+          name = `${name} ${parts.join(' ')}`;
+        }
         return {
-          name: product.name,
+          name,
           sku: product.sku,
           quantity: product.quantity,
           unitPrice: parseFloat(product.base_price),
