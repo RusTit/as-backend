@@ -141,17 +141,8 @@ export default class CommonProcessor extends Processor {
     if (!description) {
       return;
     }
-    const colorPart = description
-      .split(' ')
-      .map(s => s.trim())
-      .find(s => s.startsWith('color:'));
-    if (colorPart) {
-      const parts = colorPart.split(':');
-      if (parts.length === 2) {
-        const [_, color] = parts;
-        return color;
-      }
-    }
+    const [_, meta] = extractMetaFromDescription(description);
+    return meta.get('color');
   }
 
   matchProductForDescription(description?: string): Product | undefined {
@@ -193,10 +184,7 @@ export default class CommonProcessor extends Processor {
         this.logger.warn(JSON.stringify(transaction));
         throw new UnknownProduct(message);
       }
-      const [_, meta] = extractMetaFromDescription(
-        transaction.order.description
-      );
-      const color = meta.get('color');
+      const color = CommonProcessor.getColorFromTheDescription(description);
       const item: OrderItem = {
         name: product.name,
         sku: product.sku,
