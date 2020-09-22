@@ -17,13 +17,13 @@
   <div class="form-group">
     <label for="inputProductNameGlobName">Product Name Glob</label>
     <input type="text" class="form-control" id="inputProductNameGlobName" aria-describedby="ProductNameGlobNameHelp"
-           placeholder="Product Name Glob" required name="productNameGlob">
+           placeholder="Product Name Glob" required name="productNameGlob" value="*">
     <small id="productNameGlobHelp" class="form-text text-muted">Please enter Product Name Glob.</small>
   </div>
   <div class="form-group">
     <label for="inputProductSkuGlob">Product Sku Glob</label>
     <input type="text" class="form-control" id="inputProductSkuGlob" aria-describedby="ProductSkuGlobHelp"
-           placeholder="Product Sku Glob" required name="productSkuGlob">
+           placeholder="Product Sku Glob" required name="productSkuGlob" value="*">
     <small id="productSkuGlobHelp" class="form-text text-muted">Please enter Product Sku Glob.</small>
   </div>
   <div class="form-group">
@@ -33,10 +33,14 @@
     <small id="customNameHelp" class="form-text text-muted">Please enter Custom Name.</small>
   </div>
   <div class="form-group">
-    <label for="inputFieldName">Field Name</label>
-    <input type="text" class="form-control" id="inputFieldName" aria-describedby="FieldNameHelp"
-           placeholder="Field Name" name="fieldName">
-    <small id="fieldNameHelp" class="form-text text-muted">Please enter Field Name.</small>
+    <label for="selectFieldName">Field Name</label>
+    <select class="form-control" id="selectFieldName" aria-describedby="fieldNameHelp"
+            name="fieldName">
+      <option selected>customField1</option>
+      <option>customField2</option>
+      <option>customField3</option>
+    </select>
+    <small id="fieldNameHelp" class="form-text text-muted">Please select advanced options field name.</small>
   </div>
   <button type="submit" class="btn btn-primary">Create new Group</button>
 </form>
