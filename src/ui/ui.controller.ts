@@ -11,7 +11,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Request as RequestExpress, Response } from 'express';
 import { LoginGuard } from '../auth/login.guard';
 import { UiService } from './ui.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
@@ -25,9 +25,11 @@ export class UiController {
   constructor(private readonly uiService: UiService) {}
 
   @Get(['/', '/login'])
-  @Render('login')
-  index() {
-    return;
+  index(@Request() req: RequestExpress, @Res() res: Response) {
+    if (req.user) {
+      return res.redirect('/ui/transactions-created');
+    }
+    return res.render('login');
   }
 
   @UseGuards(LoginGuard)
