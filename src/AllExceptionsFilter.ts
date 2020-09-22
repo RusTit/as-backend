@@ -17,14 +17,23 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse();
     const request = ctx.getRequest();
 
+    this.errorsService.saveError(exception).finally(() => {
+      Logger.debug('Error is saved');
+    });
+
     const status =
       exception instanceof HttpException
         ? exception.getStatus()
         : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    this.errorsService.saveError(exception).finally(() => {
-      Logger.debug('Error is saved');
-    });
+    Logger.error(`${request.url} ${status}`);
+
+    if (exception instanceof HttpException) {
+      switch (status) {
+        case 403:
+          return response.redirect('/');
+      }
+    }
 
     response.status(status).json({
       statusCode: status,
