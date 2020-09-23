@@ -4,14 +4,14 @@ import { Repository } from 'typeorm';
 import { WebhookUpdatedDto } from './dtos';
 import {
   Address,
-  ItemOption,
-  OrderItem,
-  Dimensions,
-  Order,
-  Weight,
   AdvancedOptions,
+  Dimensions,
+  ItemOption,
+  Order,
+  OrderItem,
+  Weight,
 } from './ShipStationTypes';
-import { ShipStationProxy, ProductTag } from './ShipStationProxy';
+import { ProductTag, ShipStationProxy } from './ShipStationProxy';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
@@ -380,7 +380,16 @@ export class BigcomhookService {
           if (!order.advancedOptions) {
             order.advancedOptions = {} as AdvancedOptions;
           }
-          const value = group.customName ? group.customName : group.name;
+          let value = group.customName ? group.customName : group.name;
+          order.items.find((item) => {
+            return item.options.find((option) => {
+              const flag = option.name === 'color' || option.name === 'Color';
+              if (flag) {
+                value += ` - ${option.value}`;
+              }
+              return flag;
+            });
+          });
           switch (group.fieldName) {
             default:
             case 'customField1':
