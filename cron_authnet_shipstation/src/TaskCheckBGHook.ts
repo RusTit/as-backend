@@ -54,7 +54,7 @@ const run = async () => {
 const runOnInit = require.main === module;
 
 export const TaskCheckBGHook: CronJob = new CronJob(
-  '10 * * * *',
+  '0 10 * * * *',
   run,
   null,
   false,

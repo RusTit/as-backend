@@ -392,13 +392,12 @@ export class BigcomhookService {
     });
   }
 
-  async createShipStationOrder(payload: WebhookUpdatedDto): Promise<void> {
+  async createShipStationOrder(orderId: number): Promise<void> {
     let transactionId = '';
     try {
-      Logger.debug(payload);
       Logger.debug('Get bigcommerce order');
       const orderBigCommerce = await this.getBigCommerceOrder(
-        payload.data.id.toString(),
+        orderId.toString(),
       );
       transactionId = orderBigCommerce.payment_provider_id;
       Logger.debug(`Processing transaction id: ${transactionId}`);
@@ -408,7 +407,7 @@ export class BigcomhookService {
       }
       await this.shipStationProxy.init();
       const orderDataPairs = await this.generateOrders(
-        payload.data.id,
+        orderId,
         orderBigCommerce,
         this.shipStationProxy.tagsList,
       );
@@ -434,7 +433,7 @@ export class BigcomhookService {
         };
         await this.transactionProcessedEntity.save(dbProcessed);
       } else {
-        Logger.warn(`Order: ${payload.data.id} has not transaction id.`);
+        Logger.warn(`Order: ${orderId} has not transaction id.`);
       }
     } catch (e) {
       Logger.error(e);
@@ -451,8 +450,7 @@ export class BigcomhookService {
     }
   }
 
-  async deleteShipStationOrder(payload: WebhookUpdatedDto): Promise<void> {
-    const orderNumber = payload.data.id.toString();
+  async deleteShipStationOrder(orderNumber: number): Promise<void> {
     Logger.debug(`Processing refund/voided orderNumber BG: ${orderNumber}`);
     try {
       await this.shipStationProxy.init();
@@ -475,24 +473,29 @@ export class BigcomhookService {
   }
 
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
-    const { new_status_id, previous_status_id } = payload.data.status;
-    Logger.log(`handleHook: ${previous_status_id}, ${new_status_id}`);
-    if (new_status_id == OrderStatus.AwaitingFulfillment) {
-      switch (previous_status_id) {
-        case OrderStatus.Incomplete:
-        case OrderStatus.Pending:
-        case OrderStatus.AwaitingPayment:
-          return this.createShipStationOrder(payload);
+    if (payload.data.status) {
+      const { new_status_id, previous_status_id } = payload.data.status;
+      Logger.log(`handleHook: ${previous_status_id}, ${new_status_id}`);
+      if (new_status_id == OrderStatus.AwaitingFulfillment) {
+        switch (previous_status_id) {
+          case OrderStatus.Incomplete:
+          case OrderStatus.Pending:
+          case OrderStatus.AwaitingPayment:
+            return this.createShipStationOrder(payload.data.id);
+        }
       }
+      switch (new_status_id) {
+        case OrderStatus.Refunded:
+        case OrderStatus.Cancelled:
+        case OrderStatus.Declined:
+          return this.deleteShipStationOrder(payload.data.id);
+      }
+      Logger.debug(
+        `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
+      );
+    } else if (payload.data.refund) {
+      return this.deleteShipStationOrder(payload.data.id);
     }
-    switch (new_status_id) {
-      case OrderStatus.Refunded:
-      case OrderStatus.Cancelled:
-      case OrderStatus.Declined:
-        return this.deleteShipStationOrder(payload);
-    }
-    Logger.debug(
-      `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
-    );
+    Logger.debug(`Hook didn't processed the payload.`);
   }
 }

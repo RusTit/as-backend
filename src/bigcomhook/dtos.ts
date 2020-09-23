@@ -36,6 +36,11 @@ export class UpdatedStatus {
   new_status_id: number;
 }
 
+export class RefundStatus {
+  @ApiProperty()
+  refund_id: number;
+}
+
 export class UpdatedData {
   @ApiProperty()
   type: 'order';
@@ -45,8 +50,15 @@ export class UpdatedData {
   })
   id: number;
 
-  @ApiProperty()
-  status: UpdatedStatus;
+  @ApiProperty({
+    required: false,
+  })
+  status?: UpdatedStatus;
+
+  @ApiProperty({
+    required: false,
+  })
+  refund?: RefundStatus;
 }
 
 export class WebhookUpdatedDto extends WebHookBaseDto {
