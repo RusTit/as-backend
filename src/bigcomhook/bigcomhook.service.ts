@@ -145,7 +145,7 @@ export class BigcomhookService {
     let total = 0;
     items.forEach((item) => {
       if (Number.isFinite(item.taxAmount)) {
-        total += item.taxAmount;
+        total += item.taxAmount * item.quantity;
       }
     });
     return total;
@@ -155,7 +155,7 @@ export class BigcomhookService {
     let total = 0;
     items.forEach((item) => {
       if (Number.isFinite(item.shippingAmount)) {
-        total += item.shippingAmount;
+        total += item.shippingAmount * item.quantity;
       }
     });
     return total;
@@ -165,13 +165,13 @@ export class BigcomhookService {
     let total = 0;
     items.forEach((item) => {
       if (Number.isFinite(item.unitPrice)) {
-        total += item.unitPrice;
+        total += item.unitPrice * item.quantity;
       }
       if (Number.isFinite(item.shippingAmount)) {
-        total += item.shippingAmount;
+        total += item.shippingAmount * item.quantity;
       }
       if (Number.isFinite(item.taxAmount)) {
-        total += item.taxAmount;
+        total += item.taxAmount * item.quantity;
       }
     });
     return total;
