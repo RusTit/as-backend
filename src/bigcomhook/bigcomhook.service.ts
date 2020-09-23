@@ -308,7 +308,9 @@ export class BigcomhookService {
     const splitBGProducts = await this.splitProductsIntoIndividuals(
       productsBigCommerce,
     );
+    let index = 0;
     for (const productOrArr of splitBGProducts) {
+      ++index;
       const products = Array.isArray(productOrArr)
         ? productOrArr
         : [productOrArr];
@@ -342,6 +344,11 @@ export class BigcomhookService {
         weight,
         items: cleanedItems,
       };
+      if (splitBGProducts.length > 1) {
+        order.items.forEach((item) => {
+          item.name += `-${index}/${splitBGProducts.length}`;
+        });
+      }
       result.push({
         order,
         transaction: transactionId,
