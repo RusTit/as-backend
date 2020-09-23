@@ -26,6 +26,9 @@ export class GroupingService {
     return this.groupEntityRepository.find({
       skip,
       take,
+      order: {
+        name: 'ASC',
+      },
     });
   }
 
