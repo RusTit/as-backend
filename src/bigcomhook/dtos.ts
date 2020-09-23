@@ -22,7 +22,13 @@ export class WebHookBaseDto {
   producer: string;
 }
 
-export type UpdatedScope = 'store/order/statusUpdated' | 'store/order/updated';
+export type UpdatedScope =
+  | 'store/order/created'
+  | 'store/order/updated'
+  | 'store/order/archived'
+  | 'store/order/statusUpdated'
+  | 'store/order/message/created'
+  | 'store/order/refund/created';
 
 export class UpdatedStatus {
   @ApiProperty({
