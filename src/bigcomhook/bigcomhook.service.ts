@@ -502,6 +502,7 @@ export class BigcomhookService {
   }
 
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
+    Logger.debug(payload);
     if (payload.data.status) {
       return this.handleStatusUpdated(payload);
     } else if (payload.data.refund) {
