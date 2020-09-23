@@ -513,7 +513,14 @@ export class BigcomhookService {
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
     Logger.debug(payload);
     if (payload.data.status) {
-      return this.handleStatusUpdated(payload);
+      switch (payload.scope) {
+        case 'store/order/updated':
+          return Logger.debug(
+            'Updated event processed also as "store/order/statusUpdated", so skip.',
+          );
+        default:
+          return this.handleStatusUpdated(payload);
+      }
     } else if (payload.data.refund) {
       return this.deleteShipStationOrder(payload.data.id);
     }
