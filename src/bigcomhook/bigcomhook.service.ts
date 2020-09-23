@@ -382,7 +382,7 @@ export class BigcomhookService {
           }
           let value = group.customName ? group.customName : group.name;
           order.items.find((item) => {
-            return item.options.find((option) => {
+            return item.options?.find((option) => {
               const flag = option.name === 'color' || option.name === 'Color';
               if (flag) {
                 value += ` - ${option.value}`;

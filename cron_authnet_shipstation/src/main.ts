@@ -225,7 +225,16 @@ async function postProcessOrders(
         if (!order.advancedOptions) {
           order.advancedOptions = {} as AdvancedOptions;
         }
-        const value = group.customName ? group.customName : group.name;
+        let value = group.customName ? group.customName : group.name;
+        order.items.find(item => {
+          return item.options?.find(option => {
+            const flag = option.name === 'color' || option.name === 'Color';
+            if (flag) {
+              value += ` - ${option.value}`;
+            }
+            return flag;
+          });
+        });
         switch (group.fieldName) {
           default:
           case 'customField1':
