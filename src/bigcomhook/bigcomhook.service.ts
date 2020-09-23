@@ -479,27 +479,31 @@ export class BigcomhookService {
     }
   }
 
+  async handleStatusUpdated(payload: WebhookUpdatedDto): Promise<void> {
+    const { new_status_id, previous_status_id } = payload.data.status;
+    Logger.log(`handleHook: ${previous_status_id}, ${new_status_id}`);
+    if (new_status_id == OrderStatus.AwaitingFulfillment) {
+      switch (previous_status_id) {
+        case OrderStatus.Incomplete:
+        case OrderStatus.Pending:
+        case OrderStatus.AwaitingPayment:
+          return this.createShipStationOrder(payload.data.id);
+      }
+    }
+    switch (new_status_id) {
+      case OrderStatus.Refunded:
+      case OrderStatus.Cancelled:
+      case OrderStatus.Declined:
+        return this.deleteShipStationOrder(payload.data.id);
+    }
+    Logger.debug(
+      `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
+    );
+  }
+
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
     if (payload.data.status) {
-      const { new_status_id, previous_status_id } = payload.data.status;
-      Logger.log(`handleHook: ${previous_status_id}, ${new_status_id}`);
-      if (new_status_id == OrderStatus.AwaitingFulfillment) {
-        switch (previous_status_id) {
-          case OrderStatus.Incomplete:
-          case OrderStatus.Pending:
-          case OrderStatus.AwaitingPayment:
-            return this.createShipStationOrder(payload.data.id);
-        }
-      }
-      switch (new_status_id) {
-        case OrderStatus.Refunded:
-        case OrderStatus.Cancelled:
-        case OrderStatus.Declined:
-          return this.deleteShipStationOrder(payload.data.id);
-      }
-      Logger.debug(
-        `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
-      );
+      return this.handleStatusUpdated(payload);
     } else if (payload.data.refund) {
       return this.deleteShipStationOrder(payload.data.id);
     }
