@@ -7,13 +7,13 @@ import { Order, LabelForOrder } from './ShipStationTypes';
 
 const SHIPSTATION_DOMAIN = 'https://ssapi.shipstation.com';
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
-  reservoir: 30, // initial value
-  reservoirRefreshAmount: 30,
-  reservoirRefreshInterval: 90 * 1000, // must be divisible by 250
+  reservoir: 15, // initial value
+  reservoirRefreshAmount: 15,
+  reservoirRefreshInterval: 60 * 1000, // must be divisible by 250
 
   // also use maxConcurrent and/or minTime for safety
   // maxConcurrent: 1,
-  minTime: 10, // pick a value that makes sense for your use case
+  minTime: 1000, // pick a value that makes sense for your use case
 };
 
 export interface ProductTag {
