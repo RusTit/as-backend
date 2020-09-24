@@ -345,9 +345,7 @@ export class BigcomhookService {
         items: cleanedItems,
       };
       if (splitBGProducts.length > 1) {
-        order.items.forEach((item) => {
-          item.name += `-${index}/${splitBGProducts.length}`;
-        });
+        order.orderNumber += `-${index}/${splitBGProducts.length}`;
       }
       result.push({
         order,
