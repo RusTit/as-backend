@@ -6,6 +6,9 @@ import { SystemHealthEntity } from './entities/SystemHealth.entity';
 import * as Helper from './Helper';
 import { ProductEntity } from './entities/Product.entity';
 import { GroupEntity } from './entities/Group.entity';
+import Logger from './logger';
+
+const logger = Logger('src/db.ts');
 
 let connection: Connection | undefined;
 export async function initDbConnection(): Promise<Connection> {
@@ -62,11 +65,27 @@ export async function moveProcessedTransaction(
         await transactionalEntityManager.delete(TransactionCreatedEntity, {
           transactionId: transId,
         });
-        const newProcessedDbRow = new TransactionProcessedEntity();
-        newProcessedDbRow.transactionId = transId;
-        newProcessedDbRow.orderObject = orderResponsePayload;
-        newProcessedDbRow.labelObject = labelResponsePayload;
-        await transactionalEntityManager.save(newProcessedDbRow);
+        const existingProcessed = await transactionalEntityManager.findOne(
+          TransactionProcessedEntity,
+          {
+            where: {
+              transactionId: transId,
+            },
+          }
+        );
+        if (existingProcessed) {
+          logger.warn(
+            `Duplicate existing ${transId}. Skipping save (${JSON.stringify(
+              transactionsArr
+            )}). Please check the logs`
+          );
+        } else {
+          const newProcessedDbRow = new TransactionProcessedEntity();
+          newProcessedDbRow.transactionId = transId;
+          newProcessedDbRow.orderObject = orderResponsePayload;
+          newProcessedDbRow.labelObject = labelResponsePayload;
+          await transactionalEntityManager.save(newProcessedDbRow);
+        }
       })
     );
   });
