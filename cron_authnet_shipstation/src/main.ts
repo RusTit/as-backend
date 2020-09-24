@@ -272,12 +272,17 @@ export async function dbProcessor(): Promise<void> {
     processedOrdersPair.map(async pair => {
       const { order, transaction } = pair;
       try {
-        logger.info(`Processing order: ${order.orderNumber}`);
+        const jsonTransaction = JSON.stringify(transaction);
+        logger.info(
+          `Processing order: ${order.orderNumber} (transaction: ${jsonTransaction})`
+        );
         await Helper.SaveOrder(order);
         const shipStationResponse = await shipStationProxy.createOrUpdateOrder(
           order
         );
-        logger.info(`Order saved: ${order.orderNumber}`);
+        logger.info(
+          `Order saved: ${order.orderNumber} (transaction: ${jsonTransaction})`
+        );
         await moveProcessedTransaction(transaction, shipStationResponse);
       } catch (e) {
         await moveIssuedTransaction(transaction, e);
