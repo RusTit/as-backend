@@ -309,6 +309,8 @@ export class BigcomhookService {
       productsBigCommerce,
     );
     let index = 0;
+    const allItems = this.getOrderItems(productsBigCommerce);
+    const amountPaid = this.getAmountPaidForItems(allItems);
     for (const productOrArr of splitBGProducts) {
       ++index;
       const products = Array.isArray(productOrArr)
@@ -318,7 +320,6 @@ export class BigcomhookService {
       if (items.length === 0) {
         throw new Error(`Cannot create items for transaction`);
       }
-      const amountPaid = this.getAmountPaidForItems(items);
       const shippingAmount = this.getShippingAmount(items);
       const taxAmount = this.getTaxAmount(items);
       const dimensions = this.getDimensions(products);
