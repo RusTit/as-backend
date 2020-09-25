@@ -10,17 +10,27 @@ export class TransactionCreatedResultDto {
   @ApiProperty({
     required: false,
   })
-  price: number | null;
+  price?: number;
 
   @ApiProperty({
     required: false,
   })
-  customerName: string | null;
+  customerName?: string;
 
   @ApiProperty({
     required: false,
   })
-  customerEmail: string | null;
+  customerEmail?: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  orderNumber?: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  orderDescription?: string;
 
   @ApiProperty()
   createdAt: Date;

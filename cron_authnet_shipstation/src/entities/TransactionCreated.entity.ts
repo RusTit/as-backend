@@ -22,19 +22,31 @@ export class TransactionCreatedEntity {
     type: 'float',
     nullable: true,
   })
-  price!: number;
+  price?: number;
 
   @Column({
     nullable: true,
     name: 'customer_name',
   })
-  customerName!: string;
+  customerName?: string;
 
   @Column({
     nullable: true,
     name: 'customer_email',
   })
-  customerEmail!: string;
+  customerEmail?: string;
+
+  @Column({
+    nullable: true,
+    name: 'order_number',
+  })
+  orderNumber?: string;
+
+  @Column({
+    nullable: true,
+    name: 'order_description',
+  })
+  orderDescription?: string;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
