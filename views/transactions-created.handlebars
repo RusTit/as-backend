@@ -14,8 +14,9 @@
     <th scope="col">price</th>
     <th scope="col">customerName</th>
     <th scope="col">customerEmail</th>
+    <th scope="col">orderNumber</th>
+    <th scope="col">orderDescription</th>
     <th scope="col">createdAt</th>
-    <th scope="col">updatedAt</th>
   </tr>
   </thead>
   <tbody>
@@ -26,8 +27,9 @@
       <th>{{this.price}}</th>
       <th>{{this.customerName}}</th>
       <th>{{this.customerEmail}}</th>
+      <th>{{this.orderNumber}}</th>
+      <th>{{this.orderDescription}}</th>
       <th>{{humanDates this.createdAt}}</th>
-      <th>{{humanDates this.updatedAt}}</th>
     </tr>
   {{/each}}
   </tbody>
