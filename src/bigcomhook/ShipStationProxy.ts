@@ -8,13 +8,13 @@ export type TODO_ANY = any;
 
 const SHIPSTATION_DOMAIN = 'https://ssapi.shipstation.com';
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
-  reservoir: 30, // initial value
-  reservoirRefreshAmount: 30,
+  reservoir: 15, // initial value
+  reservoirRefreshAmount: 15,
   reservoirRefreshInterval: 60 * 1000, // must be divisible by 250
 
   // also use maxConcurrent and/or minTime for safety
-  // maxConcurrent: 1,
-  minTime: 10, // pick a value that makes sense for your use case
+  maxConcurrent: 1,
+  minTime: 1000, // pick a value that makes sense for your use case
 };
 
 export interface ProductTag {
@@ -62,6 +62,7 @@ export class ShipStationProxy {
         this.needleOptions,
       ),
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
       this.tagsList.clear();
       const { body } = response;
@@ -78,6 +79,12 @@ export class ShipStationProxy {
     }
   }
 
+  logApiLimits(response: needle.NeedleResponse): void {
+    Logger.debug(
+      `API limits: limit ${response.headers['x-rate-limit-limit']}, remaining: ${response.headers['x-rate-limit-remaining']}, reset: ${response.headers['x-rate-limit-reset']}`,
+    );
+  }
+
   async createOrUpdateOrder(orderPayload: Order): Promise<TODO_ANY> {
     const response = await this.limiter.schedule(() =>
       needle(
@@ -87,10 +94,8 @@ export class ShipStationProxy {
         this.needleOptions,
       ),
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
-      Logger.debug(
-        `API limits: limit ${response.headers['x-rate-limit-limit']}, remaining: ${response.headers['x-rate-limit-remaining']}, reset: ${response.headers['x-rate-limit-reset']}`,
-      );
       return response.body;
     } else {
       throw new Error(
@@ -118,6 +123,7 @@ export class ShipStationProxy {
         this.needleOptions,
       ),
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
       return response.body;
     } else {
@@ -139,6 +145,7 @@ export class ShipStationProxy {
     const response = await this.limiter.schedule(() =>
       needle('get', full_url, null, this.needleOptions),
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
       const { body } = response;
       return body.orders as Order[];
@@ -157,6 +164,7 @@ export class ShipStationProxy {
     const response = await this.limiter.schedule(() =>
       needle('delete', full_url, null, this.needleOptions),
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200 && response.body.success === true) {
       return true;
     }

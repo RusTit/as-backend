@@ -12,7 +12,7 @@ const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   reservoirRefreshInterval: 60 * 1000, // must be divisible by 250
 
   // also use maxConcurrent and/or minTime for safety
-  // maxConcurrent: 1,
+  maxConcurrent: 1,
   minTime: 1000, // pick a value that makes sense for your use case
 };
 
@@ -54,6 +54,12 @@ export default class ShipStationProxy {
     this.tagsList = new Map<string, ProductTag>();
   }
 
+  logApiLimits(response: needle.NeedleResponse): void {
+    this.logger.debug(
+      `API limits: limit ${response.headers['x-rate-limit-limit']}, remaining: ${response.headers['x-rate-limit-remaining']}, reset: ${response.headers['x-rate-limit-reset']}`
+    );
+  }
+
   async init(): Promise<void> {
     if (this.tagsList.size) {
       return;
@@ -66,6 +72,7 @@ export default class ShipStationProxy {
         this.needleOptions
       )
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
       const { body } = response;
       for (const item of body) {
@@ -90,10 +97,8 @@ export default class ShipStationProxy {
         this.needleOptions
       )
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
-      this.logger.debug(
-        `API limits: limit ${response.headers['x-rate-limit-limit']}, remaining: ${response.headers['x-rate-limit-remaining']}, reset: ${response.headers['x-rate-limit-reset']}`
-      );
       return response.body;
     } else {
       throw new Error(
@@ -121,6 +126,7 @@ export default class ShipStationProxy {
         this.needleOptions
       )
     );
+    this.logApiLimits(response);
     if (response.statusCode === 200) {
       return response.body;
     } else {
