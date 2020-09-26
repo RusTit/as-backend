@@ -16,6 +16,8 @@ const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   minTime: 1000, // pick a value that makes sense for your use case
 };
 
+console.log(LIMITER_OPTIONS);
+
 export interface ProductTag {
   tagId: number;
   name: string;
