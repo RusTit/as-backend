@@ -14,9 +14,7 @@ const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   // also use maxConcurrent and/or minTime for safety
   maxConcurrent: 1,
   minTime: 1000, // pick a value that makes sense for your use case
-};
-
-console.log(LIMITER_OPTIONS);
+} as const;
 
 export interface ProductTag {
   tagId: number;
@@ -54,6 +52,7 @@ export default class ShipStationProxy {
     this.limiter = new Bottleneck(LIMITER_OPTIONS);
     this.logger = LoggerFactory('src/ShipStationProxy.ts');
     this.tagsList = new Map<string, ProductTag>();
+    this.logger.debug(LIMITER_OPTIONS);
   }
 
   logApiLimits(response: needle.NeedleResponse): void {

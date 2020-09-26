@@ -57,6 +57,12 @@ export async function getBatchIdArray(
   return batchIds;
 }
 
+export async function Delay(defaultTimeout = 1000): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, defaultTimeout);
+  });
+}
+
 export function createAuthNetProxy(): AuthNetProxy {
   return new AuthNetProxy(
     AUTHNET_API_LOGIN_ID,
@@ -286,6 +292,8 @@ export async function dbProcessor(): Promise<void> {
     } catch (e) {
       await moveIssuedTransaction(transaction, e);
       logger.error(e);
+    } finally {
+      await Delay();
     }
   }
 }
