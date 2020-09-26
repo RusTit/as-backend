@@ -12,6 +12,12 @@
         location.reload(true);
       });
     }
+    function restoreTransaction(id) {
+      fetch(`/transactions-issues/restore/${id}`).then(response => {
+        console.log(response.json());
+        location.reload(true);
+      });
+    }
   </script>
 </head>
 <body>
@@ -36,6 +42,7 @@
       <th>{{humanDates this.createdAt}}</th>
       <th>{{humanDates this.updatedAt}}</th>
       <th scope="col">
+        <a href="#" class="btn btn-success" role="button" onclick="restoreTransaction({{{this.id}}})">Restore</a>
         <a href="#" class="btn btn-danger" role="button" onclick="deleteTransactionIssues({{{this.id}}})">Del</a>
       </th>
     </tr>

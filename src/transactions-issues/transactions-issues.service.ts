@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionIssuesEntity } from './TransactionIssues.entity';
 import { AuthnetService } from '../authnet/authnet.service';
+import { TransactionsCreatedService } from '../transactions-created/transactions-created.service';
 
 @Injectable()
 export class TransactionsIssuesService {
@@ -10,6 +11,7 @@ export class TransactionsIssuesService {
     @InjectRepository(TransactionIssuesEntity)
     private transactionIssuesEntity: Repository<TransactionIssuesEntity>,
     private readonly authnetService: AuthnetService,
+    private readonly transactionsCreatedService: TransactionsCreatedService,
   ) {}
 
   async findAll(skip = 0, take = 100): Promise<TransactionIssuesEntity[]> {
@@ -56,5 +58,15 @@ export class TransactionsIssuesService {
     }
     await this.transactionIssuesEntity.remove(dbEntity);
     return true;
+  }
+
+  async restoreTransactionById(id: number): Promise<void> {
+    const transactionDbEntity = await this.transactionIssuesEntity.findOne(id);
+    if (transactionDbEntity) {
+      await this.transactionsCreatedService.createNew(
+        transactionDbEntity.transactionId,
+      );
+      await this.transactionIssuesEntity.remove(transactionDbEntity);
+    }
   }
 }

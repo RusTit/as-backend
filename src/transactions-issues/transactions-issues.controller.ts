@@ -36,4 +36,9 @@ export class TransactionsIssuesController {
   async deleteTransaction(@Param('id') id: number): Promise<any> {
     return this.transactionsIssuesService.deleteTransactionById(id);
   }
+
+  @Get('/restore/:id')
+  async restoreTransaction(@Param('id') id: number): Promise<any> {
+    await this.transactionsIssuesService.restoreTransactionById(id);
+  }
 }
