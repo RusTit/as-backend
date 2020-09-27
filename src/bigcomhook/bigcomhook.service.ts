@@ -366,13 +366,20 @@ export class BigcomhookService {
         return pair;
       }
       for (const group of groups) {
+        let { productNameGlob, productSkuGlob } = group;
+        if (!productNameGlob.includes('*')) {
+          productNameGlob = `*${productNameGlob}*`;
+        }
+        if (!productSkuGlob.includes('*')) {
+          productSkuGlob = `*${productSkuGlob}*`;
+        }
         if (
           anymatch(
-            group.productNameGlob,
+            productNameGlob,
             order.items.map((item) => item.name),
           ) &&
           anymatch(
-            group.productSkuGlob,
+            productSkuGlob,
             order.items.map((item) => item.sku),
           )
         ) {
