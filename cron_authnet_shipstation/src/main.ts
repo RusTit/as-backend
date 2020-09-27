@@ -1,5 +1,5 @@
 import { CronJob } from 'cron';
-import anymatch from 'anymatch';
+import anymatch, { Matcher } from 'anymatch';
 import * as env from 'env-var';
 import moment from 'moment';
 import config from './config';
@@ -220,20 +220,24 @@ async function postProcessOrders(
       return pair;
     }
     for (const group of groups) {
-      let { productNameGlob, productSkuGlob } = group;
+      const { productNameGlob, productSkuGlob } = group;
+      let productNameMatcher: Matcher = productNameGlob;
       if (!productNameGlob.includes('*')) {
-        productNameGlob = `*${productNameGlob}*`;
+        productNameMatcher = (val: string): boolean =>
+          val.includes(productNameGlob);
       }
+      let productSkuMatcher: Matcher = productSkuGlob;
       if (!productSkuGlob.includes('*')) {
-        productSkuGlob = `*${productSkuGlob}*`;
+        productSkuMatcher = (val: string): boolean =>
+          val.includes(productSkuGlob);
       }
       if (
         anymatch(
-          productNameGlob,
+          productNameMatcher,
           order.items.map(item => item.name)
         ) &&
         anymatch(
-          productSkuGlob,
+          productSkuMatcher,
           order.items.map(item => item.sku)
         )
       ) {

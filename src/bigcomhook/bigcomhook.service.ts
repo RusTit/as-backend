@@ -16,7 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssues.entity';
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 import { GroupingService } from '../grouping/grouping.service';
-import anymatch from 'anymatch';
+import anymatch, { Matcher } from 'anymatch';
 
 // https://developer.bigcommerce.com/api-reference/orders/orders-api/order-status/getorderstatus
 export enum OrderStatus {
@@ -366,20 +366,24 @@ export class BigcomhookService {
         return pair;
       }
       for (const group of groups) {
-        let { productNameGlob, productSkuGlob } = group;
+        const { productNameGlob, productSkuGlob } = group;
+        let productNameMatcher: Matcher = productNameGlob;
         if (!productNameGlob.includes('*')) {
-          productNameGlob = `*${productNameGlob}*`;
+          productNameMatcher = (val: string): boolean =>
+            val.includes(productNameGlob);
         }
+        let productSkuMatcher: Matcher = productSkuGlob;
         if (!productSkuGlob.includes('*')) {
-          productSkuGlob = `*${productSkuGlob}*`;
+          productSkuMatcher = (val: string): boolean =>
+            val.includes(productSkuGlob);
         }
         if (
           anymatch(
-            productNameGlob,
+            productNameMatcher,
             order.items.map((item) => item.name),
           ) &&
           anymatch(
-            productSkuGlob,
+            productSkuMatcher,
             order.items.map((item) => item.sku),
           )
         ) {
