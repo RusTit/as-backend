@@ -11,9 +11,11 @@ import * as Helper from './Helper';
 import {
   convertRecordsIntoArrayOfTransactionsIds,
   getDbTransactionsCreated,
+  getDbTransactionsProcessed,
   moveIssuedTransaction,
   moveProcessedTransaction,
   getAllGroups,
+  removeDbTransactionsCreated,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor from './processors/CommonProcessor';
@@ -305,9 +307,25 @@ export async function dbProcessor(): Promise<void> {
   }
 }
 
+const checkDuplicates = async () => {
+  const [transactionsCreatedId, transactionsProcessedId] = await Promise.all([
+    getDbTransactionsCreated(),
+    getDbTransactionsProcessed(),
+  ]);
+  const setTransactionsProcessedId = new Set();
+  transactionsProcessedId.forEach(tr =>
+    setTransactionsProcessedId.add(tr.transactionId)
+  );
+  const duplicatesTransactionsCreatedId = transactionsCreatedId.filter(tr =>
+    setTransactionsProcessedId.has(tr.transactionId)
+  );
+  await removeDbTransactionsCreated(duplicatesTransactionsCreatedId);
+};
+
 const dbFlow = async () => {
   try {
     logger.info('Started');
+    await checkDuplicates();
     await dbProcessor();
   } catch (e) {
     logger.error(e);

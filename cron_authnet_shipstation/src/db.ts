@@ -27,6 +27,28 @@ export async function getDbTransactionsCreated(): Promise<
     order: {
       transactionId: 'ASC',
     },
+    select: ['id', 'transactionId'],
+  });
+}
+
+export async function removeDbTransactionsCreated(
+  transactionCreatedEntities: TransactionCreatedEntity[]
+): Promise<void> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(TransactionCreatedEntity);
+  await repository.remove(transactionCreatedEntities);
+}
+
+export async function getDbTransactionsProcessed(): Promise<
+  TransactionProcessedEntity[]
+> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(TransactionProcessedEntity);
+  return repository.find({
+    order: {
+      transactionId: 'ASC',
+    },
+    select: ['id', 'transactionId'],
   });
 }
 
