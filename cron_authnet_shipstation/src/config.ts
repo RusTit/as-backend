@@ -14,7 +14,7 @@ export default {
     },
     categories: {
       default: {
-        appenders: ['console', 'filelog'],
+        appenders: ['console'],
         level: 'debug',
       },
     },
