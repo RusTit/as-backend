@@ -4,10 +4,14 @@ import { TransactionsCreatedController } from './transactions-created.controller
 import { TransactionsCreatedService } from './transactions-created.service';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { AuthnetModule } from '../authnet/authnet.module';
+import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TransactionCreatedEntity]),
+    TypeOrmModule.forFeature([
+      TransactionCreatedEntity,
+      TransactionProcessedEntity,
+    ]),
     AuthnetModule,
   ],
   controllers: [TransactionsCreatedController],

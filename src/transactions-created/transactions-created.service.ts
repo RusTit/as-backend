@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TransactionCreatedEntity } from './TransactionCreated.entity';
 import { AuthnetService } from '../authnet/authnet.service';
+import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
 @Injectable()
 export class TransactionsCreatedService {
@@ -10,6 +11,10 @@ export class TransactionsCreatedService {
     @InjectRepository(TransactionCreatedEntity)
     private readonly transactionCreatedEntityRepository: Repository<
       TransactionCreatedEntity
+    >,
+    @InjectRepository(TransactionProcessedEntity)
+    private readonly transactionProcessedEntityRepository: Repository<
+      TransactionProcessedEntity
     >,
     private readonly authnetService: AuthnetService,
   ) {}
@@ -19,13 +24,25 @@ export class TransactionsCreatedService {
     if (NODE_ENV === 'test') {
       return;
     }
-    const existing = await this.transactionCreatedEntityRepository.findOne({
-      where: {
-        transactionId: id,
-      },
-    });
-    if (existing) {
-      Logger.warn(`Transactions with id: ${id} already exist`);
+    const [existingDbRow, duplicatedDbRow] = await Promise.all([
+      this.transactionCreatedEntityRepository.findOne({
+        where: {
+          transactionId: id,
+        },
+        select: ['id'],
+      }),
+      this.transactionProcessedEntityRepository.findOne({
+        where: {
+          transactionId: id,
+        },
+        select: ['id'],
+      }),
+    ]);
+    if (existingDbRow) {
+      Logger.warn(`Transaction with id: ${id} already exist`);
+    }
+    if (duplicatedDbRow) {
+      Logger.warn(`Transaction with id: ${id} already processed`);
     } else {
       const transactionDetails = await this.authnetService.getTransactionsDetails(
         id,

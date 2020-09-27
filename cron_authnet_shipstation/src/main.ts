@@ -302,7 +302,10 @@ export async function dbProcessor(): Promise<void> {
     orderTransTotal.push(...orderTrans);
   }
   const processedOrdersPair = await postProcessOrders(orderTransTotal);
+  let index = 0;
   for (const pair of processedOrdersPair) {
+    ++index;
+    logger.debug(`Processing: ${index}/${processedOrdersPair.length}`);
     await orderPairProcessor(pair, shipStationProxy);
   }
 }
