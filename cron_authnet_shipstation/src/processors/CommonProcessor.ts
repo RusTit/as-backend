@@ -147,7 +147,7 @@ export default class CommonProcessor extends Processor {
     if (!description) {
       return;
     }
-    const [_, meta] = extractMetaFromDescription(description);
+    const [, meta] = extractMetaFromDescription(description);
     return meta.get('color');
   }
 
