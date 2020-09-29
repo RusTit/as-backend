@@ -18,7 +18,9 @@ import {
   removeDbTransactionsCreated,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
-import CommonProcessor from './processors/CommonProcessor';
+import CommonProcessor, {
+  convertColorName,
+} from './processors/CommonProcessor';
 import BigCommerceProcessor from './processors/BigCommerceProcessor';
 import IssuedProcessor from './processors/IssuedProcessor';
 import VoidedProcessor from './processors/VoidedProcessor';
@@ -249,7 +251,8 @@ async function postProcessOrders(
           return item.options?.find(option => {
             const flag = option.name === 'color' || option.name === 'Color';
             if (flag) {
-              value += ` - ${option.value}`;
+              const val = convertColorName(option.value);
+              value += ` - ${val}`;
             }
             return flag;
           });

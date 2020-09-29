@@ -51,7 +51,8 @@ export function combineTransactions<T>(
 
 export const colorSpecialCases = new Map<string, string>();
 colorSpecialCases.set('Country-Pine', 'Country Pine');
-export function converColorName(name: string): string {
+colorSpecialCases.set('Dark Walnut', 'Walnut');
+export function convertColorName(name: string): string {
   if (colorSpecialCases.has(name)) {
     return colorSpecialCases.get(name) as string;
   }
@@ -225,7 +226,7 @@ export default class CommonProcessor extends Processor {
       transactionDetails.order.description
     );
     if (typeof color === 'string') {
-      color = converColorName(color);
+      color = convertColorName(color);
       let tag = this.tagsList.get(color);
       if (!tag) {
         tag = this.getSubMatchTag(color);
