@@ -127,6 +127,8 @@ export default class CommonProcessor extends Processor {
     const name: string = data.firstName
       ? `${data.firstName} ${data.lastName}`
       : `${borrowAddress?.name}`;
+    const state =
+      !data.state || data.state === '0' ? borrowAddress?.state : data.state;
     return {
       city: `${data.city ?? borrowAddress?.city}`,
       company: '',
@@ -135,7 +137,7 @@ export default class CommonProcessor extends Processor {
       phone: data.phoneNumber ?? borrowAddress?.phone,
       postalCode: `${data.zip ?? borrowAddress?.postalCode}`,
       residential: '',
-      state: `${data.state ?? borrowAddress?.state}`,
+      state,
       street1: `${data.address ?? borrowAddress?.street1}`,
       street2: '',
       street3: '',
