@@ -123,17 +123,20 @@ export default class CommonProcessor extends Processor {
   private readonly products: Map<string, Product>;
   private readonly tagsList: Map<string, ProductTag>;
 
-  static createAddress(data: TODO_ANY): Address {
+  static createAddress(data: TODO_ANY, borrowAddress?: Address): Address {
+    const name: string = data.firstName
+      ? `${data.firstName} ${data.lastName}`
+      : `${borrowAddress?.name}`;
     return {
-      city: `${data.city}`,
+      city: `${data.city ?? borrowAddress?.city}`,
       company: '',
       country: 'US',
-      name: `${data.firstName} ${data.lastName}`,
-      phone: data.phoneNumber,
-      postalCode: `${data.zip}`,
+      name,
+      phone: data.phoneNumber ?? borrowAddress?.phone,
+      postalCode: `${data.zip ?? borrowAddress?.postalCode}`,
       residential: '',
-      state: `${data.state}`,
-      street1: `${data.address}`,
+      state: `${data.state ?? borrowAddress?.state}`,
+      street1: `${data.address ?? borrowAddress?.street1}`,
       street2: '',
       street3: '',
       addressVerified: 'Address not yet validated',
@@ -262,15 +265,10 @@ export default class CommonProcessor extends Processor {
     const billTo: Address = CommonProcessor.createAddress(
       transactionDetails.billTo
     );
-    let shipTo: Address;
-    if (
-      typeof transactionDetails.shipTo === 'undefined' ||
-      transactionDetails.shipTo.state === '0'
-    ) {
-      shipTo = billTo;
-    } else {
-      shipTo = CommonProcessor.createAddress(transactionDetails.shipTo);
-    }
+    const shipTo: Address = CommonProcessor.createAddress(
+      transactionDetails.shipTo,
+      billTo
+    );
     const items = this.getOrderItems(arr);
     if (items.length === 0) {
       throw new Error(`Cannot create items for transaction`);
