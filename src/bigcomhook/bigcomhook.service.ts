@@ -366,7 +366,13 @@ export class BigcomhookService {
       if (!order.items || order.items.length === 0) {
         return pair;
       }
-      for (const group of groups) {
+      const sortedGroups = groups.sort(
+        (a, b) =>
+          b.productNameGlob.length +
+          b.productSkuGlob.length -
+          (a.productNameGlob.length + a.productSkuGlob.length),
+      );
+      for (const group of sortedGroups) {
         const { productNameGlob, productSkuGlob } = group;
         let productNameMatcher: Matcher = productNameGlob;
         if (!productNameGlob.includes('*')) {
@@ -390,29 +396,32 @@ export class BigcomhookService {
         ) {
           if (!order.advancedOptions) {
             order.advancedOptions = {} as AdvancedOptions;
-          }
-          let value = group.customName ? group.customName : group.name;
-          order.items.find((item) => {
-            return item.options?.find((option) => {
-              const flag = option.name === 'color' || option.name === 'Color';
-              if (flag) {
-                const val = convertColorName(option.value);
-                value += ` - ${val}`;
-              }
-              return flag;
+
+            let value = group.customName ? group.customName : group.name;
+            order.items.find((item) => {
+              return item.options?.find((option) => {
+                const flag = option.name === 'color' || option.name === 'Color';
+                if (flag) {
+                  const val = convertColorName(option.value);
+                  value += ` - ${val}`;
+                }
+                return flag;
+              });
             });
-          });
-          switch (group.fieldName) {
-            default:
-            case 'customField1':
-              order.advancedOptions.customField1 = value;
-              break;
-            case 'customField2':
-              order.advancedOptions.customField2 = value;
-              break;
-            case 'customField3':
-              order.advancedOptions.customField3 = value;
-              break;
+            switch (group.fieldName) {
+              default:
+              case 'customField1':
+                order.advancedOptions.customField1 = value;
+                break;
+              case 'customField2':
+                order.advancedOptions.customField2 = value;
+                break;
+              case 'customField3':
+                order.advancedOptions.customField3 = value;
+                break;
+            }
+          } else {
+            Logger.debug(`Skipping group: ${group.name}. Already processed.`);
           }
         }
       }
