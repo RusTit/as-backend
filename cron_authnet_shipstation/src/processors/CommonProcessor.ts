@@ -17,6 +17,7 @@ import { BluetoothLock } from '../preprocessors/combined/BluetoothLock';
 import { BiometricFingerprintLock } from '../preprocessors/combined/BiometricFingerprintLock';
 import { BluetoothSoloLock } from '../preprocessors/solo/BluetoothSoloLock';
 import { BiometricFingerprintSoloLock } from '../preprocessors/solo/BiometricFingerprintSoloLock';
+import { StandartRFIDLockV2 } from '../preprocessors/combined/StandartRFIDLockV2';
 import {
   extractMetaFromDescription,
   GeneralCombinedPreProcessor,
@@ -68,6 +69,7 @@ export default class CommonProcessor extends Processor {
     this.tagsList = tagsList;
     this.preProcessors = [
       new StandartRFIDLock(),
+      new StandartRFIDLockV2(),
       new BluetoothLock(),
       new BiometricFingerprintLock(),
       new BluetoothSoloLock(),
