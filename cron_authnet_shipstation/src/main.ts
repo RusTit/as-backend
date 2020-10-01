@@ -251,17 +251,24 @@ async function postProcessOrders(
       ) {
         if (!order.advancedOptions) {
           order.advancedOptions = {} as AdvancedOptions;
-          let value = group.customName ? group.customName : group.name;
-          order.items.find(item => {
-            return item.options?.find(option => {
-              const flag = option.name === 'color' || option.name === 'Color';
-              if (flag) {
-                const val = convertColorName(option.value);
-                value += ` - ${val}`;
-              }
-              return flag;
-            });
-          });
+          const name = group.customName ? group.customName : group.name;
+          const [firstItem] = order.items; // assuming to process only FIRST item
+          const colorOption = firstItem.options?.find(
+            option => option.name === 'color' || option.name === 'Color'
+          );
+          const color = colorOption ? convertColorName(colorOption.value) : '';
+          const sizeOption = firstItem.options?.find(
+            option => option.name === 'size' || option.name === 'Size'
+          );
+          const size = sizeOption ? sizeOption.value.split(' ')[0] : '';
+          const lockType = firstItem.name?.includes('BT')
+            ? 'BT'
+            : firstItem.name?.includes('BIO')
+            ? 'BIO'
+            : firstItem.name?.includes('RFID')
+            ? 'RFID'
+            : '';
+          const value = `${name} - ${size} ${color} - ${lockType}`;
           switch (group.fieldName) {
             default:
             case 'customField1':
