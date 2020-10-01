@@ -53,7 +53,8 @@ export function convertColorName(name: string): string {
   return name;
 }
 
-export const WHITE_LIST_CATEGORIES_NOT_SPLIT = [33];
+const EXTRA_PARTS_CATEGORY = 33;
+export const WHITE_LIST_CATEGORIES_NOT_SPLIT = [EXTRA_PARTS_CATEGORY];
 
 export function helperClearItemTaxAndShipping(items: OrderItem[]): OrderItem[] {
   return items.map((item) => {
@@ -61,6 +62,15 @@ export function helperClearItemTaxAndShipping(items: OrderItem[]): OrderItem[] {
     item.shippingAmount = undefined;
     return item;
   });
+}
+
+export function extraPartsCase(order: Order, productsArr: any[]): Order {
+  const isExtraParts =
+    productsArr.find((product) => product._meta.is_extra_part) !== undefined;
+  if (isExtraParts) {
+    order.advancedOptions.customField1 = 'Misc Shipping';
+  }
+  return order;
 }
 
 @Injectable()
@@ -272,6 +282,9 @@ export class BigcomhookService {
           categories.find((cat) =>
             WHITE_LIST_CATEGORIES_NOT_SPLIT.includes(cat),
           ) !== undefined;
+        item._meta = {
+          is_extra_part: categories.includes(EXTRA_PARTS_CATEGORY),
+        };
         if (shouldSkip) {
           sameOrder.push(item);
         } else {
@@ -326,7 +339,7 @@ export class BigcomhookService {
       const dimensions = this.getDimensions(products);
       const weight = this.getWeight(products);
       const cleanedItems = helperClearItemTaxAndShipping(items);
-      const order: Order = {
+      let order: Order = {
         billTo: billing_address,
         customerUsername: this.getCustomerName(
           orderBigCommerce.billing_address,
@@ -345,7 +358,9 @@ export class BigcomhookService {
         dimensions,
         weight,
         items: cleanedItems,
+        advancedOptions: {} as AdvancedOptions,
       };
+      order = extraPartsCase(order, products);
       if (splitBGProducts.length > 1) {
         order.orderNumber += `-${index}/${splitBGProducts.length}`;
       }
@@ -363,7 +378,11 @@ export class BigcomhookService {
     const groups = await this.groupingService.findAll(0, 1000);
     return orderDataPairs.map((pair) => {
       const { order } = pair;
-      if (!order.items || order.items.length === 0) {
+      if (
+        !order.items ||
+        order.items.length === 0 ||
+        order.advancedOptions.customField1
+      ) {
         return pair;
       }
       const sortedGroups = groups.sort(
@@ -394,9 +413,7 @@ export class BigcomhookService {
             order.items.map((item) => item.sku),
           )
         ) {
-          if (!order.advancedOptions) {
-            order.advancedOptions = {} as AdvancedOptions;
-
+          if (!order.advancedOptions.customField1) {
             let value = group.customName ? group.customName : group.name;
             order.items.find((item) => {
               return item.options?.find((option) => {
