@@ -82,3 +82,24 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
   Nest is [MIT licensed](LICENSE).
+
+
+```text
+[Unit]
+Description=as-backend service
+Documentation=https://github.com/RusTit/as-backend
+After=network.target
+
+[Service]
+Type=simple
+User=as-backend
+WorkingDirectory=/home/as-backend/as-backend
+ExecStartPre=git pull origin master
+ExecStartPre=npm install
+ExecStartPre=npm run build
+ExecStart=npm run start:prod
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
