@@ -17,6 +17,7 @@ import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssue
 import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 import { GroupingService } from '../grouping/grouping.service';
 import anymatch, { Matcher } from 'anymatch';
+import { GroupEntity } from '../grouping/Group.entity';
 
 // https://developer.bigcommerce.com/api-reference/orders/orders-api/order-status/getorderstatus
 export enum OrderStatus {
@@ -71,6 +72,26 @@ export function extraPartsCase(order: Order, productsArr: any[]): Order {
     order.advancedOptions.customField1 = 'Misc Shipping';
   }
   return order;
+}
+
+export function getSizeFromName(value: string, group?: GroupEntity): string {
+  if (group?.name === 'Mantle') {
+    return '';
+  }
+  return value.split(' ')[0];
+}
+
+export function getLockTypeFromName(name: string, group?: GroupEntity): string {
+  if (group?.name === 'Mantle') {
+    return 'BIO';
+  }
+  return name.includes('BT')
+    ? 'BT'
+    : name.includes('BIO')
+    ? 'BIO'
+    : name.includes('RFID')
+    ? 'RFID'
+    : '';
 }
 
 @Injectable()
@@ -425,14 +446,10 @@ export class BigcomhookService {
             const sizeOption = firstItem.options.find(
               (option) => option.name === 'size' || option.name === 'Size',
             );
-            const size = sizeOption ? sizeOption.value.split(' ')[0] : '';
-            const lockType = firstItem.name.includes('BT')
-              ? 'BT'
-              : firstItem.name.includes('BIO')
-              ? 'BIO'
-              : firstItem.name.includes('RFID')
-              ? 'RFID'
+            const size = sizeOption
+              ? getSizeFromName(sizeOption.value, group)
               : '';
+            const lockType = getLockTypeFromName(firstItem.name, group);
             const value = `${name} - ${size} ${color} - ${lockType}`;
             switch (group.fieldName) {
               default:

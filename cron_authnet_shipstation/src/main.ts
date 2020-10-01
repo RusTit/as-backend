@@ -38,6 +38,7 @@ import {
 } from './env-vars';
 import { TaskCheckBGHook } from './TaskCheckBGHook';
 import { AdvancedOptions } from './ShipStationTypes';
+import { GroupEntity } from './entities/Group.entity';
 
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   maxConcurrent: 100,
@@ -212,6 +213,26 @@ export function createProcessors(
   ];
 }
 
+export function getSizeFromName(value: string, group?: GroupEntity): string {
+  if (group?.name === 'Mantle') {
+    return '';
+  }
+  return value.split(' ')[0];
+}
+
+export function getLockTypeFromName(name: string, group?: GroupEntity): string {
+  if (group?.name === 'Mantle') {
+    return 'BIO';
+  }
+  return name.includes('BT')
+    ? 'BT'
+    : name.includes('BIO')
+    ? 'BIO'
+    : name.includes('RFID')
+    ? 'RFID'
+    : '';
+}
+
 async function postProcessOrders(
   orderDataPairs: OrderTransactionPair[]
 ): Promise<OrderTransactionPair[]> {
@@ -260,14 +281,10 @@ async function postProcessOrders(
           const sizeOption = firstItem.options?.find(
             option => option.name === 'size' || option.name === 'Size'
           );
-          const size = sizeOption ? sizeOption.value.split(' ')[0] : '';
-          const lockType = firstItem.name?.includes('BT')
-            ? 'BT'
-            : firstItem.name?.includes('BIO')
-            ? 'BIO'
-            : firstItem.name?.includes('RFID')
-            ? 'RFID'
+          const size = sizeOption
+            ? getSizeFromName(sizeOption.value, group)
             : '';
+          const lockType = getLockTypeFromName(firstItem.name as string, group);
           const value = `${name} - ${size} ${color} - ${lockType}`;
           switch (group.fieldName) {
             default:
