@@ -581,11 +581,15 @@ export class BigcomhookService {
       const orderBigCommerce = await this.getBigCommerceOrder(
         orderId.toString(),
       );
-      const amountPaid = Number.parseFloat(orderBigCommerce.total_inc_tax);
-      if (!Number.isFinite(amountPaid)) {
+      const totalIncTax = Number.parseFloat(orderBigCommerce.total_inc_tax);
+      const refundedAmount = Number.parseFloat(
+        orderBigCommerce.refunded_amount,
+      );
+      if (!Number.isFinite(totalIncTax) || !Number.isFinite(refundedAmount)) {
         Logger.error(orderBigCommerce);
-        throw new Error('Invalid value for total_inc_tax');
+        throw new Error('Invalid value for prices values');
       }
+      const amountPaid = totalIncTax - refundedAmount;
       await this.shipStationProxy.init();
       const orders = await this.shipStationProxy.getListOrders({
         orderNumber: `${orderId}`,
@@ -594,7 +598,7 @@ export class BigcomhookService {
       await Promise.all(
         orders.map(async (order) => {
           order.amountPaid = amountPaid;
-          order.internalNotes = `This order is partially refunded`;
+          order.customerNotes = `Refunded ($${refundedAmount})`;
           return this.shipStationProxy.createOrUpdateOrder(order);
         }),
       );
