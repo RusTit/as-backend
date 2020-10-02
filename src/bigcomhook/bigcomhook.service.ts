@@ -78,7 +78,7 @@ export function getSizeFromName(value: string, group?: GroupEntity): string {
   if (group?.name !== 'Mantle') {
     return '';
   }
-  return value.split(' ')[0];
+  return value.split(' ')[0] + 'ft';
 }
 
 export function getLockTypeFromName(name: string, group?: GroupEntity): string {
@@ -532,6 +532,14 @@ export class BigcomhookService {
   async deleteShipStationOrder(orderNumber: number): Promise<void> {
     Logger.debug(`Processing refund/voided orderNumber BG: ${orderNumber}`);
     try {
+      const orderBigCommerce = await this.getBigCommerceOrder(
+        orderNumber.toString(),
+      );
+      if (orderBigCommerce.status_id === OrderStatus.PartiallyRefunded) {
+        return Logger.debug(
+          `Order: ${orderNumber} is partially refunded, so no need to delete ShipStation order.`,
+        );
+      }
       await this.shipStationProxy.init();
       const orders = await this.shipStationProxy.getListOrders({
         orderNumber: `${orderNumber}`,
