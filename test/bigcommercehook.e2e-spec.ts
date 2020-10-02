@@ -31,10 +31,33 @@ describe('BigCommerceHook (e2e)', () => {
       hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
       data: {
         type: 'order',
-        id: 36304, // 35797, // 35791, // 35626 - no transactionId,
+        id: 36578, // 35797, // 35791, // 35626 - no transactionId,
         status: {
           previous_status_id: 0,
           new_status_id: 11,
+        },
+      },
+    };
+    return request(app.getHttpServer())
+      .post('/bigcomhook')
+      .send(payload)
+      .expect(200)
+      .expect({ status: 'WebHook was successfully processed' });
+  });
+
+  it('/bigcomhook partial refunded (POST)', () => {
+    const payload: WebhookUpdatedDto = {
+      created_at: 1599828823,
+      store_id: '1000249567',
+      producer: 'stores/jkfuhlnu8d',
+      scope: 'store/order/statusUpdated',
+      hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
+      data: {
+        type: 'order',
+        id: 36484, // 36484 - partial refunded order
+        status: {
+          previous_status_id: 0,
+          new_status_id: 14,
         },
       },
     };
@@ -54,7 +77,7 @@ describe('BigCommerceHook (e2e)', () => {
       hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
       data: {
         type: 'order',
-        id: 36081, // 35797, // 35791, // 35626 - no transactionId,
+        id: 36578, // 35797, // 35791, // 35626 - no transactionId,
         status: {
           previous_status_id: 0,
           new_status_id: 6,
@@ -72,11 +95,11 @@ describe('BigCommerceHook (e2e)', () => {
       created_at: 1599828823,
       store_id: '1000249567',
       producer: 'stores/jkfuhlnu8d',
-      scope: 'store/order/statusUpdated',
+      scope: 'store/order/refund/created',
       hash: 'da032557d2ae314c3e698a051d9792b43965e3b9',
       data: {
         type: 'order',
-        id: 36081, // 35797, // 35791, // 35626 - no transactionId,
+        id: 36578, // 35797, // 35791, // 35626 - no transactionId,
         refund: {
           refund_id: 3,
         },

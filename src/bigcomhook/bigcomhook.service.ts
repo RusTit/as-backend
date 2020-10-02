@@ -284,7 +284,6 @@ export class BigcomhookService {
   async getBigCommerceOrder(orderId: string): Promise<TODO_ANY> {
     const orderBigCommerce = await this.bigCommerceProxy.getOrder(orderId);
     Logger.debug('Bigcommerce order object');
-    Logger.debug(orderBigCommerce);
     return orderBigCommerce;
   }
 
@@ -568,25 +567,50 @@ export class BigcomhookService {
       case OrderStatus.Cancelled:
       case OrderStatus.Declined:
         return this.deleteShipStationOrder(payload.data.id);
+      case OrderStatus.PartiallyRefunded:
+        return this.processPartialRefunded(payload.data.id);
     }
     Logger.debug(
       `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
     );
   }
 
+  async processPartialRefunded(orderId: number): Promise<void> {
+    try {
+      Logger.debug('Get bigcommerce order');
+      const orderBigCommerce = await this.getBigCommerceOrder(
+        orderId.toString(),
+      );
+      const amountPaid = Number.parseFloat(orderBigCommerce.total_inc_tax);
+      if (!Number.isFinite(amountPaid)) {
+        Logger.error(orderBigCommerce);
+        throw new Error('Invalid value for total_inc_tax');
+      }
+      await this.shipStationProxy.init();
+      const orders = await this.shipStationProxy.getListOrders({
+        orderNumber: `${orderId}`,
+        pageSize: `500`, // to avoid paging issues
+      });
+      await Promise.all(
+        orders.map(async (order) => {
+          order.amountPaid = amountPaid;
+          order.internalNotes = `This order is partially refunded`;
+          return this.shipStationProxy.createOrUpdateOrder(order);
+        }),
+      );
+    } catch (e) {
+      Logger.error(`Error while processing partial refunded: ${orderId}`);
+      Logger.error(e);
+    }
+  }
+
   async handleHook(payload: WebhookUpdatedDto): Promise<void> {
     Logger.debug(payload);
-    if (payload.data.status) {
-      switch (payload.scope) {
-        case 'store/order/updated':
-          return Logger.debug(
-            'Updated event processed also as "store/order/statusUpdated", so skip.',
-          );
-        default:
-          return this.handleStatusUpdated(payload);
-      }
-    } else if (payload.data.refund) {
-      return this.deleteShipStationOrder(payload.data.id);
+    switch (payload.scope) {
+      case 'store/order/statusUpdated':
+        return this.handleStatusUpdated(payload);
+      case 'store/order/refund/created':
+        return this.deleteShipStationOrder(payload.data.id);
     }
     Logger.debug(`Hook didn't processed the payload.`);
   }

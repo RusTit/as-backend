@@ -150,7 +150,7 @@ describe('main tests', () => {
     expect(orderTransTotal.length).toBe(1);
   });
   it('test invalid combined issue', async () => {
-    const ids = ['62571623884'];
+    const ids = ['62580861183'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);
