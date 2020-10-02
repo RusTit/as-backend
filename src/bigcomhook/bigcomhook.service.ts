@@ -75,7 +75,7 @@ export function extraPartsCase(order: Order, productsArr: any[]): Order {
 }
 
 export function getSizeFromName(value: string, group?: GroupEntity): string {
-  if (group?.name === 'Mantle') {
+  if (group?.name !== 'Mantle') {
     return '';
   }
   return value.split(' ')[0];
