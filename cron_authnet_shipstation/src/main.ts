@@ -220,17 +220,63 @@ export function getSizeFromName(value: string, group?: GroupEntity): string {
   return value.split(' ')[0];
 }
 
-export function getLockTypeFromName(name: string, group?: GroupEntity): string {
-  if (group?.name === 'Mantle') {
+const lockTypes = new Map<string, string>();
+
+lockTypes.set('Rustic Racks', 'BT');
+lockTypes.set('Liberty Rustic Pistol', 'BT');
+lockTypes.set('Defender Rustic Rifle', 'BT');
+lockTypes.set('36C Contemporary Pistol', 'BT');
+lockTypes.set('47C Contemporary Rifle', 'BT');
+lockTypes.set('Guardian Frames', 'BT');
+lockTypes.set('Tactical End Table', 'BT');
+lockTypes.set('1791 Whiskey Flag', 'BT');
+lockTypes.set('Barrel Heads', 'BT');
+
+lockTypes.set('MAX flags', 'BIO');
+lockTypes.set('Mantles', 'BIO');
+
+lockTypes.set('Freedom Rifle', 'RFID');
+export function getLockTypeFromName(name: string): string {
+  if (name.includes('BT')) {
+    return 'BT';
+  } else if (name.includes('BIO')) {
     return 'BIO';
+  } else if (name.includes('RFID')) {
+    return 'RFID';
   }
-  return name.includes('BT')
-    ? 'BT'
-    : name.includes('BIO')
-    ? 'BIO'
-    : name.includes('RFID')
-    ? 'RFID'
-    : '';
+  for (const [key, value] of lockTypes) {
+    if (name.includes(key)) {
+      return value;
+    }
+  }
+  return 'RFID';
+}
+
+const specificColors = new Map<string, string>();
+specificColors.set('"Old Glory" Red & Blue Rustic Flag', 'Traditional');
+specificColors.set('"Old Glory" Torched Rustic Flag', 'Torched');
+specificColors.set('The 1791 Whiskey Barrel Flag - Special Edition', '1791');
+specificColors.set('1791 Whiskey Barrel Flag MAX', '1791 MAX');
+specificColors.set('Gunstock and Steel Flag', 'Gunstock');
+specificColors.set('Tactical Flag Barnwood Edition', 'Barnwood');
+specificColors.set('"Thin Blue Line" Rustic Flag', 'Blue Line');
+specificColors.set('"Thin Red Line" Rustic Flag', 'Red Line');
+specificColors.set('The Betsy Ross Rustic Tactical Flag', 'Betsy Ross');
+specificColors.set('The 4 Laws Tactical Flag', '4 Laws');
+specificColors.set('The Tactical Flag "Moonshine" Edition', 'Moonshine');
+specificColors.set(
+  'Elite Military Special Edition Tactical Flag',
+  'Elite Military'
+);
+specificColors.set('The Rustic Rosegold Tactical Flag', 'Rosegold');
+
+export function getColorFromName(name: string): string {
+  for (const [key, value] of specificColors) {
+    if (name.includes(key)) {
+      return value;
+    }
+  }
+  return '';
 }
 
 async function postProcessOrders(
@@ -277,14 +323,17 @@ async function postProcessOrders(
           const colorOption = firstItem.options?.find(
             option => option.name === 'color' || option.name === 'Color'
           );
-          const color = colorOption ? convertColorName(colorOption.value) : '';
+          let color = colorOption ? convertColorName(colorOption.value) : '';
+          if (!color) {
+            color = getColorFromName(firstItem.name as string);
+          }
           const sizeOption = firstItem.options?.find(
             option => option.name === 'size' || option.name === 'Size'
           );
           const size = sizeOption
             ? getSizeFromName(sizeOption.value, group)
             : '';
-          const lockType = getLockTypeFromName(firstItem.name as string, group);
+          const lockType = getLockTypeFromName(firstItem.name as string);
           const value = `${name} - ${size} ${color} - ${lockType}`;
           switch (group.fieldName) {
             default:
