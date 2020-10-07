@@ -123,10 +123,6 @@ export default class CommonProcessor extends Processor {
   private readonly products: Map<string, Product>;
   private readonly tagsList: Map<string, ProductTag>;
 
-  static isValidAddress(data: TODO_ANY): boolean {
-    return data && data.state !== '0';
-  }
-
   static createAddress(data: TODO_ANY, borrowAddress?: Address): Address {
     const name: string = data.firstName
       ? `${data.firstName} ${data.lastName}`
@@ -275,12 +271,6 @@ export default class CommonProcessor extends Processor {
       transactionDetails.shipTo,
       billTo
     );
-    const isShipToValid = CommonProcessor.isValidAddress(
-      transactionDetails.shipTo
-    );
-    const internalNotes = !isShipToValid
-      ? `Please contact [${transactionDetails.customer?.email}] to confirm shipping address.`
-      : undefined;
     const items = this.getOrderItems(arr);
     if (items.length === 0) {
       throw new Error(`Cannot create items for transaction`);
@@ -312,7 +302,6 @@ export default class CommonProcessor extends Processor {
         WeightUnits: productWithUnits.weight,
       },
       amountPaid,
-      internalNotes,
     };
     this.logger.debug(`Result: ${result.customerUsername}`);
     return result;
