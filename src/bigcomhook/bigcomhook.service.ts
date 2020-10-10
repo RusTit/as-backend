@@ -65,11 +65,22 @@ export function helperClearItemTaxAndShipping(items: OrderItem[]): OrderItem[] {
   });
 }
 
-export function extraPartsCase(order: Order, productsArr: any[]): Order {
+export function extraCase(order: Order, productsArr: any[]): Order {
   const isExtraParts =
     productsArr.find((product) => product._meta.is_extra_part) !== undefined;
   if (isExtraParts) {
     order.advancedOptions.customField1 = 'Misc Shipping';
+    return order;
+  }
+  const isSealionDiveWatch =
+    order.items.find((item) => item.sku === 'SEALIONDIVEWATCH') !== undefined;
+  if (isSealionDiveWatch) {
+    order.advancedOptions.customField1 = 'SEALION WATCH';
+  }
+  const isRaptorWatch =
+    order.items.find((item) => item.sku === 'RAPTORWATCH') !== undefined;
+  if (isRaptorWatch) {
+    order.advancedOptions.customField1 = 'RAPTOR WATCH';
   }
   return order;
 }
@@ -93,7 +104,10 @@ lockTypes.set('Defender Rustic Rifle', 'BT');
 lockTypes.set('The Defender 45R', 'BT'); // 36930
 
 lockTypes.set('36C Contemporary Pistol', 'BT');
+lockTypes.set('The 36C Shelf', 'BT');
+
 lockTypes.set('47C Contemporary Rifle', 'BT');
+lockTypes.set('The 47C Shelf', 'BT');
 
 lockTypes.set('Guardian Tactical Frame', 'BT'); // 36934
 lockTypes.set('Guardian Frames', 'BT');
@@ -106,6 +120,7 @@ lockTypes.set('1791 Whiskey Barrel Flag', 'BT'); // 36940
 lockTypes.set('1791 Whiskey Flag', 'BT');
 lockTypes.set('Flag 1791', 'BT'); // 194730
 
+lockTypes.set('The Tactical Barrel', 'BT');
 lockTypes.set('Barrel Heads', 'BT');
 
 lockTypes.set('MAX flags', 'BIO');
@@ -132,6 +147,7 @@ export function getLockTypeFromName(name: string): string {
 const specificColors = new Map<string, string>();
 specificColors.set('"Old Glory" Red & Blue Rustic Flag', 'Traditional');
 specificColors.set('"Old Glory" Torched Rustic Flag', 'Torched');
+specificColors.set('TT Flag 1791', '1791');
 specificColors.set('The 1791 Whiskey Barrel Flag - Special Edition', '1791');
 specificColors.set('1791 Whiskey Barrel Flag MAX', '1791 MAX');
 specificColors.set('Gunstock and Steel Flag', 'Gunstock');
@@ -442,7 +458,7 @@ export class BigcomhookService {
         items: cleanedItems,
         advancedOptions: {} as AdvancedOptions,
       };
-      order = extraPartsCase(order, products);
+      order = extraCase(order, products);
       if (splitBGProducts.length > 1) {
         order.orderNumber += `-${index}/${splitBGProducts.length}`;
       }

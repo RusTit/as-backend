@@ -5,7 +5,13 @@ import CombineRule from '../combineRules/CombineRule';
 import CompactRule from '../combineRules/CompactRule';
 import HardwoodRule from '../combineRules/HardwoodRule';
 import { isApprovedTransaction } from '../filters';
-import { Address, Order, OrderItem, Product } from '../ShipStationTypes';
+import {
+  Address,
+  AdvancedOptions,
+  Order,
+  OrderItem,
+  Product,
+} from '../ShipStationTypes';
 import { ProductTag, UnknownProduct } from '../ShipStationProxy';
 import path from 'path';
 import fs from 'fs/promises';
@@ -302,6 +308,7 @@ export default class CommonProcessor extends Processor {
         WeightUnits: productWithUnits.weight,
       },
       amountPaid,
+      advancedOptions: {} as AdvancedOptions,
     };
     this.logger.debug(`Result: ${result.customerUsername}`);
     return result;
@@ -356,7 +363,8 @@ export default class CommonProcessor extends Processor {
         return tr === transaction;
       });
       try {
-        const order = this.transformData(transaction);
+        let order = this.transformData(transaction);
+        order = extraCase(order);
         orderTrans.push({
           order,
           transaction: originalApproved,
@@ -380,4 +388,24 @@ export default class CommonProcessor extends Processor {
     };
     return Promise.resolve(result);
   }
+}
+
+export function extraCase(order: Order): Order {
+  if (!order.items) {
+    order.items = [];
+  }
+  if (!order.advancedOptions) {
+    order.advancedOptions = {} as AdvancedOptions;
+  }
+  const isSealionDiveWatch =
+    order.items.find(item => item.sku === 'SEALIONDIVEWATCH') !== undefined;
+  if (isSealionDiveWatch) {
+    order.advancedOptions!.customField1 = 'SEALION WATCH';
+  }
+  const isRaptorWatch =
+    order.items.find(item => item.sku === 'RAPTORWATCH') !== undefined;
+  if (isRaptorWatch) {
+    order.advancedOptions.customField1 = 'RAPTOR WATCH';
+  }
+  return order;
 }
