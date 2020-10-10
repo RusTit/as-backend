@@ -84,19 +84,35 @@ export function getSizeFromName(value: string, group?: GroupEntity): string {
 const lockTypes = new Map<string, string>();
 
 lockTypes.set('Rustic Racks', 'BT');
+
 lockTypes.set('Liberty Rustic Pistol', 'BT');
+lockTypes.set('The Liberty 35S', 'BT'); // 36944
+
+lockTypes.set('TT Defender', 'BT'); // 194646
 lockTypes.set('Defender Rustic Rifle', 'BT');
+lockTypes.set('The Defender 45R', 'BT'); // 36930
+
 lockTypes.set('36C Contemporary Pistol', 'BT');
 lockTypes.set('47C Contemporary Rifle', 'BT');
+
+lockTypes.set('Guardian Tactical Frame', 'BT'); // 36934
 lockTypes.set('Guardian Frames', 'BT');
+lockTypes.set('Guardian Frame', 'BT'); // 194734, 194729
+
 lockTypes.set('Tactical End Table', 'BT');
+
+lockTypes.set('1791 Whiskey Barrel Flag MAX', 'BIO'); // 36940
+lockTypes.set('1791 Whiskey Barrel Flag', 'BT'); // 36940
 lockTypes.set('1791 Whiskey Flag', 'BT');
+lockTypes.set('Flag 1791', 'BT'); // 194730
+
 lockTypes.set('Barrel Heads', 'BT');
 
 lockTypes.set('MAX flags', 'BIO');
 lockTypes.set('Mantles', 'BIO');
 
 lockTypes.set('Freedom Rifle', 'RFID');
+
 export function getLockTypeFromName(name: string): string {
   if (name.includes('BT')) {
     return 'BT';
