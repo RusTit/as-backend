@@ -357,8 +357,25 @@ export async function postProcessOrders(
           option => option.name === 'size' || option.name === 'Size'
         );
         const size = sizeOption ? getSizeFromName(sizeOption.value, group) : '';
-        const lockType = getLockTypeFromName(firstItem.name as string);
-        const value = `${name} - ${size} ${color} - ${lockType}`;
+
+        let lockType: string;
+        switch (group.name) {
+          case 'Pistol':
+          case 'Compact':
+            if (firstItem.name?.includes('Elite Fingerprint')) {
+              lockType = 'BIO';
+            } else if (firstItem.name?.includes('Elite')) {
+              lockType = 'BT';
+            } else {
+              lockType = getLockTypeFromName(firstItem.name as string);
+            }
+            break;
+          default:
+            lockType = getLockTypeFromName(firstItem.name as string);
+        }
+        const value = [name, `${size} ${color}`.trim(), lockType.trim()]
+          .filter(s => s)
+          .join(' - ');
         switch (group.fieldName) {
           default:
           case 'customField1':
