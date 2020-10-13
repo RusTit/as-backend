@@ -252,7 +252,11 @@ lockTypes.set('The Tactical Barrel', 'BT');
 lockTypes.set('Barrel Heads', 'BT');
 
 lockTypes.set('MAX flags', 'BIO');
+
 lockTypes.set('Mantles', 'BIO');
+lockTypes.set('Mantle', 'BIO'); // 37079
+
+lockTypes.set('Table', 'BT'); // 37081;
 
 lockTypes.set('Freedom Rifle', 'RFID');
 
