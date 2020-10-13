@@ -304,7 +304,7 @@ export function getColorFromName(name: string): string {
   return '';
 }
 
-async function postProcessOrders(
+export async function postProcessOrders(
   orderDataPairs: OrderTransactionPair[]
 ): Promise<OrderTransactionPair[]> {
   const groups = await getAllGroups();
@@ -343,38 +343,35 @@ async function postProcessOrders(
       ) {
         if (!order.advancedOptions) {
           order.advancedOptions = {} as AdvancedOptions;
-          const name = group.customName ? group.customName : group.name;
-          const [firstItem] = order.items; // assuming to process only FIRST item
-          const colorOption = firstItem.options?.find(
-            option => option.name === 'color' || option.name === 'Color'
-          );
-          let color = colorOption ? convertColorName(colorOption.value) : '';
-          if (!color) {
-            color = getColorFromName(firstItem.name as string);
-          }
-          const sizeOption = firstItem.options?.find(
-            option => option.name === 'size' || option.name === 'Size'
-          );
-          const size = sizeOption
-            ? getSizeFromName(sizeOption.value, group)
-            : '';
-          const lockType = getLockTypeFromName(firstItem.name as string);
-          const value = `${name} - ${size} ${color} - ${lockType}`;
-          switch (group.fieldName) {
-            default:
-            case 'customField1':
-              order.advancedOptions.customField1 = value;
-              break;
-            case 'customField2':
-              order.advancedOptions.customField2 = value;
-              break;
-            case 'customField3':
-              order.advancedOptions.customField3 = value;
-              break;
-          }
-        } else {
-          logger.debug(`Skipping group: ${group.name}. Already processed.`);
         }
+        const name = group.customName ? group.customName : group.name;
+        const [firstItem] = order.items; // assuming to process only FIRST item
+        const colorOption = firstItem.options?.find(
+          option => option.name === 'color' || option.name === 'Color'
+        );
+        let color = colorOption ? convertColorName(colorOption.value) : '';
+        if (!color) {
+          color = getColorFromName(firstItem.name as string);
+        }
+        const sizeOption = firstItem.options?.find(
+          option => option.name === 'size' || option.name === 'Size'
+        );
+        const size = sizeOption ? getSizeFromName(sizeOption.value, group) : '';
+        const lockType = getLockTypeFromName(firstItem.name as string);
+        const value = `${name} - ${size} ${color} - ${lockType}`;
+        switch (group.fieldName) {
+          default:
+          case 'customField1':
+            order.advancedOptions.customField1 = value;
+            break;
+          case 'customField2':
+            order.advancedOptions.customField2 = value;
+            break;
+          case 'customField3':
+            order.advancedOptions.customField3 = value;
+            break;
+        }
+        break;
       }
     }
     return pair;
