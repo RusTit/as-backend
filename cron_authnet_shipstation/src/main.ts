@@ -257,6 +257,7 @@ lockTypes.set('Mantles', 'BIO');
 lockTypes.set('Mantle', 'BIO'); // 37079
 
 lockTypes.set('Table', 'BT'); // 37081;
+lockTypes.set('Endtable', 'BT');
 
 lockTypes.set('Freedom Rifle', 'RFID');
 lockTypes.set('Rack', 'BT');
