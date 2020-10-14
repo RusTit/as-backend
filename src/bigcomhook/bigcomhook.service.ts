@@ -116,6 +116,7 @@ lockTypes.set('Guardian Frame', 'BT'); // 194734, 194729
 lockTypes.set('Tactical End Table', 'BT');
 
 lockTypes.set('1791 Whiskey Barrel Flag MAX', 'BIO'); // 36940
+lockTypes.set('1791 Flag Big', 'BIO');
 lockTypes.set('1791 Whiskey Barrel Flag', 'BT'); // 36940
 lockTypes.set('1791 Whiskey Flag', 'BT');
 lockTypes.set('Flag 1791', 'BT'); // 194730
@@ -154,6 +155,7 @@ const specificColors = new Map<string, string>();
 specificColors.set('"Old Glory" Red & Blue Rustic Flag', 'Traditional');
 specificColors.set('"Old Glory" Torched Rustic Flag', 'Torched');
 specificColors.set('TT Flag 1791', '1791');
+specificColors.set('1791 Flag Big', '1791 MAX');
 specificColors.set('The 1791 Whiskey Barrel Flag - Special Edition', '1791');
 specificColors.set('1791 Whiskey Barrel Flag MAX', '1791 MAX');
 specificColors.set('Gunstock and Steel Flag', 'Gunstock');
