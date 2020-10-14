@@ -259,6 +259,7 @@ lockTypes.set('Mantle', 'BIO'); // 37079
 lockTypes.set('Table', 'BT'); // 37081;
 
 lockTypes.set('Freedom Rifle', 'RFID');
+lockTypes.set('Rack', 'BT');
 
 export function getLockTypeFromName(name: string): string {
   if (name.includes('BT')) {
