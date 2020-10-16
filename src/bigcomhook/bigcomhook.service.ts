@@ -122,6 +122,7 @@ lockTypes.set('1791 Whiskey Flag', 'BT');
 lockTypes.set('Flag 1791', 'BT'); // 194730
 
 lockTypes.set('The Tactical Barrel', 'BT');
+lockTypes.set('Barrel Head', 'BT');
 lockTypes.set('Barrel Heads', 'BT');
 
 lockTypes.set('MAX flags', 'BIO');
