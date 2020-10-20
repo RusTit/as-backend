@@ -323,7 +323,7 @@ export function internalNoteColorUndefined(
     case 'Defender':
     case 'Frame':
     case 'Liberty':
-    case 'Rifle':
+    case 'Rifles':
       if (!color || color.toLowerCase() === 'undefined') {
         order.internalNotes = 'Color Undefined';
       }
