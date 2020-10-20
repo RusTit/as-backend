@@ -271,6 +271,8 @@ export function getLockTypeFromName(name: string): string {
     return 'BIO';
   } else if (name.includes('RFID')) {
     return 'RFID';
+  } else if (name.includes('4 Laws')) {
+    return '4 Laws';
   }
   for (const [key, value] of lockTypes) {
     if (name.includes(key)) {

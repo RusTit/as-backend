@@ -143,6 +143,8 @@ export function getLockTypeFromName(name: string): string {
     return 'BIO';
   } else if (name.includes('RFID')) {
     return 'RFID';
+  } else if (name.includes('4 Laws')) {
+    return '4 Laws';
   }
   for (const [key, value] of lockTypes) {
     if (name.includes(key)) {
@@ -520,55 +522,55 @@ export class BigcomhookService {
             order.items.map((item) => item.sku),
           )
         ) {
-          if (!order.advancedOptions.customField1) {
-            const name = group.customName ? group.customName : group.name;
-            const [firstItem] = order.items; // assuming to process only FIRST item
-            const colorOption = firstItem.options.find(
-              (option) => option.name === 'color' || option.name === 'Color',
-            );
-            let color = colorOption ? convertColorName(colorOption.value) : '';
-            if (!color) {
-              color = getColorFromName(firstItem.name);
-            }
-            const sizeOption = firstItem.options.find(
-              (option) => option.name === 'size' || option.name === 'Size',
-            );
-            const size = sizeOption
-              ? getSizeFromName(sizeOption.value, group)
-              : '';
-
-            let lockType: string;
-            switch (group.name) {
-              case 'Pistol':
-              case 'Compact':
-                if (firstItem.name?.includes('Bluetooth')) {
-                  lockType = 'BT';
-                } else {
-                  lockType = getLockTypeFromName(firstItem.name as string);
-                }
-                break;
-              default:
-                lockType = getLockTypeFromName(firstItem.name as string);
-            }
-            const value = [name, `${size} ${color}`.trim(), lockType.trim()]
-              .filter((s) => s)
-              .join(' - ');
-
-            switch (group.fieldName) {
-              default:
-              case 'customField1':
-                order.advancedOptions.customField1 = value;
-                break;
-              case 'customField2':
-                order.advancedOptions.customField2 = value;
-                break;
-              case 'customField3':
-                order.advancedOptions.customField3 = value;
-                break;
-            }
-          } else {
-            Logger.debug(`Skipping group: ${group.name}. Already processed.`);
+          if (!order.advancedOptions) {
+            order.advancedOptions = {} as AdvancedOptions;
           }
+          const name = group.customName ? group.customName : group.name;
+          const [firstItem] = order.items; // assuming to process only FIRST item
+          const colorOption = firstItem.options.find(
+            (option) => option.name === 'color' || option.name === 'Color',
+          );
+          let color = colorOption ? convertColorName(colorOption.value) : '';
+          if (!color) {
+            color = getColorFromName(firstItem.name);
+          }
+          const sizeOption = firstItem.options.find(
+            (option) => option.name === 'size' || option.name === 'Size',
+          );
+          const size = sizeOption
+            ? getSizeFromName(sizeOption.value, group)
+            : '';
+
+          let lockType: string;
+          switch (group.name) {
+            case 'Pistol':
+            case 'Compact':
+              if (firstItem.name?.includes('Bluetooth')) {
+                lockType = 'BT';
+              } else {
+                lockType = getLockTypeFromName(firstItem.name as string);
+              }
+              break;
+            default:
+              lockType = getLockTypeFromName(firstItem.name as string);
+          }
+          const value = [name, `${size} ${color}`.trim(), lockType.trim()]
+            .filter((s) => s)
+            .join(' - ');
+
+          switch (group.fieldName) {
+            default:
+            case 'customField1':
+              order.advancedOptions.customField1 = value;
+              break;
+            case 'customField2':
+              order.advancedOptions.customField2 = value;
+              break;
+            case 'customField3':
+              order.advancedOptions.customField3 = value;
+              break;
+          }
+          break;
         }
       }
       return pair;
