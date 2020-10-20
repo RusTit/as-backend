@@ -360,6 +360,12 @@ export async function postProcessOrders(
         if (!color) {
           color = getColorFromName(firstItem.name as string);
         }
+        if (
+          !color ||
+          (typeof color === 'string' && color.toLowerCase() === 'undefined')
+        ) {
+          order.internalNotes = 'Color Undefined';
+        }
         const sizeOption = firstItem.options?.find(
           option => option.name === 'size' || option.name === 'Size'
         );
