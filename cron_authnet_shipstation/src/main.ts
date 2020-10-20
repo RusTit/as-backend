@@ -39,6 +39,7 @@ import {
 import { TaskCheckBGHook } from './TaskCheckBGHook';
 import { AdvancedOptions } from './ShipStationTypes';
 import { GroupEntity } from './entities/Group.entity';
+import { Order } from './ShipStationTypes';
 
 const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
   maxConcurrent: 100,
@@ -311,6 +312,27 @@ export function getColorFromName(name: string): string {
   return '';
 }
 
+export function internalNoteColorUndefined(
+  order: Order,
+  group: GroupEntity,
+  color?: string
+): Order {
+  switch (group.name) {
+    case 'Pistol':
+    case 'Compact':
+    case 'Defender':
+    case 'Frame':
+    case 'Liberty':
+    case 'Rifle':
+      if (!color || color.toLowerCase() === 'undefined') {
+        order.internalNotes = 'Color Undefined';
+      }
+      break;
+    default:
+  }
+  return order;
+}
+
 export async function postProcessOrders(
   orderDataPairs: OrderTransactionPair[]
 ): Promise<OrderTransactionPair[]> {
@@ -360,12 +382,7 @@ export async function postProcessOrders(
         if (!color) {
           color = getColorFromName(firstItem.name as string);
         }
-        if (
-          !color ||
-          (typeof color === 'string' && color.toLowerCase() === 'undefined')
-        ) {
-          order.internalNotes = 'Color Undefined';
-        }
+        internalNoteColorUndefined(order, group, color);
         const sizeOption = firstItem.options?.find(
           option => option.name === 'size' || option.name === 'Size'
         );
