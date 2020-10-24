@@ -94,6 +94,13 @@ export function getSizeFromName(value: string, group?: GroupEntity): string {
 
 const lockTypes = new Map<string, string>();
 
+lockTypes.set('BT', 'BT');
+lockTypes.set('BIO', 'BIO');
+lockTypes.set('RFID', 'RFID');
+lockTypes.set('4 Laws', '');
+lockTypes.set('TT Arcticstorm', '');
+lockTypes.set('Recon Tactical Smart Watch', '');
+
 lockTypes.set('Rustic Racks', 'BT');
 
 lockTypes.set('Liberty Rustic Pistol', 'BT');
@@ -137,17 +144,6 @@ lockTypes.set('Freedom Rifle', 'RFID');
 lockTypes.set('Rack', 'BT');
 
 export function getLockTypeFromName(name: string): string {
-  if (name.includes('BT')) {
-    return 'BT';
-  } else if (name.includes('BIO')) {
-    return 'BIO';
-  } else if (name.includes('RFID')) {
-    return 'RFID';
-  } else if (name.includes('4 Laws')) {
-    return '';
-  } else if (name.includes('TT Arcticstorm')) {
-    return '';
-  }
   for (const [key, value] of lockTypes) {
     if (name.includes(key)) {
       return value;
