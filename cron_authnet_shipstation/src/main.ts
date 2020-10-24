@@ -229,6 +229,7 @@ lockTypes.set('RFID', 'RFID');
 lockTypes.set('The 4 Laws Flag Wall Art', '');
 lockTypes.set('TT Arcticstorm', '');
 lockTypes.set('Recon Tactical Smart Watch', '');
+lockTypes.set('Master Card', '');
 
 lockTypes.set('Rustic Racks', 'BT');
 
