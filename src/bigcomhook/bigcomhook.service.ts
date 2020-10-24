@@ -97,7 +97,7 @@ const lockTypes = new Map<string, string>();
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
 lockTypes.set('RFID', 'RFID');
-lockTypes.set('4 Laws', '');
+lockTypes.set('The 4 Laws Flag Wall Art', '');
 lockTypes.set('TT Arcticstorm', '');
 lockTypes.set('Recon Tactical Smart Watch', '');
 
