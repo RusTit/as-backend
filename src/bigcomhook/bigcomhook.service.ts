@@ -165,6 +165,7 @@ specificColors.set('Tactical Flag Barnwood Edition', 'Barnwood');
 specificColors.set('"Thin Blue Line" Rustic Flag', 'Blue Line');
 specificColors.set('"Thin Red Line" Rustic Flag', 'Red Line');
 specificColors.set('The Betsy Ross Rustic Tactical Flag', 'Betsy Ross');
+specificColors.set('The Betsy Ross Rustic Tactical  Flag', 'Betsy Ross');
 specificColors.set('The 4 Laws Tactical Flag', '4 Laws');
 specificColors.set('The Tactical Flag "Moonshine" Edition', 'Moonshine');
 specificColors.set(
