@@ -6,11 +6,9 @@ import {
   createFetcherDetails,
   createProcessors,
   createShipStationProxy,
-  getAuthTransactionDetailsArray,
-  getBatchIdArray,
   init,
+  postProcessOrders,
 } from '../src/main';
-import { isApprovedTransaction } from '../src/filters';
 import { TODO_ANY } from '../src/Helper';
 import CommonProcessor from '../src/processors/CommonProcessor';
 import Processor, { OrderTransactionPair } from '../src/processors/Processor';
@@ -108,7 +106,8 @@ describe('main tests', () => {
     expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
   it('test combined all processors', async () => {
-    const ids = ['62568853213', '62568860528'];
+    const ids = ['62617734792'];
+    // const ids = ['62608492676'];
     // const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
@@ -126,7 +125,8 @@ describe('main tests', () => {
       transactionDetails = skipped;
       orderTransTotal.push(...orderTrans);
     }
-    expect(orderTransTotal.length).toBe(1);
+    const processedOrdersPair = await postProcessOrders(orderTransTotal);
+    expect(processedOrdersPair.length).toBe(1);
     await shipStationProxy.createOrUpdateOrder(orderTransTotal[0].order);
   });
   it('test product not found on all processors', async () => {
