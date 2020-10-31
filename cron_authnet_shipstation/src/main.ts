@@ -234,7 +234,7 @@ lockTypes.set('Master Card', '');
 lockTypes.set('Rustic Racks', 'BT');
 
 lockTypes.set('Liberty Rustic Pistol', 'BT');
-lockTypes.set('The Liberty 35S', 'BT'); // 36944
+lockTypes.set('Liberty 35S', 'BT'); // 36944
 
 lockTypes.set('TT Defender', 'BT'); // 194646
 lockTypes.set('Defender Rustic Rifle', 'BT');
