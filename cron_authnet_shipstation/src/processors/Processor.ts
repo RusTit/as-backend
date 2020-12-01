@@ -22,9 +22,7 @@ export default abstract class Processor {
   protected constructor(name: string) {
     this.logger = LoggerFactory(name);
   }
-  abstract async process(
-    transactionDetails: TODO_ANY[]
-  ): Promise<ProcessorResult>;
+  abstract process(transactionDetails: TODO_ANY[]): Promise<ProcessorResult>;
 
   protected getPaymentMethod(transactionDetails: TODO_ANY): string {
     const keys = Object.keys(transactionDetails.payment);

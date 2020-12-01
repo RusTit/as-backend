@@ -275,10 +275,9 @@ export default class CommonProcessor extends Processor {
     const billTo: Address = CommonProcessor.createAddress(
       transactionDetails.billTo
     );
-    const shipTo: Address = CommonProcessor.createAddress(
-      transactionDetails.shipTo,
-      billTo
-    );
+    const shipTo: Address = transactionDetails.shipTo
+      ? CommonProcessor.createAddress(transactionDetails.shipTo, billTo)
+      : CommonProcessor.createAddress(transactionDetails.billTo);
     const items = this.getOrderItems(arr);
     if (items.length === 0) {
       throw new Error(`Cannot create items for transaction`);
