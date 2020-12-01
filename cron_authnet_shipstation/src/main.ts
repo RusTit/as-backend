@@ -109,9 +109,9 @@ export async function getAuthTransactionDetailsArray(
   batchIds: Array<Helper.TODO_ANY>,
   authNetProxy: AuthNetProxy
 ): Promise<Helper.TODO_ANY> {
-  const transactionsDetailsArrOfArr: Array<Array<
-    Helper.TODO_ANY
-  >> = await Promise.all(
+  const transactionsDetailsArrOfArr: Array<
+    Array<Helper.TODO_ANY>
+  > = await Promise.all(
     batchIds.map(async batchId => {
       logger.info(`Processing batch #${batchId}`);
       const transactionsIds = await authNetProxy.getTransactionsIdList(batchId);
@@ -340,21 +340,33 @@ export function internalNoteColorUndefined(
   return order;
 }
 
+export async function getSortedGroups(): Promise<GroupEntity[]> {
+  const groups = await getAllGroups();
+  return groups.sort(
+    (a, b) =>
+      b.productNameGlob.length +
+      b.productSkuGlob.length -
+      (a.productNameGlob.length + a.productSkuGlob.length)
+  );
+}
+
 export async function postProcessOrders(
   orderDataPairs: OrderTransactionPair[]
 ): Promise<OrderTransactionPair[]> {
-  const groups = await getAllGroups();
+  const sortedGroups = await getSortedGroups();
   return orderDataPairs.map(pair => {
     const { order } = pair;
     if (!order.items || order.items.length === 0) {
       return pair;
     }
-    const sortedGroups = groups.sort(
-      (a, b) =>
-        b.productNameGlob.length +
-        b.productSkuGlob.length -
-        (a.productNameGlob.length + a.productSkuGlob.length)
-    );
+    if (
+      order.advancedOptions &&
+      (order.advancedOptions.customField1 ||
+        order.advancedOptions.customField2 ||
+        order.advancedOptions.customField3)
+    ) {
+      return pair;
+    }
     for (const group of sortedGroups) {
       const { productNameGlob, productSkuGlob } = group;
       let productNameMatcher: Matcher = productNameGlob;

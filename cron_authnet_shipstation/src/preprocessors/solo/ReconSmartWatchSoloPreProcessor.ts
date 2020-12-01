@@ -26,10 +26,9 @@ export class ReconSmartWatchSoloPreProcessor implements PreProcessor {
       if (description) {
         for (const key of ReconCases.keys()) {
           if (description.includes(key)) {
-            transaction.order.description = description.replace(
-              key,
-              ReconCases.get(key) as string
-            );
+            transaction.order.description = description
+              .replace(key, ReconCases.get(key) as string)
+              .trim();
             return transaction;
           }
         }

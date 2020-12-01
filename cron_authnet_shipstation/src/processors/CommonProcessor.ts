@@ -24,7 +24,6 @@ import { BiometricFingerprintLock } from '../preprocessors/combined/BiometricFin
 import { BluetoothSoloLock } from '../preprocessors/solo/BluetoothSoloLock';
 import { BiometricFingerprintSoloLock } from '../preprocessors/solo/BiometricFingerprintSoloLock';
 import { StandartRFIDLockV2 } from '../preprocessors/combined/StandartRFIDLockV2';
-import { ReconSmartWatchSoloPreProcessor } from '../preprocessors/solo/ReconSmartWatchSoloPreProcessor';
 import {
   extractMetaFromDescription,
   GeneralCombinedPreProcessor,
@@ -81,7 +80,6 @@ export default class CommonProcessor extends Processor {
       new BiometricFingerprintLock(),
       new BluetoothSoloLock(),
       new BiometricFingerprintSoloLock(),
-      new ReconSmartWatchSoloPreProcessor(),
       new GeneralCombinedPreProcessor(),
     ];
   }
@@ -407,6 +405,11 @@ export function extraCase(order: Order): Order {
     order.items.find(item => item.sku === 'RAPTORWATCH') !== undefined;
   if (isRaptorWatch) {
     order.advancedOptions.customField1 = 'RAPTOR WATCH';
+  }
+  const isReconWatch =
+    order.items.find(item => item.sku === 'RECONWATCH') !== undefined;
+  if (isReconWatch) {
+    order.advancedOptions.customField1 = 'Recon Smart Watch';
   }
   return order;
 }
