@@ -225,6 +225,9 @@ const lockTypes = new Map<string, string>();
 
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
+
+lockTypes.set('1791 Flag', 'BT'); // 62679901961
+
 lockTypes.set('RFID', 'RFID');
 lockTypes.set('The 4 Laws Flag Wall Art', '');
 lockTypes.set('TT Arcticstorm', '');
@@ -286,6 +289,10 @@ const specificColors = new Map<string, string>();
 specificColors.set('"Old Glory" Red & Blue Rustic Flag', 'Traditional');
 specificColors.set('"Old Glory" Torched Rustic Flag', 'Torched');
 specificColors.set('TT Flag 1791', '1791');
+specificColors.set(
+  '1791 Flag (Premium Edition Includes: RFID lock Bluetooth, Foam, LED light)',
+  '1791'
+);
 specificColors.set('1791 Flag Big', '1791 MAX');
 specificColors.set('The 1791 Whiskey Barrel Flag - Special Edition', '1791');
 specificColors.set('1791 Whiskey Barrel Flag MAX', '1791 MAX');
