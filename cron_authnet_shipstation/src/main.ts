@@ -11,11 +11,10 @@ import * as Helper from './Helper';
 import {
   convertRecordsIntoArrayOfTransactionsIds,
   getDbTransactionsCreated,
-  getDbTransactionsProcessed,
   moveIssuedTransaction,
   moveProcessedTransaction,
   getAllGroups,
-  removeDbTransactionsCreated,
+  removeDuplicates,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor, {
@@ -473,7 +472,8 @@ export async function orderPairProcessor(
 export async function dbProcessor(): Promise<void> {
   const { shipStationProxy, authNetProxy } = await CreateAndInitCore();
   const records = await getDbTransactionsCreated();
-  const ids = convertRecordsIntoArrayOfTransactionsIds(records);
+  const uniqueRecords = await removeDuplicates(records);
+  const ids = convertRecordsIntoArrayOfTransactionsIds(uniqueRecords);
   let transactionDetails = await Promise.all(
     ids.map(createFetcherDetails(authNetProxy))
   );
@@ -493,25 +493,9 @@ export async function dbProcessor(): Promise<void> {
   }
 }
 
-const checkDuplicates = async () => {
-  const [transactionsCreatedId, transactionsProcessedId] = await Promise.all([
-    getDbTransactionsCreated(),
-    getDbTransactionsProcessed(),
-  ]);
-  const setTransactionsProcessedId = new Set();
-  transactionsProcessedId.forEach(tr =>
-    setTransactionsProcessedId.add(tr.transactionId)
-  );
-  const duplicatesTransactionsCreatedId = transactionsCreatedId.filter(tr =>
-    setTransactionsProcessedId.has(tr.transactionId)
-  );
-  await removeDbTransactionsCreated(duplicatesTransactionsCreatedId);
-};
-
 const dbFlow = async () => {
   try {
     logger.info('Started');
-    await checkDuplicates();
     await dbProcessor();
   } catch (e) {
     logger.error(e);

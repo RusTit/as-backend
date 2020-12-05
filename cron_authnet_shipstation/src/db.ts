@@ -140,6 +140,43 @@ export async function moveIssuedTransaction(
   });
 }
 
+export async function removeDuplicates(
+  records: TransactionCreatedEntity[]
+): Promise<TransactionCreatedEntity[]> {
+  const con = await initDbConnection();
+  const processedEntityRepository = con.getRepository(
+    TransactionProcessedEntity
+  );
+  const transactionIds = records.map(r => {
+    return {
+      transactionId: r.transactionId,
+    };
+  });
+  const processedAlready = await processedEntityRepository.find({
+    order: {
+      transactionId: 'ASC',
+    },
+    select: ['id', 'transactionId'],
+    where: transactionIds,
+  });
+  const processedIds: Set<string> = new Set(
+    processedAlready.map(r => r.transactionId)
+  );
+  const deleteDuplicates: TransactionCreatedEntity[] = [];
+  const uniqueEntities: TransactionCreatedEntity[] = [];
+  for (const record of records) {
+    if (processedIds.has(record.transactionId)) {
+      deleteDuplicates.push(record);
+    } else {
+      uniqueEntities.push(record);
+    }
+  }
+  if (deleteDuplicates.length) {
+    await removeDbTransactionsCreated(deleteDuplicates);
+  }
+  return uniqueEntities;
+}
+
 export function convertRecordsIntoArrayOfTransactionsIds(
   records: TransactionCreatedEntity[]
 ): Array<string> {
