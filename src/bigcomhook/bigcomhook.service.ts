@@ -97,6 +97,7 @@ const lockTypes = new Map<string, string>();
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
 
+lockTypes.set('1791 Flag Big', 'BIO');
 lockTypes.set('1791 Flag', 'BT'); // 62679901961
 
 lockTypes.set('RFID', 'RFID');
@@ -127,7 +128,6 @@ lockTypes.set('Guardian Frame', 'BT'); // 194734, 194729
 lockTypes.set('Tactical End Table', 'BT');
 
 lockTypes.set('1791 Whiskey Barrel Flag MAX', 'BIO'); // 36940
-lockTypes.set('1791 Flag Big', 'BIO');
 lockTypes.set('1791 Whiskey Barrel Flag', 'BT'); // 36940
 lockTypes.set('1791 Whiskey Flag', 'BT');
 lockTypes.set('Flag 1791', 'BT'); // 194730
