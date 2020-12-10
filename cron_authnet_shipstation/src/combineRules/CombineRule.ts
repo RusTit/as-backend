@@ -34,7 +34,7 @@ export default abstract class CombineRule {
     const color = CommonProcessor.getColorFromTheDescription(
       firstTransaction.order.description
     );
-    const email = firstTransaction.customer.email;
+    const email = firstTransaction.customer?.email;
     const combinedTransactions = [firstTransaction];
     let isFound = false;
     const rightArr = [];
@@ -53,7 +53,7 @@ export default abstract class CombineRule {
         const iterColor = CommonProcessor.getColorFromTheDescription(
           transaction.order.description
         );
-        const iterEmail = transaction.customer.email;
+        const iterEmail = transaction.customer?.email;
         if (color === iterColor && email === iterEmail) {
           isAdded = true;
           if (isFound) {
