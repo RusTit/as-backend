@@ -493,13 +493,21 @@ export async function dbProcessor(): Promise<void> {
   }
 }
 
+let isRunning = false;
+
 const dbFlow = async () => {
+  if (isRunning) {
+    logger.info('Cron job is running, so no need to run another instance');
+    return;
+  }
   try {
+    isRunning = true;
     logger.info('Started');
     await dbProcessor();
   } catch (e) {
     logger.error(e);
   } finally {
+    isRunning = false;
     logger.info('Finished');
     logger.info(`Next invoke: ${job.nextDate().toISOString()}`);
   }
@@ -510,8 +518,8 @@ const schedule = env
   .default(config.Cron.Schedule)
   .asString();
 
-// const runOnInit = require.main === module;
-const runOnInit = false;
+const runOnInit = require.main === module;
+// const runOnInit = false;
 /**
  * timezone - https://momentjs.com/timezone/
  */
