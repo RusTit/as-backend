@@ -21,7 +21,7 @@
   "dependencies": {
     "@types/cron": "^1.7.2",
     "@types/flat": "^5.0.1",
-    "@types/node": "^14.14.10",
+    "@types/node": "^14.14.12",
     "anymatch": "^3.1.1",
     "authorizenet": "^1.0.7",
     "bottleneck": "^2.19.5",
@@ -43,17 +43,17 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^26.0.18",
     "@types/needle": "^2.5.1",
-    "@typescript-eslint/eslint-plugin": "^4.9.0",
-    "@typescript-eslint/parser": "^4.9.0",
-    "eslint": "^7.14.0",
+    "@typescript-eslint/eslint-plugin": "^4.9.1",
+    "@typescript-eslint/parser": "^4.9.1",
+    "eslint": "^7.15.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "husky": "^4.3.0",
+    "eslint-plugin-prettier": "^3.2.0",
+    "husky": "^4.3.5",
     "jest": "^26.6.3",
-    "lint-staged": "^10.5.2",
+    "lint-staged": "^10.5.3",
     "prettier": "^2.2.1",
     "ts-jest": "^26.4.4"
   },
