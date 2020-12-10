@@ -510,7 +510,8 @@ const schedule = env
   .default(config.Cron.Schedule)
   .asString();
 
-const runOnInit = require.main === module;
+// const runOnInit = require.main === module;
+const runOnInit = false;
 /**
  * timezone - https://momentjs.com/timezone/
  */
