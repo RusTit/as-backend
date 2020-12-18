@@ -14,8 +14,28 @@ export class AuthwebhookService {
     private readonly transactionsIssuesService: TransactionsIssuesService,
   ) {}
 
+  async shouldSkip(payload: WebhookDto): Promise<boolean> {
+    try {
+      const details = await this.authnetService.getTransactionsDetails(
+        payload.payload.id,
+      );
+      switch (details?.solution?.name) {
+        case 'Bigcommerce':
+          Logger.debug('Skipping BC transaction on AuthNet hook');
+          return true;
+      }
+    } catch (e) {
+      Logger.error(`Error on skipping check: ${e.message}`);
+    }
+    return false;
+  }
+
   async processWebhookPayload(payload: WebhookDto): Promise<void> {
     Logger.debug(payload);
+    if (await this.shouldSkip(payload)) {
+      Logger.debug(`Transaction should be skipped. ${payload.payload?.id}`);
+      return;
+    }
     switch (payload.eventType) {
       case 'net.authorize.payment.authcapture.created':
       case 'net.authorize.payment.capture.created':
