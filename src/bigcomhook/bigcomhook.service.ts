@@ -18,6 +18,7 @@ import { TransactionProcessedEntity } from '../transactions-processed/Transactio
 import { GroupingService } from '../grouping/grouping.service';
 import anymatch, { Matcher } from 'anymatch';
 import { GroupEntity } from '../grouping/Group.entity';
+import Bottleneck from 'bottleneck';
 
 // https://developer.bigcommerce.com/api-reference/orders/orders-api/order-status/getorderstatus
 export enum OrderStatus {
@@ -190,8 +191,13 @@ export function getColorFromName(name: string): string {
   return '';
 }
 
+const LIMITER_OPTIONS: Bottleneck.ConstructorOptions = {
+  maxConcurrent: 1,
+};
+
 @Injectable()
 export class BigcomhookService {
+  private readonly createOrderMutex: Bottleneck;
   constructor(
     @InjectRepository(TransactionIssuesEntity)
     private transactionIssuesEntity: Repository<TransactionIssuesEntity>,
@@ -200,7 +206,9 @@ export class BigcomhookService {
     @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
     @Inject('BigCommerceProxy') private bigCommerceProxy: BigCommerceProxy,
     private readonly groupingService: GroupingService,
-  ) {}
+  ) {
+    this.createOrderMutex = new Bottleneck(LIMITER_OPTIONS);
+  }
 
   getCustomerName(bigCommerceAddress: TODO_ANY): string {
     return `${bigCommerceAddress.first_name} ${bigCommerceAddress.last_name}`;
@@ -698,7 +706,9 @@ export class BigcomhookService {
         case OrderStatus.Incomplete:
         case OrderStatus.Pending:
         case OrderStatus.AwaitingPayment:
-          return this.createShipStationOrder(payload.data.id);
+          return this.createOrderMutex.schedule(async () =>
+            this.createShipStationOrder(payload.data.id),
+          );
       }
     }
     switch (new_status_id) {
