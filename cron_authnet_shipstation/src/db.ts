@@ -143,6 +143,9 @@ export async function moveIssuedTransaction(
 export async function removeDuplicates(
   records: TransactionCreatedEntity[]
 ): Promise<TransactionCreatedEntity[]> {
+  if (records.length === 0) {
+    return records;
+  }
   const con = await initDbConnection();
   const processedEntityRepository = con.getRepository(
     TransactionProcessedEntity
