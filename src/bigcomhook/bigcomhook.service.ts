@@ -584,6 +584,18 @@ export class BigcomhookService {
     });
   }
 
+  async isDuplicate(transactionId?: string): Promise<boolean> {
+    if (!transactionId) {
+      return true;
+    }
+    const row = await this.transactionProcessedEntity.findOne({
+      where: {
+        transactionId: transactionId,
+      },
+    });
+    return !!row;
+  }
+
   async createShipStationOrder(orderId: number): Promise<void> {
     let transactionId = '';
     try {
@@ -592,6 +604,12 @@ export class BigcomhookService {
         orderId.toString(),
       );
       transactionId = orderBigCommerce.payment_provider_id;
+      if (await this.isDuplicate(transactionId)) {
+        Logger.debug(
+          `This transaction was already processed (BC orderId: ${orderId}, transaction id: ${transactionId})`,
+        );
+        return;
+      }
       Logger.debug(`Processing transaction id: ${transactionId}`);
       if (!(await this.checkTheBigCommerceOrder(orderBigCommerce))) {
         Logger.warn(`Can't process this kind of transactions.`);
