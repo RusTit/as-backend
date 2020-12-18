@@ -1,8 +1,8 @@
-import { CronJob } from 'cron';
+// import { CronJob } from 'cron';
 import anymatch, { Matcher } from 'anymatch';
-import * as env from 'env-var';
+// import * as env from 'env-var';
 import moment from 'moment';
-import config from './config';
+// import config from './config';
 import Bottleneck from 'bottleneck';
 import Logger from './logger';
 import AuthNetProxy from './AuthNetProxy';
@@ -15,6 +15,7 @@ import {
   moveProcessedTransaction,
   getAllGroups,
   removeDuplicates,
+  initDbConnection,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor, {
@@ -33,9 +34,9 @@ import {
   AUTHNET_TRANSACTION_KEY,
   SHIPSTATION_API_KEY,
   SHIPSTATION_API_SECRET,
-  TIMEZONE,
+  // TIMEZONE,
 } from './env-vars';
-import { TaskCheckBGHook } from './TaskCheckBGHook';
+// import { TaskCheckBGHook } from './TaskCheckBGHook';
 import { AdvancedOptions } from './ShipStationTypes';
 import { GroupEntity } from './entities/Group.entity';
 import { Order } from './ShipStationTypes';
@@ -493,46 +494,49 @@ export async function dbProcessor(): Promise<void> {
   }
 }
 
-let isRunning = false;
-
 const dbFlow = async () => {
-  if (isRunning) {
-    logger.info('Cron job is running, so no need to run another instance');
-    return;
-  }
   try {
-    isRunning = true;
+    logger.info('Init connection');
+    await initDbConnection();
     logger.info('Started');
     await dbProcessor();
   } catch (e) {
     logger.error(e);
   } finally {
-    isRunning = false;
     logger.info('Finished');
-    logger.info(`Next invoke: ${job.nextDate().toISOString()}`);
+    // logger.info(`Next invoke: ${job.nextDate().toISOString()}`);
   }
 };
 
-const schedule = env
-  .get('CRON_SCHEDULE')
-  .default(config.Cron.Schedule)
-  .asString();
+// const schedule = env
+//   .get('CRON_SCHEDULE')
+//   .default(config.Cron.Schedule)
+//   .asString();
 
-const runOnInit = require.main === module;
+// const runOnInit = require.main === module;
 // const runOnInit = false;
 /**
  * timezone - https://momentjs.com/timezone/
  */
-const job = new CronJob(
-  schedule,
-  dbFlow,
-  null,
-  false,
-  TIMEZONE,
-  null,
-  runOnInit
-);
-const jobs = [job, TaskCheckBGHook];
-if (require.main === module) {
-  jobs.forEach(j => j.start());
-}
+// const job = new CronJob(
+//   schedule,
+//   dbFlow,
+//   null,
+//   false,
+//   TIMEZONE,
+//   null,
+//   runOnInit
+// );
+// const jobs = [job, TaskCheckBGHook];
+// if (require.main === module) {
+//   jobs.forEach(j => j.start());
+// }
+
+dbFlow()
+  .catch(e => {
+    logger.error(e.message);
+  })
+  .finally(() => {
+    logger.debug('Closing connection.');
+    return initDbConnection().then(c => c.close());
+  });
