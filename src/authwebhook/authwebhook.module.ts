@@ -5,6 +5,7 @@ import { TransactionsCreatedModule } from '../transactions-created/transactions-
 import { AuthnetModule } from '../authnet/authnet.module';
 import { BigcomhookModule } from '../bigcomhook/bigcomhook.module';
 import { TransactionsIssuesModule } from '../transactions-issues/transactions-issues.module';
+import { HookmutextModule } from '../hookmutext/hookmutext.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TransactionsIssuesModule } from '../transactions-issues/transactions-is
     AuthnetModule,
     BigcomhookModule,
     TransactionsIssuesModule,
+    HookmutextModule,
   ],
   controllers: [AuthwebhookController],
   providers: [AuthwebhookService],

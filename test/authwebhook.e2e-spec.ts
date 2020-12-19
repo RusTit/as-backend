@@ -36,7 +36,30 @@ describe('Authwebhook (e2e)', () => {
         avsResponse: 'Y',
         authAmount: 45.0,
         entityName: 'transaction',
-        id: random.number({ min: 1000000, max: 9999999 }).toString(),
+        id: '62734251801',
+      },
+    };
+    return request(app.getHttpServer())
+      .post('/authwebhook')
+      .send(payload)
+      .expect(200)
+      .expect({ status: 'WebHook was successfully processed' });
+  });
+  it('/authwebhook (refunded) (POST)', () => {
+    const payload: WebhookDto = {
+      notificationId: 'a144d641-5d1c-4f34-862e-ed5bcc4de74d',
+      eventType: 'net.authorize.payment.refund.created',
+      eventDate: new Date().toJSON(),
+      webhookId: random.uuid(),
+      payload: {
+        responseCode: 1,
+        avsResponse: 'P',
+        authAmount: 100,
+        invoiceNumber: '43244',
+        entityName: 'transaction',
+        id: '62734251801',
+        merchantReferenceId: '1',
+        authCode: '1',
       },
     };
     return request(app.getHttpServer())

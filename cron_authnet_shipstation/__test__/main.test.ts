@@ -106,7 +106,14 @@ describe('main tests', () => {
     expect(zeroOrderArr.orderTrans.length).toBe(0);
   });
   it('test combined all processors', async () => {
-    const ids = ['62617734792'];
+    const ids = ['62724381556'];
+    /*
+    62718140883
+62715938055
+210551-62717918115(Settled), 62724381556(Refunded)
+     */
+    // 62679901961
+    // 62680745390
     // const ids = ['62608492676'];
     // const ids = ['42178860037', '42178860070'];
     const authNetProxy = createAuthNetProxy();
@@ -150,7 +157,7 @@ describe('main tests', () => {
     expect(orderTransTotal.length).toBe(1);
   });
   it('test invalid combined issue', async () => {
-    const ids = ['62580861183'];
+    const ids = ['62652465210'];
     const authNetProxy = createAuthNetProxy();
     const shipStationProxy = createShipStationProxy();
     await init(shipStationProxy);

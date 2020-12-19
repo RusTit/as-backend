@@ -18,6 +18,7 @@ import { ProductsModule } from './products/products.module';
 import { BigcomhookModule } from './bigcomhook/bigcomhook.module';
 import { SystemHealthModule } from './system-health/system-health.module';
 import { GroupingModule } from './grouping/grouping.module';
+import { HookmutextModule } from './hookmutext/hookmutext.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { GroupingModule } from './grouping/grouping.module';
     BigcomhookModule,
     SystemHealthModule,
     GroupingModule,
+    HookmutextModule,
   ],
   controllers: [AppController],
   providers: [

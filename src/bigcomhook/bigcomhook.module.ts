@@ -7,6 +7,7 @@ import { TransactionIssuesEntity } from '../transactions-issues/TransactionIssue
 import { ShipStationProxy } from './ShipStationProxy';
 import BigCommerceProxy from './BigCommerceProxy';
 import { GroupingModule } from '../grouping/grouping.module';
+import { HookmutextModule } from '../hookmutext/hookmutext.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { GroupingModule } from '../grouping/grouping.module';
       TransactionIssuesEntity,
     ]),
     GroupingModule,
+    HookmutextModule,
   ],
   providers: [
     BigcomhookService,
