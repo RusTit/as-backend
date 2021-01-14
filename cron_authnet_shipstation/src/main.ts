@@ -475,6 +475,7 @@ export async function dbProcessor(): Promise<void> {
   const records = await getDbTransactionsCreated();
   const uniqueRecords = await removeDuplicates(records);
   const ids = convertRecordsIntoArrayOfTransactionsIds(uniqueRecords);
+  logger.debug(`Ids: ${JSON.stringify(ids)}`);
   let transactionDetails = await Promise.all(
     ids.map(createFetcherDetails(authNetProxy))
   );
