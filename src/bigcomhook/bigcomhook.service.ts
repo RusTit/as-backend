@@ -588,7 +588,7 @@ export class BigcomhookService {
 
   async isDuplicate(transactionId?: string): Promise<boolean> {
     if (!transactionId) {
-      return true;
+      return false;
     }
     const row = await this.transactionProcessedEntity.findOne({
       where: {
