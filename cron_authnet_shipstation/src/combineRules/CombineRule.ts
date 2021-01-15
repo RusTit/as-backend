@@ -3,12 +3,35 @@ import LoggerFactory from '../logger';
 import CommonProcessor from '../processors/CommonProcessor';
 import { TODO_ANY } from '../Helper';
 
+export const MAX_DIFF_BETWEEN_INVOICES = 1;
+
 export default abstract class CombineRule {
   protected readonly logger: Logger;
   protected DESCRIPTION_TO_MATCH?: string[];
 
   protected constructor(logCategory: string) {
     this.logger = LoggerFactory(logCategory);
+  }
+
+  compareTransactionInvoices(transactionA: any, transactionB: any): boolean {
+    const invoiceA = transactionA.order?.invoiceNumber;
+    const invoiceB = transactionB.order?.invoiceNumber;
+    if (!invoiceA || !invoiceB) {
+      return false;
+    }
+    const invoiceValueA = Number.parseInt(invoiceA, 10);
+    const invoiceValueB = Number.parseInt(invoiceB, 10);
+    if (!Number.isFinite(invoiceValueA) || !Number.isFinite(invoiceValueB)) {
+      return false;
+    }
+    const diff = invoiceValueA - invoiceValueB;
+    if (Math.abs(diff) <= MAX_DIFF_BETWEEN_INVOICES) {
+      return true;
+    }
+    this.logger.warn(
+      `Possible collision: ${invoiceValueA} ${invoiceValueB} (${transactionA.transId} ${transactionB.transId})`
+    );
+    return false;
   }
 
   private matchToDescription(description: string): boolean {
@@ -54,8 +77,12 @@ export default abstract class CombineRule {
           transaction.order.description
         );
         const iterEmail = transaction.customer?.email;
-        if (color === iterColor && email === iterEmail) {
-          const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}`;
+        if (
+          color === iterColor &&
+          email === iterEmail &&
+          this.compareTransactionInvoices(firstTransaction, transaction)
+        ) {
+          const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}, invoices: ${firstTransaction.order?.invoiceNumber}-${transaction.order?.invoiceNumber}`;
           this.logger.debug(message);
           isAdded = true;
           if (isFound) {
