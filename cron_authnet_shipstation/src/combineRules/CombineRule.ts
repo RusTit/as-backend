@@ -55,9 +55,8 @@ export default abstract class CombineRule {
         );
         const iterEmail = transaction.customer?.email;
         if (color === iterColor && email === iterEmail) {
-          this.logger.log(
-            `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}`
-          );
+          const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}`;
+          this.logger.debug(message);
           isAdded = true;
           if (isFound) {
             this.logger.warn('Found duplicate color and email.');
