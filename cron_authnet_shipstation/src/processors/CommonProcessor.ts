@@ -218,7 +218,12 @@ export default class CommonProcessor extends Processor {
   }
 
   static getCustomerUsername(transactionDetails: TODO_ANY): string {
-    return `${transactionDetails.billTo.firstName} ${transactionDetails.billTo.lastName}`;
+    const firstName: string | undefined = transactionDetails.billTo.firstName;
+    let lastName: string | undefined = transactionDetails.billTo.lastName;
+    if (lastName) {
+      lastName = lastName.replace(/[0-9]/g, '');
+    }
+    return `${firstName} ${lastName}`;
   }
 
   getSubMatchTag(color: string): ProductTag | undefined {
