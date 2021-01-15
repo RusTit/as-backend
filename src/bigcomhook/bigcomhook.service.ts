@@ -389,33 +389,30 @@ export class BigcomhookService {
     productsBigCommerce: any[],
   ): Promise<any[]> {
     const result = [];
-    const sameOrder = [];
     await Promise.all(
       productsBigCommerce.map(async (item) => {
         const productDetails = await this.bigCommerceProxy.getProductDetails(
           item.product_id,
         );
         const categories: number[] = productDetails.data.categories;
-        const shouldSkip =
-          categories.find((cat) =>
-            WHITE_LIST_CATEGORIES_NOT_SPLIT.includes(cat),
-          ) !== undefined;
         item._meta = {
           is_extra_part: categories.includes(EXTRA_PARTS_CATEGORY),
         };
-        if (shouldSkip) {
-          sameOrder.push(item);
-        } else {
-          const quantity = item.quantity;
-          item.quantity = 1;
-          for (let i = 0; i < quantity; ++i) {
-            result.push(item);
-          }
-        }
       }),
     );
-    if (sameOrder.length) {
-      result.push(sameOrder);
+    const itemExtraPart = productsBigCommerce.find(
+      (item) => item._meta.is_extra_part,
+    );
+    if (itemExtraPart) {
+      result.push([...productsBigCommerce]);
+    } else {
+      productsBigCommerce.forEach((item) => {
+        const quantity = item.quantity;
+        item.quantity = 1;
+        for (let i = 0; i < quantity; ++i) {
+          result.push(item);
+        }
+      });
     }
     return result;
   }
