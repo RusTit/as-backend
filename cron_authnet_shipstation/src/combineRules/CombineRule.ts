@@ -3,7 +3,7 @@ import LoggerFactory from '../logger';
 import CommonProcessor from '../processors/CommonProcessor';
 import { TODO_ANY } from '../Helper';
 
-export const MAX_DIFF_BETWEEN_INVOICES = 1;
+export const MAX_DIFF_BETWEEN_INVOICES = 3;
 
 export default abstract class CombineRule {
   protected readonly logger: Logger;
@@ -24,12 +24,12 @@ export default abstract class CombineRule {
     if (!Number.isFinite(invoiceValueA) || !Number.isFinite(invoiceValueB)) {
       return false;
     }
-    const diff = invoiceValueA - invoiceValueB;
-    if (Math.abs(diff) <= MAX_DIFF_BETWEEN_INVOICES) {
+    const diff = Math.abs(invoiceValueA - invoiceValueB);
+    if (diff <= MAX_DIFF_BETWEEN_INVOICES) {
       return true;
     }
     this.logger.warn(
-      `Possible collision: ${invoiceValueA} ${invoiceValueB} (${transactionA.transId} ${transactionB.transId})`
+      `Possible collision (diff: ${diff}): ${invoiceValueA} ${invoiceValueB} (${transactionA.transId} ${transactionB.transId})`
     );
     return false;
   }
