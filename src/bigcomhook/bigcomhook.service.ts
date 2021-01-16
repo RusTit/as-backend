@@ -659,6 +659,45 @@ export class BigcomhookService {
     }
   }
 
+  async handleCompletedOrder(orderNumber: number): Promise<void> {
+    Logger.debug(`Processing completed orderNumber BC: ${orderNumber}`);
+    try {
+      const orderBigCommerce = await this.getBigCommerceOrder(
+        orderNumber.toString(),
+      );
+      if (orderBigCommerce.status_id !== OrderStatus.Completed) {
+        Logger.warn(
+          `Invalid status id for this handle: ${orderBigCommerce.status_id}`,
+        );
+        return;
+      }
+      const orders = await this.shipStationProxy.getListOrders({
+        orderNumber: `${orderNumber}`,
+        pageSize: `500`, // to avoid paging issues
+      });
+      const ordersToShip = orders.filter(
+        (order) => order.orderStatus === 'awaiting_shipment',
+      );
+      Logger.debug(`Found ${orders.length} orders for ${orderNumber}`);
+      if (ordersToShip.length === 0) {
+        Logger.debug('No orders that need to change status.');
+        return;
+      }
+      await this.shipStationProxy.init();
+      await Promise.all(
+        ordersToShip.map(async (order) => {
+          const { orderId } = order;
+          Logger.debug(`Updating ${orderId} (${orderNumber})`);
+          order.orderStatus = 'shipped';
+          await this.shipStationProxy.createOrUpdateOrder(order);
+        }),
+      );
+    } catch (e) {
+      const issue = e as Error;
+      Logger.error(`${issue.message}, ${issue.stack}`);
+    }
+  }
+
   async deleteShipStationOrder(orderNumber: number): Promise<void> {
     Logger.debug(`Processing refund/voided orderNumber BG: ${orderNumber}`);
     try {
@@ -707,6 +746,8 @@ export class BigcomhookService {
         return this.deleteShipStationOrder(payload.data.id);
       case OrderStatus.PartiallyRefunded:
         return this.processPartialRefunded(payload.data.id);
+      case OrderStatus.Completed:
+        return this.handleCompletedOrder(payload.data.id);
     }
     Logger.debug(
       `Skipping: prev: ${payload.data.status.previous_status_id}, new: ${payload.data.status.new_status_id}`,
