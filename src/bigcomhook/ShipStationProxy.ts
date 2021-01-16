@@ -135,12 +135,7 @@ export class ShipStationProxy {
     }
   }
 
-  async getListOrders(params: ListOrdersQuery): Promise<Order[]> {
-    const url = `${SHIPSTATION_DOMAIN}/orders`;
-    const query = Object.entries(params)
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&');
-    const full_url = `${url}${query ? `?${query}` : query}`;
+  async getListOrdersRaw(full_url: string): Promise<Order[]> {
     Logger.debug(full_url);
     const response = await this.limiter.schedule(() =>
       needle('get', full_url, null, this.needleOptions),
@@ -156,6 +151,15 @@ export class ShipStationProxy {
         } with response: ${JSON.stringify(response.body)}`,
       );
     }
+  }
+
+  async getListOrders(params: ListOrdersQuery): Promise<Order[]> {
+    const url = `${SHIPSTATION_DOMAIN}/orders`;
+    const query = Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+    const full_url = `${url}${query ? `?${query}` : query}`;
+    return this.getListOrdersRaw(full_url);
   }
 
   async deleteOrder(orderId: string | number): Promise<boolean> {
