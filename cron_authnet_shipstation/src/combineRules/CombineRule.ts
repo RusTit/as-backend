@@ -34,7 +34,10 @@ export default abstract class CombineRule {
     return false;
   }
 
-  private matchToDescription(description: string): boolean {
+  private matchToDescription(description?: string): boolean {
+    if (!description) {
+      return false;
+    }
     if (!this.DESCRIPTION_TO_MATCH) {
       throw new Error('Descriptions array is not set in the child');
     }
@@ -61,6 +64,7 @@ export default abstract class CombineRule {
     const combinedTransactions = [firstTransaction];
     let isFound = false;
     const rightArr = [];
+    let possibleTransactionMatch: TODO_ANY | null = null;
     for (let i = position + 1; i < transactions.length; ++i) {
       const transaction = transactions[i];
       if (Array.isArray(transaction)) {
@@ -69,32 +73,43 @@ export default abstract class CombineRule {
       }
       const description: string | undefined = transaction.order.description;
       let isAdded = false;
-      if (
-        typeof description === 'string' &&
-        this.matchToDescription(description)
-      ) {
+      if (this.matchToDescription(description)) {
         const iterColor = CommonProcessor.getColorFromTheDescription(
           transaction.order.description
         );
         const iterEmail = transaction.customer?.email;
-        if (
-          color === iterColor &&
-          email === iterEmail &&
-          this.compareTransactionInvoices(firstTransaction, transaction)
-        ) {
-          const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}, invoices: ${firstTransaction.order?.invoiceNumber}-${transaction.order?.invoiceNumber}`;
-          this.logger.debug(message);
-          isAdded = true;
-          if (isFound) {
-            this.logger.warn('Found duplicate color and email.');
+        if (color === iterColor && email === iterEmail) {
+          if (this.compareTransactionInvoices(firstTransaction, transaction)) {
+            const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}, invoices: ${firstTransaction.order?.invoiceNumber}-${transaction.order?.invoiceNumber}`;
+            this.logger.debug(message);
+            isAdded = true;
+            if (isFound) {
+              this.logger.warn('Found duplicate color and email.');
+            } else {
+              isFound = true;
+              combinedTransactions.push(transaction);
+            }
           } else {
-            isFound = true;
-            combinedTransactions.push(transaction);
+            if (!possibleTransactionMatch) {
+              // assuming that transaction ids list is sorted, so first possible match should be more suitable.
+              possibleTransactionMatch = transaction;
+            }
           }
         }
       }
       if (!isAdded) {
         rightArr.push(transaction);
+      }
+    }
+    if (possibleTransactionMatch && combinedTransactions.length < 2) {
+      const index = rightArr.findIndex(
+        item => item === possibleTransactionMatch
+      );
+      if (index !== -1) {
+        rightArr.splice(index, 1);
+        combinedTransactions.push(possibleTransactionMatch);
+        const message = `Found weak pair: ${combinedTransactions[0].transId} and ${combinedTransactions[1].transId}. color: ${color}, email: ${email}, invoices: ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber}`;
+        this.logger.debug(message);
       }
     }
     const result =
