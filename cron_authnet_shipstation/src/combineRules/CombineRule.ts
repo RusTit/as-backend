@@ -3,8 +3,6 @@ import LoggerFactory from '../logger';
 import CommonProcessor from '../processors/CommonProcessor';
 import { TODO_ANY } from '../Helper';
 
-export const MAX_DIFF_BETWEEN_INVOICES = 3;
-
 export default abstract class CombineRule {
   protected readonly logger: Logger;
   protected DESCRIPTION_TO_MATCH?: string[];
@@ -13,25 +11,21 @@ export default abstract class CombineRule {
     this.logger = LoggerFactory(logCategory);
   }
 
-  compareTransactionInvoices(transactionA: any, transactionB: any): boolean {
+  compareTransactionInvoices(
+    transactionA: TODO_ANY,
+    transactionB: TODO_ANY
+  ): number | null {
     const invoiceA = transactionA.order?.invoiceNumber;
     const invoiceB = transactionB.order?.invoiceNumber;
     if (!invoiceA || !invoiceB) {
-      return false;
+      return null;
     }
     const invoiceValueA = Number.parseInt(invoiceA, 10);
     const invoiceValueB = Number.parseInt(invoiceB, 10);
     if (!Number.isFinite(invoiceValueA) || !Number.isFinite(invoiceValueB)) {
-      return false;
+      return null;
     }
-    const diff = Math.abs(invoiceValueA - invoiceValueB);
-    if (diff <= MAX_DIFF_BETWEEN_INVOICES) {
-      return true;
-    }
-    this.logger.warn(
-      `Possible collision (diff: ${diff}): ${invoiceValueA} ${invoiceValueB} (${transactionA.transId} ${transactionB.transId})`
-    );
-    return false;
+    return Math.abs(invoiceValueA - invoiceValueB);
   }
 
   private matchToDescription(description?: string): boolean {
@@ -62,54 +56,58 @@ export default abstract class CombineRule {
     );
     const email = firstTransaction.customer?.email;
     const combinedTransactions = [firstTransaction];
-    let isFound = false;
     const rightArr = [];
     let possibleTransactionMatch: TODO_ANY | null = null;
+    let diffForMatch: number | null = null;
     for (let i = position + 1; i < transactions.length; ++i) {
       const transaction = transactions[i];
+      rightArr.push(transaction);
       if (Array.isArray(transaction)) {
-        rightArr.push(transaction);
         continue;
       }
       const description: string | undefined = transaction.order.description;
-      let isAdded = false;
       if (this.matchToDescription(description)) {
         const iterColor = CommonProcessor.getColorFromTheDescription(
           transaction.order.description
         );
         const iterEmail = transaction.customer?.email;
         if (color === iterColor && email === iterEmail) {
-          if (this.compareTransactionInvoices(firstTransaction, transaction)) {
-            const message = `Found pair: ${transaction.transId} and ${firstTransaction.transId}. color: ${color}, email: ${email}, invoices: ${firstTransaction.order?.invoiceNumber}-${transaction.order?.invoiceNumber}`;
-            this.logger.debug(message);
-            isAdded = true;
-            if (isFound) {
-              this.logger.warn('Found duplicate color and email.');
-            } else {
-              isFound = true;
-              combinedTransactions.push(transaction);
-            }
-          } else {
-            if (!possibleTransactionMatch) {
-              // assuming that transaction ids list is sorted, so first possible match should be more suitable.
+          if (possibleTransactionMatch === null) {
+            possibleTransactionMatch = transaction;
+          }
+          const diff = this.compareTransactionInvoices(
+            firstTransaction,
+            transaction
+          );
+          if (diffForMatch === null && diff !== null) {
+            possibleTransactionMatch = transaction;
+            diffForMatch = diff;
+            continue;
+          }
+          if (diffForMatch !== null && diff !== null) {
+            if (diff < diffForMatch) {
               possibleTransactionMatch = transaction;
+              diffForMatch = diff;
+            } else {
+              this.logger.warn(
+                `Possible collision (diff: ${diff}, ${diffForMatch}): ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber} (${firstTransaction.transId} ${transaction.transId})`
+              );
             }
           }
         }
       }
-      if (!isAdded) {
-        rightArr.push(transaction);
-      }
     }
-    if (possibleTransactionMatch && combinedTransactions.length < 2) {
+    if (possibleTransactionMatch) {
       const index = rightArr.findIndex(
         item => item === possibleTransactionMatch
       );
       if (index !== -1) {
         rightArr.splice(index, 1);
         combinedTransactions.push(possibleTransactionMatch);
-        const message = `Found weak pair: ${combinedTransactions[0].transId} and ${combinedTransactions[1].transId}. color: ${color}, email: ${email}, invoices: ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber}`;
+        const message = `Found pair: ${combinedTransactions[0].transId} and ${combinedTransactions[1].transId}. color: ${color}, email: ${email}, invoices: ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber}`;
         this.logger.debug(message);
+      } else {
+        this.logger.error('Error: index cannot be -1');
       }
     }
     const result =
