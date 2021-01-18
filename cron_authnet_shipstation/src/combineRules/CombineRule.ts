@@ -57,7 +57,7 @@ export default abstract class CombineRule {
     const email = firstTransaction.customer?.email;
     const combinedTransactions = [firstTransaction];
     const rightArr = [];
-    let possibleTransactionMatch: TODO_ANY | null = null;
+    let transactionMatch: TODO_ANY | null = null;
     let diffForMatch: number | null = null;
     for (let i = position + 1; i < transactions.length; ++i) {
       const transaction = transactions[i];
@@ -72,21 +72,21 @@ export default abstract class CombineRule {
         );
         const iterEmail = transaction.customer?.email;
         if (color === iterColor && email === iterEmail) {
-          if (possibleTransactionMatch === null) {
-            possibleTransactionMatch = transaction;
+          if (transactionMatch === null) {
+            transactionMatch = transaction;
           }
           const diff = this.compareTransactionInvoices(
             firstTransaction,
             transaction
           );
           if (diffForMatch === null && diff !== null) {
-            possibleTransactionMatch = transaction;
+            transactionMatch = transaction;
             diffForMatch = diff;
             continue;
           }
           if (diffForMatch !== null && diff !== null) {
             if (diff < diffForMatch) {
-              possibleTransactionMatch = transaction;
+              transactionMatch = transaction;
               diffForMatch = diff;
             } else {
               this.logger.warn(
@@ -97,14 +97,13 @@ export default abstract class CombineRule {
         }
       }
     }
-    if (possibleTransactionMatch) {
-      const index = rightArr.findIndex(
-        item => item === possibleTransactionMatch
-      );
+    if (transactionMatch) {
+      const index = rightArr.findIndex(item => item === transactionMatch);
       if (index !== -1) {
         rightArr.splice(index, 1);
-        combinedTransactions.push(possibleTransactionMatch);
-        const message = `Found pair: ${combinedTransactions[0].transId} and ${combinedTransactions[1].transId}. color: ${color}, email: ${email}, invoices: ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber}`;
+        combinedTransactions.push(transactionMatch);
+        const [tranA, tranB] = combinedTransactions;
+        const message = `Found pair: ${tranA.transId} and ${tranB.transId}. color: ${color}, email: ${email}, invoices: ${tranA.order?.invoiceNumber}-${tranB.order?.invoiceNumber}`;
         this.logger.debug(message);
       } else {
         this.logger.error('Error: index cannot be -1');
