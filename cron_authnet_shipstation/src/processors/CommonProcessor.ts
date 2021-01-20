@@ -416,5 +416,10 @@ export function extraCase(order: Order): Order {
   if (isReconWatch) {
     order.advancedOptions.customField1 = 'Recon Smart Watch';
   }
+  const isMilsub =
+    order.items.find(item => item.sku === 'MILSUB') !== undefined;
+  if (isMilsub) {
+    order.advancedOptions.customField1 = 'MILSUB';
+  }
   return order;
 }
