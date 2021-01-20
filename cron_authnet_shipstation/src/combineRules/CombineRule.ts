@@ -90,7 +90,7 @@ export default abstract class CombineRule {
               diffForMatch = diff;
             } else {
               this.logger.warn(
-                `Possible collision (diff: ${diff}, ${diffForMatch}): ${combinedTransactions[0].order?.invoiceNumber}-${combinedTransactions[1].order?.invoiceNumber} (${firstTransaction.transId} ${transaction.transId})`
+                `Possible collision (diff: ${diff}, ${diffForMatch}): ${firstTransaction.order?.invoiceNumber}-${transaction.order?.invoiceNumber} (${firstTransaction.transId} ${transaction.transId})`
               );
             }
           }
