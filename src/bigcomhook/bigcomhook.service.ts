@@ -325,8 +325,8 @@ export class BigcomhookService {
     let totalWeight = 0;
     productsBigCommerce.forEach((product) => {
       const weight = Number.parseFloat(product.weight);
-      if (Number.isFinite(weight)) {
-        totalWeight += weight;
+      if (Number.isFinite(weight) && Number.isFinite(product.quantity)) {
+        totalWeight += weight * product.quantity;
       }
     });
     return {
