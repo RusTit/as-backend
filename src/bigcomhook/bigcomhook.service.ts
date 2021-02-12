@@ -390,6 +390,7 @@ export class BigcomhookService {
     productsBigCommerce: any[],
   ): Promise<any[]> {
     const result = [];
+    const miscShipping = [];
     await Promise.all(
       productsBigCommerce.map(async (item) => {
         const productDetails = await this.bigCommerceProxy.getProductDetails(
@@ -401,19 +402,23 @@ export class BigcomhookService {
         };
       }),
     );
-    const itemExtraPart = productsBigCommerce.find(
-      (item) => item._meta.is_extra_part,
-    );
-    if (itemExtraPart) {
-      result.push([...productsBigCommerce]);
-    } else {
-      productsBigCommerce.forEach((item) => {
+    productsBigCommerce.forEach((item) => {
+      if (item._meta.is_extra_part) {
+        miscShipping.push(item);
+      } else {
         const quantity = item.quantity;
         item.quantity = 1;
         for (let i = 0; i < quantity; ++i) {
           result.push(item);
         }
-      });
+      }
+    });
+    if (miscShipping.length) {
+      if (miscShipping.length === 1) {
+        result.push(miscShipping[0]);
+      } else {
+        result.push(miscShipping);
+      }
     }
     return result;
   }
