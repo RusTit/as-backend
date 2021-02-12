@@ -322,17 +322,18 @@ export class BigcomhookService {
   }
 
   getWeight(productsBigCommerce: Array<TODO_ANY>): Weight | undefined {
-    const firstWithWeight = productsBigCommerce.find(
-      (product) => product.weight,
-    );
-    if (firstWithWeight) {
-      const value = parseFloat(firstWithWeight.weight);
-      return {
-        units: 'pounds',
-        value,
-        WeightUnits: value,
-      } as Weight;
-    }
+    let totalWeight = 0;
+    productsBigCommerce.forEach((product) => {
+      const weight = Number.parseFloat(product.weight);
+      if (Number.isFinite(weight)) {
+        totalWeight += weight;
+      }
+    });
+    return {
+      units: 'pounds',
+      value: totalWeight,
+      WeightUnits: totalWeight,
+    } as Weight;
   }
 
   getSubMatchTag(
