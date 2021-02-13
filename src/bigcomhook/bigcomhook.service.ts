@@ -72,6 +72,7 @@ export function extraCase(order: Order, productsArr: any[]): Order {
     productsArr.find((product) => product._meta.is_extra_part) !== undefined;
   if (isExtraParts) {
     order.advancedOptions.customField1 = 'Misc Shipping';
+    order.serviceCode = 'USPS';
     return order;
   }
   const isSealionDiveWatch =
@@ -472,6 +473,7 @@ export class BigcomhookService {
         orderStatus: 'awaiting_shipment',
         paymentMethod: orderBigCommerce.payment_method,
         shipTo: shipping_address,
+        serviceCode: 'UPS',
         tagIds: this.getTagsIds(tagsList, products),
         amountPaid,
         taxAmount,
