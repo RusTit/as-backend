@@ -36,6 +36,7 @@ function setFieldsFromThePayload(
   ) as DimensionUnits;
   dbEntity.width = validationFloat(productEditDto.width);
   dbEntity.weightUnits = validationString(productEditDto.weightUnits) as Units;
+  dbEntity.insuranceValue = validationFloat(productEditDto.insuranceValue);
 }
 
 @Injectable()
