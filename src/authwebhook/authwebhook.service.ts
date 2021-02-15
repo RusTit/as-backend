@@ -4,6 +4,7 @@ import { TransactionsCreatedService } from '../transactions-created/transactions
 import { AuthnetService } from '../authnet/authnet.service';
 import { ShipStationProxy } from '../bigcomhook/ShipStationProxy';
 import { TransactionsIssuesService } from '../transactions-issues/transactions-issues.service';
+import BigCommerceProxy from '../bigcomhook/BigCommerceProxy';
 
 @Injectable()
 export class AuthwebhookService {
@@ -11,6 +12,7 @@ export class AuthwebhookService {
     private transactionsCreatedService: TransactionsCreatedService,
     private authnetService: AuthnetService,
     @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
+    @Inject('BigCommerceProxy') private bigCommerceProxy: BigCommerceProxy,
     private readonly transactionsIssuesService: TransactionsIssuesService,
   ) {}
 
@@ -53,8 +55,44 @@ export class AuthwebhookService {
       `Processing refund/voided transactions: ${payload.payload.id}`,
     );
     try {
-      const orderNumber = payload.payload.invoiceNumber;
       await this.shipStationProxy.init();
+      const transactionId = payload.payload.id;
+      const orderNumber = payload.payload.invoiceNumber;
+      const transactionDetails = await this.authnetService.getTransactionsDetails(
+        transactionId,
+      );
+      const { refTransId } = transactionDetails;
+      if (refTransId) {
+        const mainTransactionDetails = await this.authnetService.getTransactionsDetails(
+          refTransId,
+        );
+        const { settleAmount: originSettleAmount } = transactionDetails;
+        const { settleAmount: mainSettleAmount } = mainTransactionDetails;
+        if (
+          Number.isFinite(originSettleAmount) &&
+          Number.isFinite(mainSettleAmount) &&
+          originSettleAmount !== mainSettleAmount
+        ) {
+          Logger.debug(
+            `Transaction ${transactionId} is partial refunded (main ${refTransId}, ${originSettleAmount}, ${mainSettleAmount})`,
+          );
+          const amountPaid = mainSettleAmount;
+          const refundedAmount = originSettleAmount - mainSettleAmount;
+          const orders = await this.shipStationProxy.getListOrders({
+            orderNumber: `${orderNumber}`,
+            pageSize: `500`, // to avoid paging issues
+          });
+          await Promise.all(
+            orders.map(async (order) => {
+              order.amountPaid = amountPaid;
+              order.customerNotes = `Refunded ($${refundedAmount})`;
+              return this.shipStationProxy.createOrUpdateOrder(order);
+            }),
+          );
+          return;
+        }
+      }
+
       const orders = await this.shipStationProxy.getListOrders({
         orderNumber: `${orderNumber}`,
         pageSize: `500`, // to avoid paging issues

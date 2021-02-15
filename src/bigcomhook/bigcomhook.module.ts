@@ -51,6 +51,6 @@ import { HookmutextModule } from '../hookmutext/hookmutext.module';
     },
   ],
   controllers: [BigcomhookController],
-  exports: ['ShipStationProxy'],
+  exports: ['ShipStationProxy', 'BigCommerceProxy'],
 })
 export class BigcomhookModule {}
