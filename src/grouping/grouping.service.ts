@@ -4,6 +4,16 @@ import { GroupEntity } from './Group.entity';
 import { Repository } from 'typeorm';
 import { GroupNewDto, GroupingEditDto } from './dtos';
 
+function validationFloat(value: any): number | null {
+  if (typeof value == 'string' && value.trim().length) {
+    const floatResult = parseFloat(value.trim());
+    if (Number.isNaN(floatResult)) {
+      return null;
+    }
+    return floatResult;
+  }
+  return null;
+}
 function setFieldsFromThePayload(
   groupNewDto: GroupNewDto,
   dbRow: GroupEntity,
@@ -13,6 +23,7 @@ function setFieldsFromThePayload(
   dbRow.productSkuGlob = groupNewDto.productSkuGlob;
   dbRow.customName = groupNewDto.customName;
   dbRow.fieldName = groupNewDto.fieldName;
+  dbRow.insuranceValue = validationFloat(groupNewDto.insuranceValue);
   return dbRow;
 }
 @Injectable()

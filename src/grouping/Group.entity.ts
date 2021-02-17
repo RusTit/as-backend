@@ -36,6 +36,12 @@ export class GroupEntity {
   })
   fieldName?: string;
 
+  @Column({
+    type: 'float',
+    nullable: true,
+  })
+  insuranceValue: number;
+
   @CreateDateColumn({
     type: 'timestamp with time zone',
     name: 'created_at',

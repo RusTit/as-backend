@@ -68,4 +68,27 @@ describe('Authwebhook (e2e)', () => {
       .expect(200)
       .expect({ status: 'WebHook was successfully processed' });
   });
+  it('/authwebhook (partial refunded) (POST)', () => {
+    const payload: WebhookDto = {
+      notificationId: '67fd00ec-e843-41ce-a92d-435d30c2611e',
+      eventType: 'net.authorize.payment.refund.created',
+      eventDate: new Date().toJSON(),
+      webhookId: random.uuid(),
+      payload: {
+        responseCode: 1,
+        avsResponse: 'P',
+        authAmount: 50,
+        invoiceNumber: '227284',
+        entityName: 'transaction',
+        id: '62842178487',
+        authCode: '2',
+        merchantReferenceId: '2',
+      },
+    };
+    return request(app.getHttpServer())
+      .post('/authwebhook')
+      .send(payload)
+      .expect(200)
+      .expect({ status: 'WebHook was successfully processed' });
+  });
 });

@@ -39,6 +39,11 @@ export class GroupNewDto {
     required: false,
   })
   fieldName?: string;
+
+  @ApiProperty({
+    required: false,
+  })
+  insuranceValue: number | null;
 }
 
 export class GroupingEditDto extends GroupNewDto {}

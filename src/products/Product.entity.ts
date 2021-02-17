@@ -65,12 +65,6 @@ export class ProductEntity {
   })
   weightUnits: Units;
 
-  @Column({
-    type: 'float',
-    nullable: true,
-  })
-  insuranceValue: number;
-
   @CreateDateColumn({
     type: 'timestamp with time zone',
     name: 'created_at',

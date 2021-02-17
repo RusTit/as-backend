@@ -42,6 +42,12 @@
     </select>
     <small id="fieldNameHelp" class="form-text text-muted">Please select advanced options field name.</small>
   </div>
+  <div class="form-group">
+    <label for="inputInsuranceValue">Group insurance</label>
+    <input type="number" class="form-control" id="inputInsuranceValue" aria-describedby="groupInsuranceHelp"
+           placeholder="Group insurance" name="insuranceValue" value="{{group.insuranceValue}}">
+    <small id="groupInsuranceHelp" class="form-text text-muted">Please enter group insurance.</small>
+  </div>
   <button type="submit" class="btn btn-primary">Update Group</button>
 </form>
 </div>

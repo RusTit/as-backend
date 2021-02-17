@@ -57,11 +57,6 @@ export class ProductNewDto {
     enum: ['pounds', 'ounces', 'grams'],
   })
   weightUnits: Units | null;
-
-  @ApiProperty({
-    required: false,
-  })
-  insuranceValue: number | null;
 }
 
 export class ProductEditDto extends ProductNewDto {}
