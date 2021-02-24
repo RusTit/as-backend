@@ -61,37 +61,8 @@ export class AuthwebhookService {
       const transactionDetails = await this.authnetService.getTransactionsDetails(
         transactionId,
       );
-      const { refTransId } = transactionDetails;
-      if (refTransId) {
-        const mainTransactionDetails = await this.authnetService.getTransactionsDetails(
-          refTransId,
-        );
-        const { settleAmount: originSettleAmount } = transactionDetails;
-        const { settleAmount: mainSettleAmount } = mainTransactionDetails;
-        if (
-          Number.isFinite(originSettleAmount) &&
-          Number.isFinite(mainSettleAmount) &&
-          originSettleAmount !== mainSettleAmount
-        ) {
-          Logger.debug(
-            `Transaction ${transactionId} is partial refunded (main ${refTransId}, ${originSettleAmount}, ${mainSettleAmount})`,
-          );
-          const amountPaid = mainSettleAmount;
-          const refundedAmount = originSettleAmount - mainSettleAmount;
-          const orders = await this.shipStationProxy.getListOrders({
-            orderNumber: `${orderNumber}`,
-            pageSize: `500`, // to avoid paging issues
-          });
-          await Promise.all(
-            orders.map(async (order) => {
-              order.amountPaid = amountPaid;
-              order.customerNotes = `Refunded ($${refundedAmount})`;
-              return this.shipStationProxy.createOrUpdateOrder(order);
-            }),
-          );
-          return;
-        }
-      }
+
+      const { settleAmount: originSettleAmount } = transactionDetails;
 
       const orders = await this.shipStationProxy.getListOrders({
         orderNumber: `${orderNumber}`,
@@ -101,8 +72,20 @@ export class AuthwebhookService {
       await Promise.all(
         orders.map(async (order) => {
           const { orderId } = order;
-          Logger.debug(`Deleting ${orderId} (${orderNumber})`);
-          await this.shipStationProxy.deleteOrder(orderId);
+          if (
+            Number.isFinite(originSettleAmount) &&
+            order.amountPaid !== originSettleAmount
+          ) {
+            order.amountPaid -= originSettleAmount;
+            order.customerNotes = `Refunded ($${originSettleAmount})`;
+            Logger.debug(
+              `Partial refunded ${orderId} (${orderNumber}) transactionId: ${transactionId}`,
+            );
+            await this.shipStationProxy.createOrUpdateOrder(order);
+          } else {
+            Logger.debug(`Deleting ${orderId} (${orderNumber})`);
+            await this.shipStationProxy.deleteOrder(orderId);
+          }
         }),
       );
     } catch (e) {
