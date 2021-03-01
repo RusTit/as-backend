@@ -226,6 +226,7 @@ const lockTypes = new Map<string, string>();
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
 
+lockTypes.set('1791 Flag (Premium Edition)', 'BIO');
 lockTypes.set('1791 Flag Big', 'BIO');
 lockTypes.set('1791 Flag', 'BT'); // 62679901961
 
@@ -533,11 +534,13 @@ const dbFlow = async () => {
 //   jobs.forEach(j => j.start());
 // }
 
-dbFlow()
-  .catch(e => {
-    logger.error(e.message);
-  })
-  .finally(() => {
-    logger.debug('Closing connection.');
-    return initDbConnection().then(c => c.close());
-  });
+if (require.main === module) {
+  dbFlow()
+    .catch(e => {
+      logger.error(e.message);
+    })
+    .finally(() => {
+      logger.debug('Closing connection.');
+      return initDbConnection().then(c => c.close());
+    });
+}

@@ -100,6 +100,7 @@ const lockTypes = new Map<string, string>();
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
 
+lockTypes.set('1791 Flag (Premium Edition)', 'BIO');
 lockTypes.set('1791 Flag Big', 'BIO');
 lockTypes.set('1791 Flag', 'BT'); // 62679901961
 
@@ -592,6 +593,7 @@ export class BigcomhookService {
   }
 
   async isDuplicate(transactionId?: string): Promise<boolean> {
+    // return false;
     if (!transactionId) {
       return false;
     }
