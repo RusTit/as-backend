@@ -728,8 +728,9 @@ export class BigcomhookService {
       await Promise.all(
         orders.map(async (order) => {
           const { orderId } = order;
-          Logger.debug(`Deleting ${orderId} (${orderNumber})`);
-          await this.shipStationProxy.deleteOrder(orderId);
+          order.orderStatus = 'cancelled';
+          Logger.debug(`Marking cancelled ${orderId} (${orderNumber})`);
+          await this.shipStationProxy.createOrUpdateOrder(order);
         }),
       );
     } catch (e) {
