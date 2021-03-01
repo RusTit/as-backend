@@ -5,6 +5,9 @@ import { AuthnetService } from '../authnet/authnet.service';
 import { ShipStationProxy } from '../bigcomhook/ShipStationProxy';
 import { TransactionsIssuesService } from '../transactions-issues/transactions-issues.service';
 import BigCommerceProxy from '../bigcomhook/BigCommerceProxy';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthwebhookService {
@@ -14,6 +17,8 @@ export class AuthwebhookService {
     @Inject('ShipStationProxy') private shipStationProxy: ShipStationProxy,
     @Inject('BigCommerceProxy') private bigCommerceProxy: BigCommerceProxy,
     private readonly transactionsIssuesService: TransactionsIssuesService,
+    @InjectRepository(TransactionProcessedEntity)
+    private transactionProcessedEntity: Repository<TransactionProcessedEntity>,
   ) {}
 
   async shouldSkip(payload: WebhookDto): Promise<boolean> {
@@ -57,10 +62,23 @@ export class AuthwebhookService {
     try {
       await this.shipStationProxy.init();
       const transactionId = payload.payload.id;
-      const orderNumber = payload.payload.invoiceNumber;
+      let orderNumber = null;
       const transactionDetails = await this.authnetService.getTransactionsDetails(
         transactionId,
       );
+
+      const mainTransactionId = transactionDetails.refTransId;
+
+      const rowOrderProcessed = await this.transactionProcessedEntity.findOne({
+        where: {
+          transactionId: mainTransactionId,
+        },
+      });
+      if (rowOrderProcessed) {
+        orderNumber = rowOrderProcessed.orderObject.orderNumber;
+      } else {
+        orderNumber = payload.payload.invoiceNumber;
+      }
 
       const { settleAmount: originSettleAmount } = transactionDetails;
 

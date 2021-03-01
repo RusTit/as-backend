@@ -6,6 +6,8 @@ import { AuthnetModule } from '../authnet/authnet.module';
 import { BigcomhookModule } from '../bigcomhook/bigcomhook.module';
 import { TransactionsIssuesModule } from '../transactions-issues/transactions-issues.module';
 import { HookmutextModule } from '../hookmutext/hookmutext.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TransactionProcessedEntity } from '../transactions-processed/TransactionProcessed.entity';
 
 @Module({
   imports: [
@@ -14,6 +16,7 @@ import { HookmutextModule } from '../hookmutext/hookmutext.module';
     BigcomhookModule,
     TransactionsIssuesModule,
     HookmutextModule,
+    TypeOrmModule.forFeature([TransactionProcessedEntity]),
   ],
   controllers: [AuthwebhookController],
   providers: [AuthwebhookService],
