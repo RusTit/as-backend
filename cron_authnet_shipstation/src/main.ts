@@ -423,6 +423,13 @@ export async function postProcessOrders(
           default:
             lockType = getLockTypeFromName(firstItem.name as string);
         }
+        if (color) {
+          order.items.forEach(item => {
+            if (item.sku) {
+              item.sku = `${item.sku}-${color}`;
+            }
+          });
+        }
         const value = [name, `${size} ${color}`.trim(), lockType.trim()]
           .filter(s => s)
           .join(' - ');
