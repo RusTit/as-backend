@@ -71,3 +71,11 @@ export class ProductDto extends ProductNewDto {
   @ApiProperty()
   updatedAt: Date;
 }
+
+export class ColorSKUDto {
+  @ApiProperty()
+  colorName: string;
+
+  @ApiProperty()
+  colorSKU: string;
+}

@@ -17,6 +17,7 @@ import {
   ProductDto,
   ProductNewDto,
   ProductEditDto,
+  ColorSKUDto,
 } from './dtos';
 import { OperationResultDto } from '../dtos';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
@@ -91,5 +92,18 @@ export class ProductsController {
     return {
       message: 'Product was successfully delete.',
     };
+  }
+
+  @Post(':id/colorSKU')
+  async createNewColorSKU(
+    @Param('id') id: number,
+    @Body() colorSKUDto: ColorSKUDto,
+  ) {
+    return this.productsService.createNewColorSKU(id, colorSKUDto);
+  }
+
+  @Delete('colorSKU/:id')
+  async deleteColorSKU(@Param('id') id: number) {
+    return this.productsService.deleteColorSKU(id);
   }
 }

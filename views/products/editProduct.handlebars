@@ -4,20 +4,28 @@
   {{> header }}
   <title>New product</title>
   <script>
-    function addNewColorSKU(id) {
+    function addNewColorSKU(productId) {
       const colorName = document.getElementById('newColorName').value;
       const colorSKU = document.getElementById('newColorSKU').value;
       const data = {
         colorName,
         colorSKU,
       }
-      fetch(`/products/${id}/colorSKU`, {
+      fetch(`/products/${productId}/colorSKU`, {
         method: 'post',
         credentials: 'same-origin',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(data),
+      }).then(response => {
+        console.log(response.json());
+        location.reload(true);
+      });
+    }
+    function deleteColorSKU(colorSKUId) {
+      fetch(`/products/colorSKU/${colorSKUId}`, {
+        method: 'delete'
       }).then(response => {
         console.log(response.json());
         location.reload(true);
@@ -100,7 +108,9 @@
       <td>{{this.id}}</td>
       <td>{{this.colorName}}</td>
       <td>{{this.colorSKU}}</td>
-      <td></td>
+      <td>
+        <a href="#" class="btn btn-danger" role="button" onclick="deleteColorSKU({{{this.id}}})">Del</a>
+      </td>
     </tr>
     {{/each}}
     <tr>
@@ -114,7 +124,7 @@
         <input type="text" id="newColorSKU" name="newColorSKU">
       </td>
       <td>
-        <a href="#" class="btn" role="button" onclick="addNewColorSKU({{{this.id}}})">Del</a>
+        <a href="#" class="btn btn-primary" role="button" onclick="addNewColorSKU({{{product.id}}})">Add</a>
       </td>
     </tr>
     </thead>

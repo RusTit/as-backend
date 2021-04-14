@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DimensionUnits, ProductEntity, Units } from './Product.entity';
-import { ProductEditDto, ProductNewDto } from './dtos';
+import { ColorSKUDto, ProductEditDto, ProductNewDto } from './dtos';
+import { ApiProperty } from '@nestjs/swagger';
+import { ProductColorSKUEntity } from '../entities/ProductColorSKU.entity';
 
 function validationString(value: any): string | null {
   if (typeof value == 'string' && value.trim().length) {
@@ -43,6 +45,8 @@ export class ProductsService {
   constructor(
     @InjectRepository(ProductEntity)
     private readonly productEntityRepository: Repository<ProductEntity>,
+    @InjectRepository(ProductColorSKUEntity)
+    private readonly productColorSKUEntityRepository: Repository<ProductColorSKUEntity>,
   ) {}
 
   async findById(id: number): Promise<ProductEntity> {
@@ -88,5 +92,27 @@ export class ProductsService {
     }
     await this.productEntityRepository.remove(dbEntity);
     return true;
+  }
+
+  async createNewColorSKU(id: number, data: ColorSKUDto): Promise<void> {
+    const product = await this.productEntityRepository.findOne(id);
+    if (!product) {
+      throw new Error(`Product with id: ${id} not found`);
+    }
+    const newColorSKU = new ProductColorSKUEntity();
+    newColorSKU.colorName = data.colorName;
+    newColorSKU.colorSKU = data.colorSKU;
+    newColorSKU.productEntity = product;
+    await this.productColorSKUEntityRepository.save(newColorSKU);
+  }
+
+  async deleteColorSKU(id: number): Promise<void> {
+    const existingEntity = await this.productColorSKUEntityRepository.findOne(
+      id,
+    );
+    if (!existingEntity) {
+      throw new Error(`ColorSKU with this ID is not found: ${id}`);
+    }
+    await this.productColorSKUEntityRepository.remove(existingEntity);
   }
 }
