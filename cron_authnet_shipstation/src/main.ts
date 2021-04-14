@@ -16,6 +16,7 @@ import {
   getAllGroups,
   removeDuplicates,
   initDbConnection,
+  getColor,
 } from './db';
 import Processor, { OrderTransactionPair } from './processors/Processor';
 import CommonProcessor, {
@@ -355,7 +356,7 @@ export async function postProcessOrders(
   orderDataPairs: OrderTransactionPair[]
 ): Promise<OrderTransactionPair[]> {
   const sortedGroups = await getSortedGroups();
-  return orderDataPairs.map(pair => {
+  const resultPromises = orderDataPairs.map(async pair => {
     const { order } = pair;
     if (!order.items || order.items.length === 0) {
       return pair;
@@ -424,11 +425,17 @@ export async function postProcessOrders(
             lockType = getLockTypeFromName(firstItem.name as string);
         }
         if (color) {
-          order.items.forEach(item => {
+          const promises = order.items.map(async item => {
             if (item.sku) {
-              item.sku = `${item.sku}-${color}`;
+              let itemColor = color.toUpperCase();
+              const colorSKU = await getColor(item.sku, color);
+              if (colorSKU) {
+                itemColor = colorSKU;
+              }
+              item.sku = `${item.sku}${itemColor}`;
             }
           });
+          await Promise.all(promises);
         }
         const value = [name, `${size} ${color}`.trim(), lockType.trim()]
           .filter(s => s)
@@ -450,6 +457,7 @@ export async function postProcessOrders(
     }
     return pair;
   });
+  return Promise.all(resultPromises);
 }
 
 export async function orderPairProcessor(

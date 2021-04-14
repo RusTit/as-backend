@@ -69,10 +69,10 @@ export class ProductEntity {
 
   @OneToMany(
     () => ProductColorSKUEntity,
-    (productColorSku) => productColorSku.productEntity,
+    productColorSku => productColorSku.productEntity,
     {
       cascade: ['insert', 'update', 'remove', 'recover', 'soft-remove'],
-    },
+    }
   )
   colorSKUEntities!: ProductColorSKUEntity[];
 

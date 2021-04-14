@@ -199,3 +199,24 @@ export async function getAllGroups(): Promise<GroupEntity[]> {
   const repository = con.getRepository(GroupEntity);
   return repository.find();
 }
+
+export async function getColor(
+  sku: string,
+  colorName: string
+): Promise<string | undefined> {
+  const con = await initDbConnection();
+  const repository = con.getRepository(ProductEntity);
+  const product = await repository.findOne({
+    where: {
+      sku,
+    },
+    relations: ['colorSKUEntities'],
+  });
+  if (product) {
+    const dbRow = product.colorSKUEntities.find(c => c.colorName === colorName);
+    if (dbRow) {
+      return dbRow.colorSKU;
+    }
+  }
+  return undefined;
+}
