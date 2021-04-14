@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  OneToMany,
 } from 'typeorm';
+import { ProductColorSKUEntity } from './ProductColorSKU.entity';
 
 export type DimensionUnits = 'inches' | 'centimeters';
 
@@ -64,6 +66,15 @@ export class ProductEntity {
     nullable: true,
   })
   weightUnits!: Units;
+
+  @OneToMany(
+    () => ProductColorSKUEntity,
+    (productColorSku) => productColorSku.productEntity,
+    {
+      cascade: ['insert', 'update', 'remove', 'recover', 'soft-remove'],
+    },
+  )
+  colorSKUEntities!: ProductColorSKUEntity[];
 
   @CreateDateColumn({
     type: 'timestamp with time zone',
