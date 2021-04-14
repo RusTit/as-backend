@@ -46,7 +46,9 @@ export class ProductsService {
   ) {}
 
   async findById(id: number): Promise<ProductEntity> {
-    return this.productEntityRepository.findOne(id);
+    return this.productEntityRepository.findOne(id, {
+      relations: ['colorSKUEntities'],
+    });
   }
 
   async findAll(skip = 0, take = 100): Promise<ProductEntity[]> {
