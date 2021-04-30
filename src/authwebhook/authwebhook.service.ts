@@ -99,11 +99,15 @@ export class AuthwebhookService {
             Logger.debug(
               `Partial refunded ${orderId} (${orderNumber}) transactionId: ${transactionId}`,
             );
-            await this.shipStationProxy.createOrUpdateOrder(order);
           } else {
+            order.orderStatus = 'cancelled';
+            Logger.debug(`Marking cancelled ${orderId} (${orderNumber})`);
+            /*
             Logger.debug(`Deleting ${orderId} (${orderNumber})`);
             await this.shipStationProxy.deleteOrder(orderId);
+            */
           }
+          await this.shipStationProxy.createOrUpdateOrder(order);
         }),
       );
     } catch (e) {
