@@ -278,6 +278,8 @@ lockTypes.set('Endtable', 'BT');
 lockTypes.set('Freedom Rifle', 'RFID');
 lockTypes.set('Rack', 'BT');
 
+lockTypes.set('The Guardian MAX', 'BIO');
+
 export function getLockTypeFromName(name: string): string {
   for (const [key, value] of lockTypes) {
     if (name.includes(key)) {
