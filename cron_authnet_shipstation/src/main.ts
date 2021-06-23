@@ -224,6 +224,8 @@ export function getSizeFromName(value: string, group?: GroupEntity): string {
 
 const lockTypes = new Map<string, string>();
 
+lockTypes.set('Family Secret Tactical Trap', 'BT');
+
 lockTypes.set('BT', 'BT');
 lockTypes.set('BIO', 'BIO');
 
