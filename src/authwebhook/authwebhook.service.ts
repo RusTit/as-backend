@@ -92,7 +92,8 @@ export class AuthwebhookService {
           const { orderId } = order;
           if (
             Number.isFinite(originSettleAmount) &&
-            order.amountPaid !== originSettleAmount
+            order.amountPaid !== originSettleAmount &&
+            order.amountPaid - originSettleAmount > 0
           ) {
             order.amountPaid -= originSettleAmount;
             order.customerNotes = `Refunded ($${originSettleAmount})`;
